@@ -1,0 +1,1 @@
+@include('frontend.includes.nav_cont')
