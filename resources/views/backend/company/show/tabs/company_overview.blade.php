@@ -191,7 +191,7 @@
                 <td>@include('backend.auth.user.includes.confirm', ['user' => $user])</td>
             </tr>
        --}}
-             @if(isset($company_details->timezone) && !empty($company_details->timezone))
+             <!-- @if(isset($company_details->timezone) && !empty($company_details->timezone))
             <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.timezone')</th>
                 <td>{{ $company_details->timezone }}</td>
@@ -201,8 +201,8 @@
                 <th>@lang('labels.backend.access.users.tabs.content.overview.timezone')</th>
                 <td>-</td>
             </tr>
-            @endif
-            {{--<tr>
+            @endif -->
+            <!-- {{--<tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.last_login_at')</th>
                 <td>
                    @if($company_details->last_login_at)
@@ -212,11 +212,11 @@
                     @endif
                 </td>
             </tr>
-              --}}
-            <tr>
+              --}} -->
+            <!-- <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.last_login_ip')</th>
                 <td>{{ $company_details->last_login_ip ?? 'N/A' }}</td>
-            </tr>
+            </tr> -->
             <?php }?>
 
             @if(isset($company_details->facebook_url) && !empty($company_details->facebook_url))

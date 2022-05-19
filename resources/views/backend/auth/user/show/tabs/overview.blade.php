@@ -157,7 +157,7 @@
                 <td>@include('backend.auth.user.includes.confirm', ['user' => $user])</td>
             </tr>
 
-            @if(isset($user->timezone) && !empty($user->timezone))
+            <!-- @if(isset($user->timezone) && !empty($user->timezone))
 
             <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.timezone')</th>
@@ -168,10 +168,10 @@
                 <th>@lang('labels.backend.access.users.tabs.content.overview.timezone')</th>
                 <td>-</td>
             </tr>
-            @endif
+            @endif -->
 
 
-            <tr>
+            <!-- <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.last_login_at')</th>
                 <td>
                    @if($user->last_login_at)
@@ -180,12 +180,12 @@
                         N/A
                     @endif
                 </td>
-            </tr>
+            </tr> -->
 
-            <tr>
+            <!-- <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.last_login_ip')</th>
                 <td>{{ $user->last_login_ip ?? 'N/A' }}</td>
-            </tr>
+            </tr> -->
             <?php }?>
 
             @if(isset($user_details->facebook_url) && !empty($user_details->facebook_url))
