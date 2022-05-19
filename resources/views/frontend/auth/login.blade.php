@@ -111,14 +111,17 @@
               <!-- <button class="btn login-btn" type="submit">iniciar sesión</button> -->
               <button class="btn login-btn" type="submit">@lang('labels.frontend.login.pay_in')</button>
 
-                @if(config('access.captcha.login'))
+                <!-- @if(config('access.captcha.login'))
                     <div class="row">
                         <div class="col">
                             @captcha
                             {{ html()->hidden('captcha_status', 'true') }}
-                        </div><!--col-->
-                    </div><!--row-->
-                @endif
+                        </div>
+                    </div>  
+                @endif -->
+
+                <!-- </div>col -->
+                <!-- </div>  row -->
 
               <p class="ins-sec">@lang('labels.frontend.login.dont_have_an_account'), <!-- <a href="{{ url('/') }}" class="reg-link"> -->
               <a href="#" class="reg-link" data-toggle="modal" data-target="#exampleModal">
@@ -171,8 +174,8 @@
 </div>
 @endsection
 
-@push('after-scripts')
+<!-- @push('after-scripts')
     @if(config('access.captcha.login'))
         @captchaScripts
     @endif
-@endpush
+@endpush -->
