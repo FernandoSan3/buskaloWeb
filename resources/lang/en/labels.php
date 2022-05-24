@@ -18,7 +18,8 @@ return [
         'no' => 'No',
         'copyright' => 'Copyright',
         'custom' => 'Custom',
-        'actions' => [
+        'actions' => 'Actions',
+        'actions1' => [
             'actions' => 'Actions',
             'show_profile' => 'Show Profile',
             'edit' => 'Edit',
