@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    @lang('Customer Paymant management')                    
+                    @lang('labels.backend.customerpaymant.management')                    
                 </h4>
             </div><!--col-->
 
@@ -32,12 +32,12 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> Customer Name </th>
-                            <th> Amount  </th>
-                            <th> Transaction Id </th>
-                            <th> Payment Status</th>
-                            <th> Created At</th>
+                            <th> @lang('labels.backend.customerpaymant.table.id') </th>
+                            <th> @lang('labels.backend.customerpaymant.table.customer_name') </th>
+                            <th> @lang('labels.backend.customerpaymant.table.amount') </th>
+                            <th> @lang('labels.backend.customerpaymant.table.transaction_id') </th>
+                            <th> @lang('labels.backend.customerpaymant.table.payment_status') </th>
+                            <th> @lang('labels.backend.customerpaymant.table.created_at') </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -49,9 +49,9 @@
                                     <td>{{ $paymetns->trans_id }}</td>
                                     <td>
                                         @if($paymetns->status=='success')
-                                        <button class="btn btn-success">Success</button>
+                                        <button class="btn btn-success"> @lang('labels.backend.customerpaymant.btn-success') </button>
                                         @else
-                                        <a onclick="return confirm('Are you sure want to change status?')" href="{{url('admin/customer/payment/update/'. $paymetns->id)}}"> <button class="btn btn-danger">Pending</button></a>
+                                        <a onclick="return confirm('Are you sure want to change status?')" href="{{url('admin/customer/payment/update/'. $paymetns->id)}}"> <button class="btn btn-danger"> @lang('labels.backend.customerpaymant.btn-danger') </button></a>
                                         @endif
                                     </td>
                                      <td>{{ $paymetns->created_at }}</td>

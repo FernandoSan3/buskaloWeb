@@ -367,6 +367,8 @@ return [
             'update' => 'Actualizar pago del cliente',
             'edit' => 'Editar pago del cliente',
             'management' => 'Administración de pagos de clientes',
+            'btn-success' => 'Éxito',
+            'btn-danger' => 'Pendiente',
 
             'table' => [
                 'id' => 'Id',

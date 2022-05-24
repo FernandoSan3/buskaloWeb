@@ -261,6 +261,8 @@ return [
             'update' => 'Update Customer Paymant',
             'edit' => 'Edit Create Customer Paymant',
             'management' => 'Customer Paymant Management',
+            'btn-success' => 'Success',
+            'btn-danger' => 'Pending',
 
             'table' => [
                 'id' => 'Id',
