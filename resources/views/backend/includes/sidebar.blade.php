@@ -89,7 +89,8 @@
                     <a class="nav-link nav-dropdown-toggle {{
                             active_class(Route::is('admin/aplicacions*'))
                         }}" href="#">
-                        <i class="nav-icon fas fa-list"></i> Aplicaciones
+                        <i class="nav-icon fas fa-list"></i> 
+                        @lang('labels.backend.other.applications')
                     </a>
 
                     <ul class="nav-dropdown-items">
@@ -97,7 +98,7 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/aplicacions'))
                         }}" href="{{ route('admin.aplicacions') }}">
-                              Nuevas
+                              @lang('labels.backend.other.new')
                             </a>
                         </li>
                     </ul>

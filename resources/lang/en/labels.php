@@ -18,7 +18,23 @@ return [
         'no' => 'No',
         'copyright' => 'Copyright',
         'custom' => 'Custom',
-        'actions' => 'Actions',
+        'actions' => [
+            'actions' => 'Actions',
+            'show_profile' => 'Show Profile',
+            'edit' => 'Edit',
+            'edit_payment_method' => 'Edit Payment Method',
+            'all_contractor_certificates' => 'All Certificates',
+            'all_contractor_images_gallery' => 'Image Gallery',
+            'all_contractor_videos_gallery' => 'Video Gallery',
+            'all_contractor_police_records' => 'All Police Records',
+            'show_services_offered' => 'Services',
+            'edit_coverage_area' => 'Edit Coverage Area',
+            'destroy' => 'Delete Contractor',
+            'destroyC' => 'Delete Company',
+            'serviceRequests' => 'Service Request',
+            'accept' => 'Accept',
+            'reject' => 'Reject',
+        ],
         'active' => 'Active',
         'deleted_users' => 'Deleted Users',
         'buttons' => [
@@ -38,6 +54,9 @@ return [
     'backend' => [
         'other' => [
             'other' => 'Others',
+            'new' => 'New',
+            'applications' => "Applications",
+            'applications_management' => 'Applications Management'
         ],
         'access' => [
             'roles' => [
