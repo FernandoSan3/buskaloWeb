@@ -70,7 +70,7 @@ return [
                     'no_deactivated' => 'لا يوجد أي مستخدمين معطلين',
                     'no_deleted' => 'لا يوحد أي مستخدمين محذوفين',
                     'roles' => 'الأدوار',
-                    'social' => 'Social',
+                    'social' => 'اجتماعي',
                     'total' => 'مجموع المستخدم|مجموع المستخدمين',
                 ],
 
@@ -91,6 +91,7 @@ return [
                             'last_login_ip' => 'Last Login IP',
                             'last_updated' => 'Last Updated',
                             'name' => 'Name',
+                            'ruc' => 'Ruc or ID',
                             'status' => 'Status',
                             'timezone' => 'Timezone',
                         ],

@@ -89,7 +89,7 @@ return [
                             'deleted_at' => 'Slettet den',
                             'email' => 'E-mail',
                             'last_login_at' => 'Last Login At',
-                            'last_login_ip' => 'Last Login IP',
+                            // 'last_login_ip' => 'Last Login IP',
                             'last_updated' => 'Sist Oppdatert',
                             'first_name' => 'Brukernavn',
                             'last_name' => 'Etternavn',

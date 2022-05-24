@@ -91,6 +91,7 @@ return [
                             'last_login_ip' => 'Last Login IP',
                             'last_updated' => 'Τελευταία ενημέρωση',
                             'name' => 'Όνομα',
+                            'ruc' => 'Ruc',
                             'status' => 'Status',
                             'timezone' => 'Timezone',
                         ],
