@@ -36,6 +36,9 @@ return [
     ],
 
     'backend' => [
+        'other' => [
+            'other' => 'Others',
+        ],
         'access' => [
             'roles' => [
                 'create' => 'Create Role',
@@ -106,6 +109,7 @@ return [
                             'last_updated' => 'Last Updated',
                             'timezone' => 'Timezone',
                             'name' => 'Name',
+                            'ruc' => 'RUC or ID',
                             'first_name' => 'First Name',
                             'last_name' => 'Last Name',
                             'status' => 'Status',
@@ -132,6 +136,7 @@ return [
         ],
 
          'about' => [
+            'about' => 'About Us',
             'create' => 'Create About',
             'update' => 'Update About',
             'edit' => 'Edit About',
@@ -171,6 +176,7 @@ return [
         ],
 
          'terms_and_condition' => [
+            'terms_and_condition' => 'Terms And Conditions',
             'create' => 'Create Terms And Condition',
             'update' => 'Update Terms And Condition',
             'edit' => 'Edit Terms And Condition',
@@ -190,6 +196,7 @@ return [
         ],
 
         'work_with_us' => [
+            'work_with_us' => 'Work With Us',
             'create' => 'Create Work With Us',
             'update' => 'Update Work With Us',
             'edit' => 'Edit Work With Us',
@@ -209,6 +216,7 @@ return [
         ],
 
         'category' => [
+            'category' => 'Categorys',
             'create' => 'Create Category',
             'update' => 'Update Category',
             'edit' => 'Edit Category',
@@ -229,6 +237,7 @@ return [
 
 
         'services' => [
+            'services' => 'Services',
             'create' => 'Create Service',
             'update' => 'Update Service',
             'edit' => 'Edit Service',
@@ -247,7 +256,32 @@ return [
             ],
         ],
 
+        'customerpaymant' => [
+            'create' => 'Create Customer Paymant',
+            'update' => 'Update Customer Paymant',
+            'edit' => 'Edit Create Customer Paymant',
+            'management' => 'Customer Paymant Management',
+
+            'table' => [
+                'id' => 'Id',
+                'sort' => 'Sort',
+                'en_name' => 'Name(En)',
+                'es_name' => 'Name(Es)',
+                'customer_name' => 'Custome Name',
+                'amount' => 'Amout',
+                'transaction_id' => 'Transaction Id',
+                'payment_status' => 'Payment Status',
+                'status' => 'Status',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+        ],
+
+
         'subservices' => [
+            'subservices' => 'Sub-Services',
             'create' => 'Create Subservice',
             'update' => 'Update Subservice',
             'edit' => 'Edit Subservice',
@@ -270,6 +304,7 @@ return [
         ],
 
         'childsubservices' => [
+            'childsubservices' => 'Child-Sub-Service',
             'create' => 'Create Childsubservice',
             'update' => 'Update Childsubservice',
             'edit' => 'Edit Childsubservice',
@@ -341,6 +376,7 @@ return [
 
 
         'questions' => [
+            'questions' => 'Questions',
             'create' => 'Create Question',
             'update' => 'Update Question',
             'edit' => 'Edit Question',
@@ -404,6 +440,7 @@ return [
          ],
 
         'cities' => [
+            'city' => 'Cities',
             'create' => 'Create City',
             'update' => 'Update City',
             'edit' => 'Edit City',
@@ -423,6 +460,7 @@ return [
         ],
 
         'provinces' => [
+            'provinces' => 'Provinces',
             'create' => 'Create Province',
             'update' => 'Update Province',
             'edit' => 'Edit Province',
@@ -600,8 +638,8 @@ return [
 
 
         'work' => [
+            'work' => 'How does it work',
             'create' => 'Create How does it work',
-
             'management' => 'How does it work',
 
            /* 'table' => [

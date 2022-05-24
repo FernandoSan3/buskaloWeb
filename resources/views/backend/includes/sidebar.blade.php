@@ -164,7 +164,7 @@
                     }}" href="{{ route('admin.category.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Category
+                        @lang('labels.backend.category.category')
                     </a>
                 </li>
 
@@ -173,8 +173,9 @@
                         active_class(Route::is('admin/services'))
                     }}" href="{{ route('admin.services.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
+                        
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Services
+                        @lang('labels.backend.services.services')
                     </a>
                 </li>
 
@@ -184,7 +185,7 @@
                     }}" href="{{ route('admin.subservices.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Sub-Services
+                        @lang('labels.backend.subservices.subservices')
                     </a>
                 </li>
 
@@ -194,7 +195,7 @@
                     }}" href="{{ route('admin.childsubservices.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Child-Sub-Services
+                        @lang('labels.backend.childsubservices.childsubservices')
                     </a>
                 </li>
 
@@ -204,7 +205,7 @@
                     }}" href="{{ route('admin.questions.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Questions
+                        @lang('labels.backend.questions.questions')
                     </a>
                 </li>
 
@@ -213,7 +214,7 @@
                         active_class(Route::is('admin/provinces'))
                     }}" href="{{ route('admin.provinces.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Provinces
+                        @lang('labels.backend.provinces.provinces')
                     </a>
                 </li>
 
@@ -223,7 +224,8 @@
                     }}" href="{{ route('admin.cities.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Cities
+                        <!-- Cities -->
+                        @lang('labels.backend.cities.city')
                     </a>
                 </li>
                 <li class="nav-item">
@@ -239,7 +241,7 @@
                     active_class(Route::is('admin/customer/payment'))
                 }}" href="{{ route('admin.customer.payment') }}">
                     <i class="nav-icon fas fa-tachometer-alt"></i>
-                   Customer Payment Management
+                    @lang('labels.backend.customerpaymant.management') 
                     </a>
                 </li>
 
@@ -361,7 +363,8 @@
                     <a class="nav-link nav-dropdown-toggle {{
                             active_class(Route::is('admin/company*'))
                         }}" href="#">
-                        <i class="nav-icon fas fa-list"></i> Other
+                        <i class="nav-icon fas fa-list"></i> 
+                        @lang('labels.backend.other.other')
                     </a>
 
                     <ul class="nav-dropdown-items">
@@ -369,7 +372,7 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/work'))
                         }}" href="{{ route('admin.work.index') }}">
-                              How Does It Work
+                              @lang('labels.backend.work.work')
                             </a>
                         </li>
 
@@ -377,7 +380,7 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/about_us'))
                         }}" href="{{ route('admin.about_us.index') }}">
-                              About Us
+                              @lang('labels.backend.about.about')
                             </a>
                         </li>
                        <!--  <li class="nav-item">
@@ -392,7 +395,8 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/terms_and_condition'))
                         }}" href="{{ route('admin.terms_and_condition.index') }}">
-                              Terms And Condition
+
+                              @lang('labels.backend.terms_and_condition.terms_and_condition') 
                             </a>
                         </li>
 
@@ -400,7 +404,7 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/work_with_us'))
                         }}" href="{{ route('admin.work_with_us.index') }}">
-                              Work With Us
+                              @lang('labels.backend.work_with_us.work_with_us') 
                             </a>
                         </li>
 
