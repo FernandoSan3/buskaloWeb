@@ -32,7 +32,30 @@
               <tr>
               <th>@lang('labels.backend.access.users.tabs.content.overview.name')</th><td>-</td>
             </tr>
-            @endif
+        @endif
+
+        @if(isset($company_details->ruc_no) && !empty($company_details->ruc_no) && ($company_details->identity_no) && !empty($company_details->identity_no))
+             <tr>
+                <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                <td>{{ $company_details->ruc_no }} - {{ $company_details->identity_no }}</td>
+            </tr>
+            @elseif(isset($company_details->ruc_no) && !empty($company_details->ruc_no))
+                <tr>
+                    <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                    <td>{{ $company_details->ruc_no }}</td>
+                </tr>
+            @elseif(isset($company_details->identity_no) && !empty($company_details->identity_no))
+                <tr>
+                    <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                    <td>{{ $company_details->identity_no }}</td>
+                </tr>
+            <tr>
+                <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                <td>-</td>
+            </tr>
+        @endif
+
+        
 
             @if(isset($company_details->year_of_constitution) && !empty($company_details->year_of_constitution))
              <tr>

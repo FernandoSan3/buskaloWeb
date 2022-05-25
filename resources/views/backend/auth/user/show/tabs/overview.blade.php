@@ -35,18 +35,28 @@
                 <td>-</td>
             </tr>
             @endif
-
-            @if(isset($user->ruc_no) && !empty($user->ruc_no))
+              
+            @if(isset($user->ruc_no) && !empty($user->ruc_no) && ($user->identity_no) && !empty($user->identity_no ))
              <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
-                <td>{{ $user->ruc_no }}</td>
+                <td>{{ $user->ruc_no }} - {{ $user->identity_no }}</td>
             </tr>
+            @elseif(isset($user->ruc_no) && !empty($user->ruc_no))
+                <tr>
+                    <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                    <td>{{ $user->ruc_no }}</td>
+                </tr>
+            @elseif(isset($user->identity_no) && !empty($user->identity_no))
+                <tr>
+                    <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
+                    <td>{{ $user->identity_no }}</td>
+                </tr>
             @else
             <tr>
                 <th>@lang('labels.backend.access.users.tabs.content.overview.ruc')</th>
                 <td>-</td>
             </tr>
-            @endif            
+            @endif
 
              @if(isset($user->mobile_number) && !empty($user->mobile_number))
 

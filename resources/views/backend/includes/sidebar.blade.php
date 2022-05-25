@@ -109,7 +109,7 @@
                     <a class="nav-link nav-dropdown-toggle {{
                             active_class(Route::is('admin/contractors*'))
                         }}" href="#">
-                        <i class="nav-icon fas fa-list"></i> Contractors
+                        <i class="nav-icon fas fa-list"></i> @lang('labels.backend.contractor.management')
                     </a>
 
                     <ul class="nav-dropdown-items">
@@ -117,14 +117,14 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/contractors'))
                         }}" href="{{ route('admin.contractors.index') }}">
-                              Contractors
+                              @lang('labels.backend.contractor.management')
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/contractors*'))
                         }}" href="{{ route('admin.contractors.create') }}">
-                                Create Contractor
+                                @lang('labels.backend.other.create_contractor')
                             </a>
                         </li>
                     </ul>
