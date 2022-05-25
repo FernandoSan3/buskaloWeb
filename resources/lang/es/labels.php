@@ -183,7 +183,8 @@ return [
             'other' => 'Otros',
             'applications' => "Aplicaciones",
             'new' => 'Nuevo',
-            'applications_management' => 'Administración de aplicaciones'
+            'applications_management' => 'Administración de aplicaciones',
+            'create_contractor' => 'Crear contratista',
         ],
         'access' => [
             'roles' => [
@@ -236,6 +237,8 @@ return [
                     'roles' => 'Roles',
                     'social' => 'Social',
                     'total' => 'usuario total | usuarios totales',
+                    'city' => 'Ciudad',
+                    'profession' => 'Profesión'
                 ],  
 
                 'tabs' => [

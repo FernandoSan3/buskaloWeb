@@ -57,7 +57,9 @@ return [
             'other' => 'Others',
             'new' => 'New',
             'applications' => "Applications",
-            'applications_management' => 'Applications Management'
+            'applications_management' => 'Applications Management',
+            'create_ontractor' => 'Create Contractor',
+
         ],
         'access' => [
             'roles' => [
@@ -109,6 +111,8 @@ return [
                     'roles' => 'Roles',
                     'social' => 'Social',
                     'total' => 'user total|users total',
+                    'city' => 'City',
+                    'profession' => 'Profession'
                 ],  
 
                 'tabs' => [

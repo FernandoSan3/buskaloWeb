@@ -34,6 +34,7 @@
                             <th> @lang('labels.backend.access.users.table.id') </th>
                             <th> @lang('labels.backend.access.users.table.username') </th>
                             <th> @lang('labels.backend.access.users.table.email') </th>
+                            <th> @lang('labels.backend.access.users.table.profession') </th>
                             <th> @lang('labels.backend.access.users.table.mobile') </th>
                             <th> @lang('labels.general.actions1.actions') </th>
                         </tr>
@@ -46,6 +47,7 @@
                                 <td>{{ $key+1 }}</td>
                                 <td>{{ $user->username }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>{{ $user->profile_title }}</td>
                                 <td>{{ $user->mobile_number }}</td>
 
                                 <td class="btn-td">
