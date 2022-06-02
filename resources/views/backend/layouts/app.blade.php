@@ -40,6 +40,8 @@
  
     <!-- 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <!-- recaptcha -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body class="app header-fixed sidebar-fixed aside-menu-off-canvas sidebar-lg-show">

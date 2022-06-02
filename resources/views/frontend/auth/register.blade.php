@@ -76,6 +76,7 @@
     </div>
 @endif
 
+ 
  <header>
       <div class="container">
         <nav class="navbar navbar-expand-lg">
@@ -232,20 +233,19 @@
                     @php $disabled = '' @endphp
                 @endif -->
 
-              
               <div class="input-group1">
                 <label class="col-sm-12 col-form-label">@lang('Recaptcha'):</label>
               </div>
               <div class="input-group1">
                 <div class="col-captcha-register">
-                  @if (config('access.captcha.contact'))
+                  <!-- @if (config('access.captcha.registration')) -->
                   <div class="form-group">
                     <div class="col-md-12">
                       <div class="g-recaptcha" data-sitekey="{{env('GOOGLE_RECAPTCHA_KEY')}}">
                       </div>
                     </div>
                   </div>
-                  @endif
+                  <!-- @endif -->
                 </div>
               </div>
 
@@ -312,6 +312,7 @@
         //     });
         // });
     </script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
   <script>
   $(".accpet_tc").on('click', function(){
    
@@ -321,7 +322,6 @@
       window.location.href = url;
   });
 </script>
-<script src='https://www.google.com/recaptcha/api.js'></script>
 @endsection
 <style type="text/css">
   .err_msg_a{
@@ -355,9 +355,3 @@
             return ret;
         }
     </script>
-
-@push('after-scripts')
-    @if(config('access.captcha.registration'))
-        @captchaScripts
-    @endif
-@endpush

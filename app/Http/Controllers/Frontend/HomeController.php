@@ -128,7 +128,7 @@ class HomeController extends Controller
         $request_data = $request->all();
         if(empty($request_data ))
         {
-            return redirect()->to('profesional/register');
+            // return redirect()->to('profesional/register');
         }
         $user_group_id =  Session::get('user_group_id');
         $user_group_id = isset($request->user_group_id) && !empty($request->user_group_id) ? $request->user_group_id : '' ;

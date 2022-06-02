@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Frontend\Auth;
 
 use App\Events\Frontend\Auth\UserRegistered;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterRequest;
+// use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\Frontend\Auth\RegisterRequest;
 use App\Repositories\Frontend\Auth\UserRepository;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -24,6 +25,9 @@ class RegisterController extends Controller
 {
     use RegistersUsers;
 
+
+
+
     /**
      * @var UserRepository
      */
@@ -40,14 +44,43 @@ class RegisterController extends Controller
     }
 
     /**
+     * Get a validator for an incoming registration request.
+     * @param array $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            // 'name' => ['required', 'string', 'max:255'],
+            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            // 'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'g-recaptcha-response' => function ($attribute, $value, $fail ){
+                $secret = config('services.recaptcha.secret');
+                $response = $value;
+                $userIp = $_SERVER['REMOTE_ADDR'];
+                $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$response&remoteip=$userIp";
+                $response = \file_get_contents($url);
+                $response = json_decode($response);
+                if(!$response->success) {
+                    Session::flash('g-recaptcha-response', 'Por favor, verifica el captcha.');
+                    Session::flash('alert-class ', 'alert-danger');
+                    $fail($attribute.'google Recaptcha Failed');
+                }
+    
+            },
+        ]);
+    }
+
+
+    /**
      * Where to redirect users after login.
      *
      * @return string
      */
-    public function redirectPath()
-    {
-        return route(home_route());
-    }
+    // public function redirectPath()
+    // {
+    //     return route(home_route());
+    // }
 
     /**
      * Show the application registration form.
@@ -61,6 +94,7 @@ class RegisterController extends Controller
         abort_unless(config('access.registration'), 404);
 
         return view('frontend.auth.register', compact('request_data', 'user_group_id'));
+        
     }
 
     public function otpVerify(Request $request,$userid)
@@ -95,7 +129,7 @@ class RegisterController extends Controller
 
             auth()->loginUsingId($userid,true);
 
-            return redirect($this->redirectPath())->withFlashSuccess(__('alerts.frontend.auth.register.profile_created_successfully')); 
+            return redirect($this->route(home_route()))->withFlashSuccess(__('alerts.frontend.auth.register.profile_created_successfully')); 
         }
         else
         {

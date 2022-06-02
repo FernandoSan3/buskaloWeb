@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Requests;
+// namespace App\Http\Requests;
+namespace App\Http\Requests\Frontend\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -36,23 +37,23 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', Rule::unique('users')],
             'password' => 'required|min:8|confirmed',
            // 'password' => PasswordRules::register($this->email),
-            'g-recaptcha-response' => ['required_if:captcha_status,true', 'captcha'],
-            //'g-recaptcha-response' => ['required'],
+            // 'g-recaptcha-response' => ['required_if:captcha_status,true', 'captcha'],
+            'g-recaptcha-response' => ['required'],
         ];
     }
 
     /**
      * @return array
      */
-             public function messages()
-             {
-                 return [
-                    'g-recaptcha-response.required_if' => __('validation.required', ['attribute' => 'captcha']),
-                    'mobile_number.unique' => __('validation.unique', ['attribute' => 'número de teléfono']),
-                    //'unique' => 'El campo :attribute ya está en uso.',
-                   // 'unique' => 'El campo número de teléfono ya esa en uso',
-                   // 'mobile_number.required' => 'El campo número de teléfono ya esa en uso',
-                   // 'password'=>trans('hrll')
-                 ];
-             }
+    public function messages()
+    {
+        return [
+        'g-recaptcha-response.required_if' => __('validation.required', ['attribute' => 'captcha']),
+        'mobile_number.unique' => __('validation.unique', ['attribute' => 'número de teléfono']),
+        //'unique' => 'El campo :attribute ya está en uso.',
+        // 'unique' => 'El campo número de teléfono ya esa en uso',
+        // 'mobile_number.required' => 'El campo número de teléfono ya esa en uso',
+        // 'password'=>trans('hrll')
+        ];
+    }
 }
