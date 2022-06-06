@@ -217,7 +217,7 @@
                                   {{ html()->text('ruc_no',isset($getUser->ruc_no)?$getUser->ruc_no:'')
                                 ->placeholder(__('labels.frontend.company.redirect_company.ruc_o_rise'))
                                 ->id('rucNo')
-                                ->maxlength(13)
+                                ->attribute('maxlength', 13)
                                 ->required() }}
                                   <!-- <input type="text" name="ruc_no" placeholder="@lang('labels.frontend.company.redirect_company.ruc_o_rise')" class="" required="" id="rucNo" maxlength="13">
                                   -->
@@ -226,8 +226,9 @@
 
                                  <li><h6>@lang('labels.frontend.company.redirect_company.year_of_incorporation')*</h6>
                                    {{ html()->text('year_of_constitution',isset($getUser->year_of_constitution)?$getUser->year_of_constitution:'')
-                                     ->placeholder(__('labels.frontend.company.redirect_company.year_of_incorporation'))
+                                    ->placeholder(__('labels.frontend.company.redirect_company.year_of_incorporation'))
                                     ->id('constYear')
+                                    ->attribute('maxlength', 4)
                                     ->required() }}
                                   <!-- <input type="text" name="year_of_constitution" id="constYear" placeholder="@lang('labels.frontend.company.redirect_company.year_of_incorporation')" class="">
                                    -->
@@ -240,28 +241,34 @@
                                     ->required()}} 
                                 <!-- <input type="text" placeholder="@lang('labels.frontend.company.profile.username')" id="username" name="username" class="" required> -->
                                 </li>
-                                   <li><h6>@lang('labels.frontend.company.profile.campo_profesion')</h6>
+                                   <li><h6>@lang('labels.frontend.company.profile.campo_profesion')*</h6>
                                   {{ html()->text('profile_title',isset($getUser->profile_title)?$getUser->profile_title:'')
-                                     ->placeholder(__('labels.frontend.company.profile.campo_profesion'))
-                                    ->id('profile_title')}}
+                                    ->placeholder(__('labels.frontend.company.profile.campo_profesion'))
+                                    ->id('profile_title')
+                                    ->required()}}
                                 </li>
+                                <div class="profile_title-msg" style="text-align: center;"></div>
+                                   </li>
 
                                 <li><h6>@lang('labels.frontend.company.redirect_company.legal_representative')*</h6> 
                                   {{ html()->text('legal_representative',isset($getUser->legal_representative)?$getUser->legal_representative:'')
-                                     ->placeholder(__('labels.frontend.company.redirect_company.legal_representative'))
-                                    ->id('constYear')
-                                    ->required() }}
+                                    ->placeholder(__('labels.frontend.company.redirect_company.legal_representative'))
+                                    ->id('legalFrep')
+                                    ->required()}}
+                                 
                                  <!--  <input type="text" name="legal_representative" placeholder="@lang('labels.frontend.company.redirect_company.legal_representative')" id="legalRep" class="" required="">
                                   -->
-                                  <div class="legal-rep-msg" style="text-align: center;"></div>
-                                  </li>
+                                  <div class="legal-frep-msg" style="text-align: center;"></div>  
+                                </li>
                                 <li><h6>@lang('labels.frontend.company.profile.identity_no')*</h6>
                                   {{ html()->text('identity_no',isset($getUser->identity_no)?$getUser->identity_no:'')
                                      ->placeholder(__('labels.frontend.company.profile.identity_no'))
                                     ->id('identity_no')
+                                    ->attribute('maxlength', 10)
                                     ->required() }}
                                 <!--  <input type="text" name="identity_no" placeholder="@lang('labels.frontend.company.profile.identity_no')" id="identity_no" class="" required="">
                                  -->
+                                 <div class="identity-no-msg" style="text-align: center;"></div>  
                                 </li>
                                 <li><h6>@lang('labels.frontend.company.redirect_company.web_address')</h6> 
                                   {{ html()->text('website_address',isset($getUser->website_address)?$getUser->website_address:'')
@@ -305,15 +312,20 @@
 
                                 <li><h6>@lang('labels.frontend.company.profile.landline_number')</h6> 
                                   {{ html()->text('landline_number',isset($getUser->landline_number)?$getUser->landline_number:'')
-                                     ->placeholder(__('labels.frontend.company.profile.landline_number'))
-                                    ->id('landline_number')}}
+                                    ->placeholder(__('labels.frontend.company.profile.landline_number'))
+                                    ->id('landline_number')
+                                    ->attribute('maxlength', 9)}}
+                              
                                <!--  <input type="text" placeholder="@lang('labels.frontend.company.profile.landline_number')" id="landline_number" name="landline_number" class=""> -->
-                                </li>
+                                <div class ="landline-msg" style="text-align: center;"></div>
+                              </li>
 
                                 <li><h6>@lang('labels.frontend.company.profile.office_number')</h6> 
                                    {{ html()->text('office_number',isset($getUser->office_number)?$getUser->office_number:'')
                                      ->placeholder(__('labels.frontend.company.profile.office_number'))
-                                    ->id('office_number')}}
+                                    ->id('office_number')
+                                    ->attribute('maxlength', 10)}}
+                                <div class="office-number-msg" style="text-align: center;"></div>
                                 <!-- <input type="text" placeholder="@lang('labels.frontend.company.profile.office_number')" id="office_number" name="office_number" class=""> -->
                                 </li>
                                
@@ -324,7 +336,7 @@
 
 
                           <!--**********Payment Method Update Start Here************-->
-                        <div class="row">
+                        <!-- <div class="row">
                           <div class="col-md-6 pro-info">
                             <div class="pro-heading">
                               <h3>@lang('labels.frontend.company.redirect_company.payment_methods')</h3>
@@ -347,7 +359,6 @@
                                 ?>
 
                                     {{html()->checkbox('payment_method_id[]', $checked,$v_menthod->id )->class('switch-input') }}
-                                   <!--  <input type="checkbox" value="{{$v_menthod->id}}" name="payment_method_id[]" multiple=""> -->
                                     <span class="checkmark"></span>
                                   </label>
                               <?php      
@@ -356,7 +367,10 @@
 
                               ?>
                             </div>
-                          </div>
+                          </div> -->
+
+                                                             <!--  <input type="checkbox" value="{{$v_menthod->id}}" name="payment_method_id[]" multiple=""> -->
+
 
                           <!--**********Payment Method Update End Here************-->
 
@@ -364,42 +378,44 @@
                           <!--**********Social Networks Start Here************-->
 
 
-                          <div class="col-md-6 pro-info">
+                          
+                          <div class="pro-info">
                             <div class="pro-heading">
                               <h3>@lang('labels.frontend.company.redirect_company.social_media')</h3>
                               <!-- <button type="btn" data-toggle="modal" data-target="#socialMediaModal"
                                class="edit-btn"><i class="fa fa-edit"></i>Edit</button> -->
                             </div>
-                               <ul class="info-list">
-                                <li><h6>@lang('labels.frontend.company.redirect_company.facebook')</h6><span>
+                               <ul class="info-list edit-pro-input">
+                               <!-- <ul class="info-list"> -->
+                                <li><h6>@lang('labels.frontend.company.redirect_company.facebook')</h6>
                                    {{ html()->text('facebook_url',isset($socialnetwork->facebook_url)?$socialnetwork->facebook_url:'')
                                       ->placeholder(__('https://www.facebook.com'))
                                       ->id('facebookUrl') }}
                                   <!-- <input type="text" placeholder="https://www.@lang('labels.frontend.company.redirect_company.facebook').com" name="facebook_url" class="" id="facebookUrl"> -->
                                   <div class="facebook-url-msg" style="text-align: center;"></div>
                                 </span></li>
-                                <li><h6>@lang('labels.frontend.company.redirect_company.instagram')</h6><span>
+                                <li><h6>@lang('labels.frontend.company.redirect_company.instagram')</h6>
                                   {{ html()->text('instagram_url',isset($socialnetwork->instagram_url)?$socialnetwork->instagram_url:'')
                                     ->placeholder(__('https://www.instagram.com'))
                                     ->id('instagramUrl') }}
                                  <!--  <input type="text" placeholder="https://www.@lang('labels.frontend.company.redirect_company.instagram').com" name="instagram_url" class="" id="instagramUrl"> -->
                                    <div class="instagram-url-msg" style="text-align: center;"></div>
                                 </span></li>
-                                <li><h6>@lang('labels.frontend.company.redirect_company.linkedin')</h6> <span>
+                                <li><h6>@lang('labels.frontend.company.redirect_company.linkedin')</h6>
                                   {{ html()->text('linkedin_url',isset($socialnetwork->linkedin_url)?$socialnetwork->linkedin_url:'')
                                     ->placeholder(__('https://www.instagram.com'))
                                     ->id('linkedinUrl') }}
                                  <!--  <input type="text" placeholder="https://www.@lang('labels.frontend.company.redirect_company.linkedin').com" name="linkedin_url" class="" id="linkedinUrl"> -->
                                   <div class="linkedin-url-msg" style="text-align: center;"></div>
                                 </span></li>
-                                <li><h6>@lang('labels.frontend.company.redirect_company.twitter')</h6> <span>
+                                <li><h6>@lang('labels.frontend.company.redirect_company.twitter')</h6>
                                   {{ html()->text('twitter_url',isset($socialnetwork->twitter_url)?$socialnetwork->twitter_url:'')
                                         ->placeholder(__('https://www.twitter.com'))
                                         ->id('twitterUrl') }}
                                  <!--  <input type="text" placeholder="https://www.@lang('labels.frontend.company.redirect_company.twitter').com" name="twitter_url" class="" id="twitterUrl"> -->
                                    <div class="twitter-url-msg" style="text-align: center;"></div>
                                 </span></li>
-                                <li><h6>@lang('labels.frontend.company.redirect_company.other_url')</h6><span>
+                                <li><h6>@lang('labels.frontend.company.redirect_company.other_url')</h6>
                                   {{ html()->text('other',isset($socialnetwork->other)?$socialnetwork->other:'')
                                 ->placeholder(__('https://www.buskalo.com'))
                                 ->id('otherUrl') }}
@@ -522,16 +538,11 @@
                         <div class="row">
                           <div class="col-md-12 mb-3">
                             
-                          {{--  <div class="cer-div">
+                           <div class="cer-div">
                               <div class="pro-heading">
                                 <h3>Area de Cobertura</h3>
                                 </div>
-                                <ul class="area-list">
-                                  <li><img src="{{ url('img/frontend/check1.png') }}"> Barrio</li>
-                                  <li><img src="{{ url('img/frontend/check1.png') }}"> Ciudad</li>
-                                  <li><img src="{{ url('img/frontend/check1.png') }}"> Provincia</li>
-                                </ul>
-                              </div> --}}
+                              </div>
 
                           </div>
                         </div>
@@ -818,31 +829,83 @@ $('#constYear').on('input', function ()
           $(this).addClass('extravalid-input').removeClass('extrainvalid-input');
        }
   });
+//profile_title
+$('#profile_title').on('input', function (){
+  var profile_title = $(this).val();
+  var validName = /^[a-zA-Zñáéíóúü_+\-':"\\|,.\/? ]*$/;
+  if (profile_title.length == 0) 
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.profile_title_is_required')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else if (profile_title.length <= 3)
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.atleast_4_character_required')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else if (!validName.test(profile_title)) 
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.only_characters_allowed')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.profile_title-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+});
+        
 
 //validation for legal frep REQUIRED
-$('#legalRep').on('input', function () 
+$('#legalFrep').on('input', function ()
 {
-       var legalRep = $(this).val();
-       //var validName = /^[a-zA-Z ]*$/;
+        var legalFrep = $(this).val();
         var validName = /^[a-zA-Zñáéíóúü_+\-':"\\|,.\/? ]*$/;
-
-         if (legalRep.length == 0) 
-       {
-          $('.legal-rep-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.required')');
+        if (legalFrep.length == 0) 
+        {
+          $('.legal-frep-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.legal_rep_is_required')');
           $(this).addClass('invalid-input').removeClass('valid-input');
-       }
-       if (!validName.test(legalRep)) 
-       {
-          $('.legal-rep-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.only_characters')');
+        }
+        else if (legalFrep.length <= 3)
+        {
+          $('.legal-frep-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.atleast_4_character_required')');
           $(this).addClass('invalid-input').removeClass('valid-input');
-          
-       }
-       else 
-       {
-          $('.legal-rep-msg').empty();
+        }
+        else if (!validName.test(legalFrep)) 
+        {
+          $('.legal-frep-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.only_characters_allowed')');
+          $(this).addClass('invalid-input').removeClass('valid-input');
+        }
+        else 
+        {
+          $('.legal-frep-msg').empty();
           $(this).addClass('valid-input').removeClass('invalid-input');
-       }
-  });
+        }
+});  
+
+// validatio identification_type REQUIRED
+$('#identity_no').on('input', function (
+){
+  var identity_no = $(this).val();
+  var validName = /^[0-9]*$/;
+  // var validName = /^\d{9}\-\d{1}$/;
+
+  if (identity_no.length == 0) 
+  {
+    $('.identity-no-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.identity_no_is_required')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else if (!validName.test(identity_no)) 
+  {
+    $('.identity-no-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.identity_no_must_have_numeric')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.identity-no-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+});
 
 
   //validation for address REQUIRED
@@ -867,6 +930,41 @@ $('#legalRep').on('input', function ()
             $(this).addClass('valid-input').removeClass('invalid-input');
          }
     });
+
+// validating landline
+$('#landline_number').on('input', function () 
+{
+  var landline = $(this).val();
+  var validName = /^[0-9]*$/;
+    if (!validName.test(landline)) 
+  {
+    $('.landline-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.landline_must_have_numeric')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.landline-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+  });
+  
+// validating mobile
+$('#office_number').on('input', function () 
+{
+  var mobile = $(this).val();
+  var validName = /^[0-9]*$/;
+  if (!validName.test(mobile)) 
+  {
+    $('.office-number-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.mobile_must_have_numeric')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.office-number-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+  });
+
 
 
   //validation for Mobile  REQUIRED

@@ -87,7 +87,7 @@ return [
         'file' => 'El fichero del campo :attribute debe tener un tamaño menor o igual de :min kilobytes.',
         //'string' => 'El texto :attribute debe tener, al menos, :min caracteres.',
         
-         'string' => 'La contraseña tiene que constar de por lo menos, :min número.',
+         'string' => 'La contraseña tiene que constar de al menos, :min caracteres.',
 
         'array' => 'La lista :attribute debe contener, al menos, :min elementos.',
     ],

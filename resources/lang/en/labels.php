@@ -1020,6 +1020,16 @@ return [
                      'address_must_have_alphanumeric' => 'Address must have alphanumeric characters only',
                      'invalid_url' => 'Invalid Url',
                      'required' => 'Required',
+                     'profile_title_is_required' => 'El título del perfil es necesario',
+                     'atleast_4_character_required' => 'At least 4 characters are required',
+                     'only_characters_allowed' => 'Only alpha characters and blank spaces are allowed',
+                     'legal_rep_is_required' => 'The legal representative is required',
+                     'landline_must_have_numeric' => 'Landline number must have only numbers',
+                     'identity_no_must_have_numeric' => 'Identity number must have only numbers',
+                     'mobile_must_have_numeric' => 'Office phone number must have numbers only',
+                     'identity_no_is_required' => 'Identity number is required',
+                     'identity_no_must_be_valid' => 'The identification number must be valid',
+                     'coverage_area' => 'Coverage Area',
                      
 
 

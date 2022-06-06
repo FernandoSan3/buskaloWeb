@@ -77,10 +77,10 @@ class RegisterController extends Controller
      *
      * @return string
      */
-    // public function redirectPath()
-    // {
-    //     return route(home_route());
-    // }
+    public function redirectPath()
+    {
+        return route(home_route());
+    }
 
     /**
      * Show the application registration form.
@@ -129,7 +129,8 @@ class RegisterController extends Controller
 
             auth()->loginUsingId($userid,true);
 
-            return redirect($this->route(home_route()))->withFlashSuccess(__('alerts.frontend.auth.register.profile_created_successfully')); 
+            return redirect($this->redirectPath())->withFlashSuccess(__('alerts.frontend.auth.register.profile_created_successfully')); 
+
         }
         else
         {

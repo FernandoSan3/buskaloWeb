@@ -34,7 +34,7 @@ class CompanyRegisterRequest extends FormRequest
             'address' => ['required'],
             'ruc_no' => ['required'],
             'legal_representative' => ['required'],
-            'payment_method_id' => ['required'],
+            // 'payment_method_id' => ['required'],
            // 'user_id' => ['required', 'string'],
              'mobile_number' => ['required','regex:/^([0-9\s\-\+\(\)]*)$/','min:10', Rule::unique('users')->ignore(Session::get('userId'))],
         ];
