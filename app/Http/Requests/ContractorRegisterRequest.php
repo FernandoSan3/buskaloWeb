@@ -36,7 +36,7 @@ class ContractorRegisterRequest extends FormRequest
             //'user_id' => ['required', 'string'],
             'mobile_number' => ['required','regex:/^([0-9\s\-\+\(\)]*)$/','min:10', Rule::unique('users')->ignore(Session::get('userId'))],
             'identity_no' => ['required'],
-            'payment_method_id' => ['required'],
+            // 'payment_method_id' => ['required'],
             
         ];
     }

@@ -232,12 +232,13 @@
                             <!-- <input type="text" placeholder="Cédula o pasaporte" name="identity_no" class="" required="" id="identityNo"> -->
                             <div class="identity-no-msg" style="text-align: center;"></div>
                             </li>
-                            <li><h6>{{--Titulo  de perfil* --}}@lang('labels.frontend.constructor.redirect_constructor.profession')</h6> 
+                            <li><h6>{{--Titulo  de perfil* --}}@lang('labels.frontend.constructor.redirect_constructor.profession')*</h6> 
                              {{ html()->text('profile_title',isset($getUser->profile_title)?$getUser->profile_title:'')
                                 ->placeholder(__('labels.frontend.constructor.redirect_constructor.profile_title'))
-                                ->id('profileTitle') }}
+                                ->id('profile_title') 
+                                ->required()}}
                            <!--  <input type="text" id="profileTitle" placeholder="@lang('labels.frontend.constructor.redirect_constructor.profile_title')" name="profile_title" class="" >
-                            --> <div class="profile-title-msg" style="text-align: center;"></div>
+                            --> <div class="profile_title-msg" style="text-align: center;"></div>
                             </li>
 
                             <li><h6>@lang('labels.frontend.constructor.redirect_constructor.direction')*</h6> 
@@ -305,15 +306,21 @@
                                 <li><h6>@lang('labels.frontend.company.profile.landline_number')</h6> 
                                   {{ html()->text('landline_number',isset($getUser->landline_number)?$getUser->landline_number:'')
                                 ->placeholder(__('labels.frontend.company.profile.landline_number'))
-                                ->id('landline_number') }}
+                                ->id('landline_number')
+                                ->attribute('maxlength', 9)}}
 
                                 <!-- <input type="text" placeholder="@lang('labels.frontend.company.profile.landline_number')" id="landline_number" name="landline_number" class="">
-                                 --></li>
+                                 -->
+                                 <div class ="landline-msg" style="text-align: center;"></div>
+                                </li>
+                                 
 
                                 <li><h6>@lang('labels.frontend.company.profile.office_number')</h6> 
                                 {{ html()->text('office_number',isset($getUser->office_number)?$getUser->office_number:'')
                                 ->placeholder(__('labels.frontend.company.profile.office_number'))
-                                ->id('office_number') }}
+                                ->id('office_number')
+                                ->attribute('maxlength', 10)}}
+                                <div class="office-number-msg" style="text-align: center;"></div>
                                <!--  <input type="text" placeholder="@lang('labels.frontend.company.profile.office_number')" id="office_number" name="office_number" class="">
                                  --></li>
                            
@@ -324,8 +331,8 @@
 
 
                       <!--**********Payment Method Update Start Here************-->
-                    <div class="row">
-                      <div class="col-md-6 pro-info">
+                    <!-- <div class="row"> -->
+                      <!-- <div class="col-md-6 pro-info">
                         <div class="pro-heading">
                           <h3>@lang('labels.frontend.constructor.redirect_constructor.payment_methods')</h3>
                          
@@ -344,7 +351,6 @@
                                 $checked=true;
                                  }?>
                                   {{ html()->checkbox('payment_method_id[]', $checked,$v_menthod->id )->class('switch-input') }}
-                               <!--  <input type="checkbox" value="{{$v_menthod->id}}" name="payment_method_id[]" multiple=""> -->
                                 <span class="checkmark"></span>
                               </label>
                           <?php      
@@ -353,7 +359,9 @@
 
                           ?>
                         </div>
-                      </div>
+                      </div> -->
+                       <!--  <input type="checkbox" value="{{$v_menthod->id}}" name="payment_method_id[]" multiple=""> -->
+
 
                       <!--**********Payment Method Update End Here************-->
 
@@ -362,51 +370,51 @@
                       <!--**********Social Networks Start Here************-->
 
 
-                      <div class="col-md-6 pro-info">
+                      <div class="pro-info">
                         <div class="pro-heading">
                           <h3>@lang('labels.frontend.constructor.redirect_constructor.social_media')</h3>
                           <!-- <button type="btn" data-toggle="modal" data-target="#socialMediaModal"
                            class="edit-btn"><i class="fa fa-edit"></i>Edit</button> -->
                         </div>
-                            <ul class="info-list">
-                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.facebook')</h6><span>
+                            <ul class="info-list edit-pro-input">
+                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.facebook')</h6>
                                {{ html()->text('facebook_url',isset($socialnetwork->facebook_url)?$socialnetwork->facebook_url:'')
                                 ->placeholder(__('https://www.facebook.com'))
                                 ->id('facebookUrl') }}
                              <!--  <input type="text" placeholder="https://www.facebook.com" name="facebook_url" class="" id="facebookUrl"> -->
                               <div class="facebook-url-msg" style="text-align: center;"></div>
-                            </span></li>
-                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.instagram')</h6><span>
+                            </li>
+                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.instagram')</h6>
                               {{ html()->text('instagram_url',isset($socialnetwork->instagram_url)?$socialnetwork->instagram_url:'')
                                 ->placeholder(__('https://www.instagram.com'))
                                 ->id('instagramUrl') }}
                               <!-- <input type="text" placeholder="https://www.instagram.com" name="instagram_url" class="" id="instagramUrl"> -->
                                <div class="instagram-url-msg" style="text-align: center;"></div>
-                            </span></li>
-                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.linkedin')</h6> <span>
+                            </li>
+                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.linkedin')</h6>
                               {{ html()->text('linkedin_url',isset($socialnetwork->linkedin_url)?$socialnetwork->linkedin_url:'')
                                 ->placeholder(__('https://www.linkedin.com'))
                                 ->id('linkedinUrl') }}
                              <!--  <input type="text" placeholder="https://www.linkedin.com" name="linkedin_url" class="" id="linkedinUrl"> -->
                               <div class="linkedin-url-msg" style="text-align: center;"></div>
-                            </span></li>
-                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.twitter')</h6> <span>
+                            </li>
+                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.twitter')</h6> 
                               {{ html()->text('twitter_url',isset($socialnetwork->twitter_url)?$socialnetwork->twitter_url:'')
                                 ->placeholder(__('https://www.twitter.com'))
                                 ->id('twitterUrl') }}
                               <!-- <input type="text" placeholder="https://www.twitter.com" name="twitter_url" class="" id="twitterUrl"> -->
                                <div class="twitter-url-msg" style="text-align: center;"></div>
-                            </span></li>
-                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.other_url')</h6><span>
+                            </li>
+                            <li><h6>@lang('labels.frontend.constructor.redirect_constructor.other_url')</h6>
                               {{ html()->text('other',isset($socialnetwork->other)?$socialnetwork->other:'')
                                 ->placeholder(__('https://www.buskalo.com'))
                                 ->id('otherUrl') }}
                             <!-- <input type="text" placeholder="https://www.buskalo.com" name="other" class="" id="otherUrl"> -->
                              <div class="other-url-msg" style="text-align: center;"></div>
-                            </span></li>
+                            </li>
                           </ul>
                       </div>
-                    </div>
+                    <!-- </div> -->
                   <!--**********Social Networks END Here************-->
 
                     <div class="pro-info">
@@ -558,20 +566,14 @@
 
 
 
-                 <div class="row">
-                    <div class="col-md-12 mb-3">
-                      
-                   {{--   <div class="cer-div">
-                        <div class="pro-heading">
-                          <h3>Area de Cobertura</h3>
-                          </div>
-                          <ul class="area-list">
-                            <li><img src="{{ url('img/frontend/check1.png') }}"> Barrio</li>
-                            <li><img src="{{ url('img/frontend/check1.png') }}"> Ciudad</li>
-                            <li><img src="{{ url('img/frontend/check1.png') }}"> Provincia</li>
-                          </ul>
-                        </div> --}}
-
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  
+                  <div class="cer-div">
+                    <div class="pro-heading">
+                      <h3>@lang('labels.frontend.company.redirect_company.coverage_area')</h3>
+                      </div>
+                    </div>
 
                 </div>
               </div>
@@ -834,16 +836,6 @@ $('#identityNo').on('input', function ()
           $('.identity-no-msg').addClass('invalid-msg').text('@lang('labels.frontend.constructor.redirect_constructor.identity_is_not_required')');
           $(this).addClass('invalid-input').removeClass('valid-input');
        }
-       // else if (identityNo.length < 8) 
-       // {
-       //    $('.identity-no-msg').addClass('invalid-msg').text("Identity No should be 8 digits.");
-       //    $(this).addClass('invalid-input').removeClass('valid-input');
-       // }
-       //  else if (identityNo.length > 8) 
-       // {
-       //    $('.identity-no-msg').addClass('invalid-msg').text("Identity No should be 8 digits.");
-       //    $(this).addClass('invalid-input').removeClass('valid-input');
-       // }
        else if (!validName.test(identityNo)) 
        {
           $('.identity-no-msg').addClass('invalid-msg').text('@lang('labels.frontend.constructor.redirect_constructor.only_numbers_are_allowed')');
@@ -896,6 +888,41 @@ $('#profileTitle').on('input', function ()
          }
     });
 
+// validating landline
+$('#landline_number').on('input', function () 
+{
+  var landline = $(this).val();
+  var validName = /^[0-9]*$/;
+    if (!validName.test(landline)) 
+  {
+    $('.landline-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.landline_must_have_numeric')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.landline-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+  });
+  
+// validating mobile
+$('#office_number').on('input', function () 
+{
+  var mobile = $(this).val();
+  var validName = /^[0-9]*$/;
+  if (!validName.test(mobile)) 
+  {
+    $('.office-number-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.mobile_must_have_numeric')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.office-number-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+  });
+
+
 
   //validation for Mobile  REQUIRED
   // $('#mobileNumber').on('input', function () 
@@ -941,6 +968,32 @@ $('#profileTitle').on('input', function ()
   //           $(this).addClass('valid-input').removeClass('invalid-input');
   //        }
   //   });
+  //profile_title
+$('#profile_title').on('input', function (){
+  var profile_title = $(this).val();
+  var validName = /^[a-zA-Zñáéíóúü_+\-':"\\|,.\/? ]*$/;
+  if (profile_title.length == 0) 
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.profile_title_is_required')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else if (profile_title.length <= 3)
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.atleast_4_character_required')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else if (!validName.test(profile_title)) 
+  {
+    $('.profile_title-msg').addClass('invalid-msg').text('@lang('labels.frontend.company.redirect_company.only_characters_allowed')');
+    $(this).addClass('invalid-input').removeClass('valid-input');
+  }
+  else 
+  {
+    $('.profile_title-msg').empty();
+    $(this).addClass('valid-input').removeClass('invalid-input');
+  }
+});
+        
 
     //validation for landline
     $('#landlineNumber').on('input', function () 

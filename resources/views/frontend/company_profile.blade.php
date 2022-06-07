@@ -540,7 +540,7 @@
                             
                            <div class="cer-div">
                               <div class="pro-heading">
-                                <h3>Area de Cobertura</h3>
+                                <h3>@lang('labels.frontend.company.redirect_company.coverage_area')</h3>
                                 </div>
                               </div>
 
