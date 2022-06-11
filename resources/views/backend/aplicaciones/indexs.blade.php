@@ -36,7 +36,6 @@
                             <th> @lang('labels.backend.access.users.table.email') </th>
                             <th> @lang('labels.backend.access.users.table.profession') </th>
                             <th> @lang('labels.backend.access.users.table.mobile') </th>
-                            <th> @lang('labels.backend.access.users.table.citiename') </th>
                             <th> @lang('labels.general.actions1.actions') </th>
                         </tr>
                         </thead>
@@ -51,8 +50,7 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->profile_title }}</td>
                                 <td>{{ $user->mobile_number }}</td>
-                                <td>{{ $user->name }}</td>
-
+                                
                                 <td class="btn-td">
                                     <div class="dropdown">
                                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

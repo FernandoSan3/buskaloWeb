@@ -97,11 +97,21 @@
                         <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/aplicacions'))
+                        }}" href="{{ route('admin.aplicacions.index') }}">
+                              @lang('labels.backend.other.new1')
+                              </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{
+                            active_class(Route::is('admin/aplicacions'))
                         }}" href="{{ route('admin.aplicacions') }}">
                               @lang('labels.backend.other.new')
                             </a>
                         </li>
+
                     </ul>
+                        
                 </li>
                 <li class="nav-item nav-dropdown {{
                     active_class(Route::is('admin/contractors*'), 'open')

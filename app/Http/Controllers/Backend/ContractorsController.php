@@ -228,8 +228,6 @@ class ContractorsController extends Controller
         if($worker_id) {
 
 
-
-
             $doc_name = $request->file('doc_name');
             if(isset($doc_name) && !empty($doc_name)) {
                 //die('jgfg');
@@ -965,7 +963,7 @@ class ContractorsController extends Controller
 
         $cities=DB::table('cities')->where('status','1')->whereRaw("(deleted_at IS null )")->get()->toArray();
 
-        //echo "<pre>"; print_r($user_details); die('con');
+        // echo "<pre>"; print_r($user_details); die('con');
 
         $provinces=DB::table('provinces')->where('status','1')->whereRaw("(deleted_at IS null )")->get();
 
@@ -1076,6 +1074,7 @@ class ContractorsController extends Controller
 
 
         $whole_country=!empty($request->whole_country) ? $request->whole_country : '0' ;
+        print_r($whole_country); die('con');
         $proviences=!empty($request->proviences) ? $request->proviences : '' ;
 
         if(!empty($whole_country) && $whole_country==1)
@@ -1755,7 +1754,6 @@ class ContractorsController extends Controller
 
     public function serviceRequests($user_id) {
 
-
       $service_requests = DB::table('service_request')
         ->join('category','service_request.category_id','=','category.id')
         ->join('services','service_request.service_id','=','services.id')
@@ -1812,7 +1810,6 @@ class ContractorsController extends Controller
         ->where('service_request.id',$request_id)
         ->first();
 
-
         if($show_service) {
 
             $show_service->question_detail = DB::table('service_request_questions')
@@ -1822,9 +1819,7 @@ class ContractorsController extends Controller
             ->where('service_request_questions.deleted_at',NULL)
             ->where('service_request_questions.service_request_id',$request_id)
             ->get();
-
       }
-
 
        $user_details = DB::table('buy_requested_services')
             ->join('users','buy_requested_services.user_id','=','users.id')
@@ -1863,11 +1858,22 @@ class ContractorsController extends Controller
         return redirect()->route('admin.contractors.index')->with('success','contractor deleted successfully.');
    }
 
-    public function aplicacions()
+    public function aplicacions1()
     { 
 
-        $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
-        
+        // $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
+
+        // $first = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
+
+        $users = DB::table('users_services_area')
+                ->join('users', 'users_services_area.user_id', '=', 'users.id')
+                ->latest('users.created_at')->where('users.deleted_at',NULL)
+                ->where('users.approval_status',0)
+                ->whereIN('users.user_group_id',[3,4])->where('users.mobile_number','!=', NULL)
+                ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
+                ->select('users.id', 'users.username', 'users.email','users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+                ->get();
+
         foreach ($users as $key => $value) {
         $value->total_service_requests = DB::table('service_request')
         ->join('category','service_request.category_id','=','category.id')
@@ -1877,11 +1883,33 @@ class ContractorsController extends Controller
         ->where('service_request.user_id',$value->id)
         ->count();
 
+
       }
       // echo "<pre>"; print_r($users->toArray());die;
 
         return view('backend.aplicaciones.index',compact('users'));
     }
+    public function aplicacions()
+    { 
+
+        $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
+
+        foreach ($users as $key => $value) {
+        $value->total_service_requests = DB::table('service_request')
+        ->join('category','service_request.category_id','=','category.id')
+        ->join('services','service_request.service_id','=','services.id')
+        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
+        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
+        ->where('service_request.user_id',$value->id)
+        ->count();
+
+
+      }
+      // echo "<pre>"; print_r($users->toArray());die;
+
+        return view('backend.aplicaciones.indexs',compact('users'));
+    }
+
 
     public function  aplicacionsAccept($id=null)
     {

@@ -56,6 +56,7 @@ return [
         'other' => [
             'other' => 'Others',
             'new' => 'New',
+            'new1' => 'Incomplete',
             'applications' => "Applications",
             'applications_management' => 'Applications Management',
             'create_ontractor' => 'Create Contractor',
