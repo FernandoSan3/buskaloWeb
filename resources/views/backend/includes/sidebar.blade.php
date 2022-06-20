@@ -64,7 +64,6 @@
                         }}" href="#">
                         <i class="nav-icon fas fa-list"></i> @lang('menus.backend.log-viewer.main')
                     </a>
-
                     <ul class="nav-dropdown-items">
                         <li class="nav-item">
                             <a class="nav-link {{
@@ -281,7 +280,6 @@
                         active_class(Route::is('admin/polygon'))
                     }}" href="{{ route('admin.polygon.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-
                        Polygon
                     </a>
                 </li> --}}

@@ -35,6 +35,8 @@ return [
             'serviceRequests' => 'Solicitud de servicio',
             'accept' => 'Aceptar',
             'reject' => 'Rechazar',
+            'creditpackage' => 'Paquete de crédito',
+            'payment_info' => 'Información de pago',
         ],
         'active' => 'Activo',
         'deleted_users' => 'Usuarios eliminados',
@@ -240,7 +242,7 @@ return [
                     'total' => 'usuario total | usuarios totales',
                     'city' => 'Ciudad',
                     'profession' => 'Profesión',
-                    'citiename' => 'Ciuidad',  
+                    'citiename' => 'Ciudad',  
                 ],  
 
                 'tabs' => [
@@ -763,11 +765,13 @@ return [
         ],
 
         'company' => [
-            'create' => 'Crear Company',
-            'update' => 'Actualizar Company',
-            'edit' => 'Editar Company',
-            'management' => 'Administración de la empresa',
+            'company' => 'Empresas',
+            'create' => 'Crear Empresa',
+            'update' => 'Actualizar Empresa',
+            'edit' => 'Editar Empresa',
+            'management' => 'Administración de empresa',
             'view' => 'Ver la empresa',
+
 
             'table' => [
                 'id' => 'Id',

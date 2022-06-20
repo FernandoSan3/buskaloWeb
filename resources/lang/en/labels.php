@@ -35,6 +35,8 @@ return [
             'serviceRequests' => 'Service Request',
             'accept' => 'Accept',
             'reject' => 'Reject',
+            'creditpackage' => 'Credit Package',
+            'payment_info' => 'Payment Information',
         ],
         'active' => 'Active',
         'deleted_users' => 'Deleted Users',
@@ -113,7 +115,8 @@ return [
                     'social' => 'Social',
                     'total' => 'user total|users total',
                     'city' => 'City',
-                    'profession' => 'Profession'
+                    'profession' => 'Profession',
+                    'citiename' => 'City', 
                 ],  
 
                 'tabs' => [
@@ -637,6 +640,7 @@ return [
         ],
 
         'company' => [
+            'company' => 'Companies',
             'create' => 'Create Company',
             'update' => 'Update Company',
             'edit' => 'Edit Company',

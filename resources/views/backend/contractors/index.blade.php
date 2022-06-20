@@ -32,11 +32,13 @@
                     <table id="example" class="table">
                         <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>username</th>
-                            <th>@lang('labels.backend.access.users.table.email')</th>
-                            <th>Mobile</th>
-                            <th>@lang('labels.general.actions')</th>
+                        <th> @lang('labels.backend.access.users.table.id') </th>
+                            <th> @lang('labels.backend.access.users.table.username') </th>
+                            <th> @lang('labels.backend.access.users.table.email') </th>
+                            <th> @lang('labels.backend.access.users.table.mobile') </th>
+                            <th> @lang('labels.backend.access.users.table.profession') </th>
+                            <th> @lang('labels.backend.access.users.table.citiename') </th>
+                            <th> @lang('labels.general.actions1.actions') </th>                            
                         </tr>
                         </thead>
                         <tbody>
@@ -48,42 +50,44 @@
                                 <td>{{ $user->username }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->mobile_number }}</td>
+                                <td>{{ $user->profile_title }}</td>
+                                <td>{{ $user->name }}</td>
 
                                 <td class="btn-td">
                                     <div class="dropdown">
                                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Actions
+                                        @lang('labels.general.actions1.actions')
                                       </button>
                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                      <a class="dropdown-item" href="{{ route('admin.contractors.show',$user->id) }}">Show Profile</a>
+                                      <a class="dropdown-item" href="{{ route('admin.contractors.show',$user->id) }}"> @lang('labels.general.actions1.show_profile') </a>
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit',$user->id) }}">Edit</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit',$user->id) }}"> @lang('labels.general.actions1.edit') </a>
 
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit_payment_method',$user->id) }}">Edit Payment Method</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit_payment_method',$user->id) }}">  @lang('labels.general.actions1.edit_payment_method') </a>
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_certificates',$user->id) }}">All Certificates</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_certificates',$user->id) }}"> @lang('labels.general.actions1.all_contractor_certificates') </a>
 
                                         {{-- <a class="dropdown-item" href="{{ route('admin.contractors.add_contractor_gallery',$user->id) }}">Add Gallery</a> --}}
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_images_gallery',$user->id) }}">Image Gallery</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_images_gallery',$user->id) }}"> @lang('labels.general.actions1.all_contractor_images_gallery') </a>
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_videos_gallery',$user->id) }}">Video Gallery</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_videos_gallery',$user->id) }}"> @lang('labels.general.actions1.all_contractor_videos_gallery') </a>
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_police_records',$user->id) }}">All Police Records</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_police_records',$user->id) }}"> @lang('labels.general.actions1.all_contractor_police_records') </a>
 
-                                         <a class="dropdown-item" href="{{ route('admin.contractors.show_services_offered',$user->id) }}"> Services</a>
+                                         <a class="dropdown-item" href="{{ route('admin.contractors.show_services_offered',$user->id) }}"> @lang('labels.general.actions1.show_services_offered') </a>
 
                                         {{--<a class="dropdown-item" href="{{ route('admin.contractors.add_services_offered',$user->id) }}">Add Services</a>
                                         <a class="dropdown-item" href="{{ route('admin.contractors.edit_services_offered',$user->id) }}">Edit Services</a>--}}
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit_coverage_area',$user->id) }}">Edit Coverage Area</a>
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.destroy',$user->id) }}">Delete Contractor</a>
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.creditpackage',$user->id) }}">Credit Package</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.edit_coverage_area',$user->id) }}"> @lang('labels.general.actions1.edit_coverage_area') </a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.destroy',$user->id) }}"> @lang('labels.general.actions1.destroy') </a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.creditpackage',$user->id) }}"> @lang('labels.general.actions1.creditpackage') </a>
 
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.serviceRequests',$user->id) }}">Servicio Solicitudes<!-- Service Request --><span class="badge" style="background-color: #007bff;color: white;
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.serviceRequests',$user->id) }}"> @lang('labels.general.actions1.serviceRequests') <!-- Service Request --><span class="badge" style="background-color: #007bff;color: white;
                                        ">{{ $user->total_service_requests}}
                                         </span></a>
-                                        <a class="dropdown-item" href="{{ route('admin.contractors.payment',$user->id) }}">Payment Information</a>
+                                        <a class="dropdown-item" href="{{ route('admin.contractors.payment',$user->id) }}"> @lang('labels.general.actions1.payment_info')</a>
                                       </div>
                                     </div>
                                 </td>

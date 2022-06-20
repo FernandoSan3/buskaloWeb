@@ -25,23 +25,38 @@ class ContractorsController extends Controller
 {
 
     public function index()
-    { 
+    {
 
-        $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('user_group_id',3)->where('approval_status',1)->get();
+        // $users = DB::table('users')
+        //     ->latest()
+        //     ->where('deleted_at', NULL)
+        //     ->where('user_group_id', 3)
+        //     ->where('approval_status', 1)
+        //     ->get();
+
+        $users = DB::table('users_services_area')
+            ->join('users', 'users_services_area.user_id', '=', 'users.id')
+            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->where('users.approval_status', 1)
+            // ->whereIN('users.user_group_id', [3, 4])
+            ->where('user_group_id', 3)
+            ->where('users.mobile_number', '!=', NULL)
+            ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->get();
         //echo "<pre>";print_r($users); die;
         foreach ($users as $key => $value) {
-        $value->total_service_requests = DB::table('service_request')
-        ->join('category','service_request.category_id','=','category.id')
-        ->join('services','service_request.service_id','=','services.id')
-        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-        ->where('service_request.user_id',$value->id)
-        ->count();
+            $value->total_service_requests = DB::table('service_request')
+                ->join('category', 'service_request.category_id', '=', 'category.id')
+                ->join('services', 'service_request.service_id', '=', 'services.id')
+                ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                ->where('service_request.user_id', $value->id)
+                ->count();
+        }
+        // echo "<pre>"; print_r($users->toArray());die;
 
-      }
-      // echo "<pre>"; print_r($users->toArray());die;
-
-        return view('backend.contractors.index',compact('users'));
+        return view('backend.contractors.index', compact('users'));
     }
 
     public function search(Request $request)
@@ -49,15 +64,15 @@ class ContractorsController extends Controller
         $search = $request->search;
 
         $order = DB::table('users')
-            ->where('username','like',"%".$search."%");
+            ->where('username', 'like', "%" . $search . "%");
         //print_r($order); die;
-        return view('backend.contractors.index',compact('search'));
+        return view('backend.contractors.index', compact('search'));
     }
 
 
     public function create()
     {
-       // die('create');
+        // die('create');
         return view('backend.contractors.create');
     }
 
@@ -76,30 +91,24 @@ class ContractorsController extends Controller
         }
 
 
-        $imagename=""; $storeName="";
+        $imagename = "";
+        $storeName = "";
 
-        if(!empty($request->avatar_location))
-        {
-          $destinationPath = public_path('/img/contractor/profile');
+        if (!empty($request->avatar_location)) {
+            $destinationPath = public_path('/img/contractor/profile');
 
-           if($request->avatar_location=="")
-           {
-              $imagename="";
-            }
-            else
-            {
+            if ($request->avatar_location == "") {
+                $imagename = "";
+            } else {
                 $image = $request->avatar_location;
-                $imagename = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
+                $imagename = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
 
-                $storeName=  'contractor/profile/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
+                $storeName =  'contractor/profile/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
 
-                 if(file_exists(public_path().$destinationPath.$imagename))
-                 {
-                    unlink(public_path().$destinationPath.$imagename);
+                if (file_exists(public_path() . $destinationPath . $imagename)) {
+                    unlink(public_path() . $destinationPath . $imagename);
                     $image->move($destinationPath, $imagename);
-                }
-                 else
-                 {
+                } else {
                     $image->move($destinationPath, $imagename);
                 }
             }
@@ -129,7 +138,7 @@ class ContractorsController extends Controller
 
         $user_id = DB::table('users')->insertGetId($insert_arr);
 
-        if($user_id) {
+        if ($user_id) {
             $bonus_arr['user_id'] = $user_id;
             $bonus_arr['debit'] = 20;
             $bonus_arr['credit'] = 0;
@@ -151,19 +160,17 @@ class ContractorsController extends Controller
             $social_arr['updated_at'] = Carbon::now();
 
             DB::table('social_networks')->insertGetId($social_arr);
-
-
         }
 
 
-        return redirect()->route('admin.contractors.index')->with('success','contractor created successfully.');
+        return redirect()->route('admin.contractors.index')->with('success', 'contractor created successfully.');
     }
 
 
     public function createWorker($user_id)
     {
-        $document_types = DB::table('document_types')->where('deleted_at',NULL)->first();
-        return view('backend.contractors.create_worker',compact('user_id','document_types'));
+        $document_types = DB::table('document_types')->where('deleted_at', NULL)->first();
+        return view('backend.contractors.create_worker', compact('user_id', 'document_types'));
     }
 
 
@@ -181,28 +188,22 @@ class ContractorsController extends Controller
         }
 
 
-        $imagename=""; $storeName="";
+        $imagename = "";
+        $storeName = "";
 
-        if(!empty($request->profile_pic))
-        {
-          $destinationPath = public_path('/img/worker/profile');
+        if (!empty($request->profile_pic)) {
+            $destinationPath = public_path('/img/worker/profile');
 
-           if($request->profile_pic=="")
-           {
-              $imagename="";
-            }
-            else
-            {
+            if ($request->profile_pic == "") {
+                $imagename = "";
+            } else {
                 $image = $request->profile_pic;
-                $imagename = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                $storeName=  'worker/profile/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                 if(file_exists(public_path().$destinationPath.$imagename))
-                 {
-                    unlink(public_path().$destinationPath.$imagename);
+                $imagename = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                $storeName =  'worker/profile/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                if (file_exists(public_path() . $destinationPath . $imagename)) {
+                    unlink(public_path() . $destinationPath . $imagename);
                     $image->move($destinationPath, $imagename);
-                }
-                 else
-                 {
+                } else {
                     $image->move($destinationPath, $imagename);
                 }
             }
@@ -225,28 +226,26 @@ class ContractorsController extends Controller
         $worker_id = DB::table('workers')->insertGetId($insert_arr);
 
 
-        if($worker_id) {
+        if ($worker_id) {
 
 
             $doc_name = $request->file('doc_name');
-            if(isset($doc_name) && !empty($doc_name)) {
+            if (isset($doc_name) && !empty($doc_name)) {
                 //die('jgfg');
                 foreach ($doc_name as $doc_name_new) {
 
-                    $imagename_doc=""; $storeDocName="";
+                    $imagename_doc = "";
+                    $storeDocName = "";
                     $destinationPath = public_path('/img/worker/document');
                     $image = $doc_name_new;
-                    $imagename_doc = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
+                    $imagename_doc = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
                     //echo $image->getClientOriginalExtension(); die;
 
-                    $storeDocName=  'worker/document/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                    if(file_exists(public_path().$destinationPath.$imagename_doc))
-                    {
-                        unlink(public_path().$destinationPath.$imagename_doc);
+                    $storeDocName =  'worker/document/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                    if (file_exists(public_path() . $destinationPath . $imagename_doc)) {
+                        unlink(public_path() . $destinationPath . $imagename_doc);
                         $image->move($destinationPath, $imagename_doc);
-                    }
-                     else
-                    {
+                    } else {
                         $image->move($destinationPath, $imagename_doc);
                     }
 
@@ -262,18 +261,17 @@ class ContractorsController extends Controller
                     DB::table('workers_document')->insertGetId($doc_arr_arr);
                 }
             }
+        }
 
-            }
 
-
-        return redirect()->route('admin.contractors.index')->with('success','worker created successfully.');
+        return redirect()->route('admin.contractors.index')->with('success', 'worker created successfully.');
     }
 
     public function editWorker($worker_id)
     {
-        $document_types = DB::table('document_types')->where('deleted_at',NULL)->first();
-        $worker_details = DB::table('workers')->where('id',$worker_id)->first();
-        return view('backend.contractors.edit_worker',compact('worker_id','document_types','worker_details'));
+        $document_types = DB::table('document_types')->where('deleted_at', NULL)->first();
+        $worker_details = DB::table('workers')->where('id', $worker_id)->first();
+        return view('backend.contractors.edit_worker', compact('worker_id', 'document_types', 'worker_details'));
     }
 
 
@@ -286,30 +284,24 @@ class ContractorsController extends Controller
             'address' => 'required',
         ]);
 
-        $worker_details = DB::table('workers')->where('id',$request->worker_id)->first();
+        $worker_details = DB::table('workers')->where('id', $request->worker_id)->first();
 
-        $imagename=""; $storeName="";
+        $imagename = "";
+        $storeName = "";
 
-        if(!empty($request->profile_pic))
-        {
-          $destinationPath = public_path('/img/worker/profile');
+        if (!empty($request->profile_pic)) {
+            $destinationPath = public_path('/img/worker/profile');
 
-           if($request->profile_pic=="")
-           {
-              $imagename="";
-            }
-            else
-            {
+            if ($request->profile_pic == "") {
+                $imagename = "";
+            } else {
                 $image = $request->profile_pic;
-                $imagename = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                $storeName=  'worker/profile/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                 if(file_exists(public_path().$destinationPath.$imagename))
-                 {
-                    unlink(public_path().$destinationPath.$imagename);
+                $imagename = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                $storeName =  'worker/profile/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                if (file_exists(public_path() . $destinationPath . $imagename)) {
+                    unlink(public_path() . $destinationPath . $imagename);
                     $image->move($destinationPath, $imagename);
-                }
-                 else
-                 {
+                } else {
                     $image->move($destinationPath, $imagename);
                 }
             }
@@ -326,30 +318,28 @@ class ContractorsController extends Controller
         $update_arr['address'] = $request->address;
         $update_arr['updated_at'] = Carbon::now();
 
-        $update_worker = DB::table('workers')->where('id',$request->worker_id)->update($update_arr);
+        $update_worker = DB::table('workers')->where('id', $request->worker_id)->update($update_arr);
 
 
-        if($update_worker) {
+        if ($update_worker) {
 
 
             $doc_name = $request->file('doc_name');
-            if(isset($doc_name) && !empty($doc_name)) {
+            if (isset($doc_name) && !empty($doc_name)) {
                 foreach ($doc_name as $doc_name_new) {
 
-                    $imagename_doc=""; $storeDocName="";
+                    $imagename_doc = "";
+                    $storeDocName = "";
                     $destinationPath = public_path('/img/worker/document');
                     $image = $doc_name_new;
-                    $imagename_doc = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
+                    $imagename_doc = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
                     //echo $image->getClientOriginalExtension(); die;
 
-                    $storeDocName=  'worker/document/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                    if(file_exists(public_path().$destinationPath.$imagename_doc))
-                    {
-                        unlink(public_path().$destinationPath.$imagename_doc);
+                    $storeDocName =  'worker/document/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                    if (file_exists(public_path() . $destinationPath . $imagename_doc)) {
+                        unlink(public_path() . $destinationPath . $imagename_doc);
                         $image->move($destinationPath, $imagename_doc);
-                    }
-                     else
-                    {
+                    } else {
                         $image->move($destinationPath, $imagename_doc);
                     }
 
@@ -365,34 +355,33 @@ class ContractorsController extends Controller
                     DB::table('workers_document')->insertGetId($doc_arr_arr);
                 }
             }
-
         }
 
-        return redirect()->route('admin.contractors.index')->with('success','worker updated successfully.');
+        return redirect()->route('admin.contractors.index')->with('success', 'worker updated successfully.');
     }
 
 
     public function show($user_id)
     {
 
-        $contractor_details = DB::table('users')->leftjoin('social_networks','users.id','=','social_networks.user_id')
-        ->select('users.*','facebook_url','instagram_url','snap_chat_url','twitter_url','youtube_url')
-        ->where('users.id',$user_id)->first();
+        $contractor_details = DB::table('users')->leftjoin('social_networks', 'users.id', '=', 'social_networks.user_id')
+            ->select('users.*', 'facebook_url', 'instagram_url', 'snap_chat_url', 'twitter_url', 'youtube_url')
+            ->where('users.id', $user_id)->first();
 
-        return view('backend.contractors.view_contractor',compact('contractor_details'));
+        return view('backend.contractors.view_contractor', compact('contractor_details'));
     }
 
 
     public function edit($user_id)
     {
 
-        $user_details = DB::table('users')->leftjoin('social_networks','users.id','=','social_networks.user_id')
-        ->select('users.*','facebook_url','instagram_url','snap_chat_url','twitter_url','youtube_url')
-        ->where('users.id',$user_id)->first();
+        $user_details = DB::table('users')->leftjoin('social_networks', 'users.id', '=', 'social_networks.user_id')
+            ->select('users.*', 'facebook_url', 'instagram_url', 'snap_chat_url', 'twitter_url', 'youtube_url')
+            ->where('users.id', $user_id)->first();
 
         //echo "<pre>"; print_r($user_details); die('con');
 
-        return view('backend.contractors.edit',compact('user_details'));
+        return view('backend.contractors.edit', compact('user_details'));
     }
 
 
@@ -415,46 +404,40 @@ class ContractorsController extends Controller
 
 
 
-       /*$user_details = DB::table('users')->join('social_networks','users.id','=','social_networks.user_id')
+        /*$user_details = DB::table('users')->join('social_networks','users.id','=','social_networks.user_id')
         ->select('users.*','facebook_url','instagram_url','snap_chat_url','twitter_url','youtube_url')
         ->where('users.id',$request->user_id)->first();*/
         $user_details = DB::table('users')
-                       ->where('id',$request->user_id)->first();
+            ->where('id', $request->user_id)->first();
 
         $social_details = DB::table('social_networks')
-                       ->where('user_id',$request->user_id)->first();
+            ->where('user_id', $request->user_id)->first();
 
 
 
-        $imagename=""; $storeName="";
+        $imagename = "";
+        $storeName = "";
 
-        if(!empty($request->avatar_location))
-        {
+        if (!empty($request->avatar_location)) {
 
-         $ext = $request->avatar_location->getClientOriginalExtension();
+            $ext = $request->avatar_location->getClientOriginalExtension();
 
-          $destinationPath = public_path('/img/contractor/profile');
-
-
-          $store_imagename = $request->user_id.'.'.$ext;
+            $destinationPath = public_path('/img/contractor/profile');
 
 
-           if($request->avatar_location=="")
-           {
-              $imagename="";
-            }
-            else
-            {
+            $store_imagename = $request->user_id . '.' . $ext;
+
+
+            if ($request->avatar_location == "") {
+                $imagename = "";
+            } else {
                 $image = $request->avatar_location;
-                $imagename = $request->user_id. '.' . $image->getClientOriginalExtension();
-                $storeName=  $store_imagename;
-                 if(file_exists(public_path().$destinationPath.$imagename))
-                 {
-                    unlink(public_path().$destinationPath.$imagename);
+                $imagename = $request->user_id . '.' . $image->getClientOriginalExtension();
+                $storeName =  $store_imagename;
+                if (file_exists(public_path() . $destinationPath . $imagename)) {
+                    unlink(public_path() . $destinationPath . $imagename);
                     $image->move($destinationPath, $store_imagename);
-                }
-                 else
-                 {
+                } else {
                     $image->move($destinationPath, $store_imagename);
                 }
             }
@@ -475,9 +458,9 @@ class ContractorsController extends Controller
         $update_arr['profile_description'] = $request->profile_description;
         $update_arr['updated_at'] = Carbon::now();
 
-        $user_id = DB::table('users')->where('id',$request->user_id)->update($update_arr);
+        $user_id = DB::table('users')->where('id', $request->user_id)->update($update_arr);
 
-        if(!empty($user_id)){
+        if (!empty($user_id)) {
 
             $social_arr['facebook_url'] = $request->facebook_url;
             $social_arr['instagram_url'] = $request->instagram_url;
@@ -486,9 +469,8 @@ class ContractorsController extends Controller
             $social_arr['youtube_url'] = $request->youtube_url;
             $social_arr['updated_at'] = Carbon::now();
 
-            $update_social = DB::table('social_networks')->where('user_id',$request->user_id)->update($social_arr);
-
-            }else {
+            $update_social = DB::table('social_networks')->where('user_id', $request->user_id)->update($social_arr);
+        } else {
 
             $social_arr['user_id'] = $request->user_id;
             $social_arr['facebook_url'] = $request->facebook_url;
@@ -499,80 +481,71 @@ class ContractorsController extends Controller
             $social_arr['created_at'] = Carbon::now();
 
             DB::table('social_networks')->insert($social_arr);
+        }
 
 
-         }
-
-
-        return redirect()->route('admin.contractors.index')->with('success','contractor updated successfully.');
-
+        return redirect()->route('admin.contractors.index')->with('success', 'contractor updated successfully.');
     }
 
     public function paymentInfo($id)
     {
-        $paymentinfo = DB::table('users')->where('id',$id)->first();
+        $paymentinfo = DB::table('users')->where('id', $id)->first();
         return view('backend.contractors.show_payment', compact('paymentinfo'));
     }
 
     public function addServicesOffered($user_id)
     {
 
-         $added_service = DB::table('services_offered')
-         ->join('services','services_offered.service_id','=','services.id')
-         ->select('services.en_name','services.es_name','services_offered.service_id')
-         ->where('services_offered.user_id',$user_id)
-         ->where('services_offered.deleted_at',NULL)
-         ->get();
+        $added_service = DB::table('services_offered')
+            ->join('services', 'services_offered.service_id', '=', 'services.id')
+            ->select('services.en_name', 'services.es_name', 'services_offered.service_id')
+            ->where('services_offered.user_id', $user_id)
+            ->where('services_offered.deleted_at', NULL)
+            ->get();
 
         $service_ids = array();
-        if(isset($added_service) && count($added_service) > 0){
+        if (isset($added_service) && count($added_service) > 0) {
 
             foreach ($added_service as $key => $value) {
 
-                array_push($service_ids,$value->service_id);
+                array_push($service_ids, $value->service_id);
             }
         }
 
 
-        $services = DB::table('services')->where('status',1)->where('deleted_at',NULL)->get();
+        $services = DB::table('services')->where('status', 1)->where('deleted_at', NULL)->get();
 
-        $sub_services = DB::table('sub_services')->where('status','1')
-            ->where('services_id','!=',NULL)->whereRaw("(deleted_at IS null )")
+        $sub_services = DB::table('sub_services')->where('status', '1')
+            ->where('services_id', '!=', NULL)->whereRaw("(deleted_at IS null )")
             ->get()->toArray();
 
 
         $first_arr = array();
         $combinedData = array();
-        if(!empty($services))
-        {
-            foreach ($services as $service)
-            {
-                $first_arr['id']=isset($service) && !empty($service->id) ? $service->id : '' ;
-                $first_arr['name']=isset($service) && !empty($service->es_name) ? $service->es_name : '' ;
+        if (!empty($services)) {
+            foreach ($services as $service) {
+                $first_arr['id'] = isset($service) && !empty($service->id) ? $service->id : '';
+                $first_arr['name'] = isset($service) && !empty($service->es_name) ? $service->es_name : '';
 
-                $subservices=DB::table('sub_services')->where('status','1')->whereRaw("(services_id = '".$service->id."' AND deleted_at IS null )")->get();
+                $subservices = DB::table('sub_services')->where('status', '1')->whereRaw("(services_id = '" . $service->id . "' AND deleted_at IS null )")->get();
 
-                $options=array();
+                $options = array();
 
-                foreach ($subservices as $subservice)
-                {
-                    $arr_new2['service_id']=isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '' ;
-                    $arr_new2['sub_service_id']=isset($subservice) && !empty($subservice->id) ? $subservice->id : '' ;
-                    $arr_new2['name']=isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '' ;
+                foreach ($subservices as $subservice) {
+                    $arr_new2['service_id'] = isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '';
+                    $arr_new2['sub_service_id'] = isset($subservice) && !empty($subservice->id) ? $subservice->id : '';
+                    $arr_new2['name'] = isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '';
 
                     array_push($options, $arr_new2);
                 }
 
-                $first_arr['subservices']=$options ;
+                $first_arr['subservices'] = $options;
                 array_push($combinedData, $first_arr);
-
             }
         }
         //echo "<pre>"; print_r($combinedData); die;
 
-        return view('backend.contractors.create_services_offered',compact('user_id','services','service_ids','combinedData'));
-
-
+        return view('backend.contractors.create_services_offered', compact('user_id', 'services', 'service_ids', 'combinedData'));
     }
 
 
@@ -586,120 +559,112 @@ class ContractorsController extends Controller
 
         //echo "<pre>"; print_r($request->services); die;
 
-    if(!empty($request->services))
-    {
-        $serviceOfferedData=$request->services;
-        $getData = DB::table('services_offered')->select('id','user_id','service_id','created_at','updated_at')->whereRaw("(user_id = '".$userId."')")->get()->toArray();
-        // if(!empty($getData))
-        // {
-        //     DB::table('services_offered')->where('user_id', '=', $userId)->delete();
-        // }
+        if (!empty($request->services)) {
+            $serviceOfferedData = $request->services;
+            $getData = DB::table('services_offered')->select('id', 'user_id', 'service_id', 'created_at', 'updated_at')->whereRaw("(user_id = '" . $userId . "')")->get()->toArray();
+            // if(!empty($getData))
+            // {
+            //     DB::table('services_offered')->where('user_id', '=', $userId)->delete();
+            // }
 
 
-        foreach($serviceOfferedData as $key => $value)
-        {
-            $sub_service_id = NULL;
-            $service_id = NULL;
-            $serv_subserv = explode(",",$value);
-            $service_id = (int)$serv_subserv[0];
+            foreach ($serviceOfferedData as $key => $value) {
+                $sub_service_id = NULL;
+                $service_id = NULL;
+                $serv_subserv = explode(",", $value);
+                $service_id = (int)$serv_subserv[0];
 
-            if(isset($serv_subserv[1])){
+                if (isset($serv_subserv[1])) {
 
-                $sub_service_id = (int)$serv_subserv[1];
+                    $sub_service_id = (int)$serv_subserv[1];
+                }
+
+                $serv['user_id']        = $userId;
+                $serv['service_id']     = $service_id;
+                $serv['sub_service_id'] = $sub_service_id;
+                $serv['created_at']     = Carbon::now();
+
+                $saveserv = DB::table('services_offered')->insert($serv);
             }
-
-            $serv['user_id']        = $userId;
-            $serv['service_id']     = $service_id;
-            $serv['sub_service_id'] = $sub_service_id;
-            $serv['created_at']     = Carbon::now();
-
-            $saveserv = DB::table('services_offered')->insert($serv);
-
-
         }
-    }
 
 
         return redirect()->route('admin.contractors.show_services_offered', ['id' => $userId]);
     }
 
-      public function editServicesOffered($user_id)
+    public function editServicesOffered($user_id)
     {
 
 
-     $services_details = DB::table('services_offered')
-         ->join('services','services_offered.service_id','=','services.id')
-         ->select('services.en_name','services.es_name','services_offered.service_id','services_offered.sub_service_id')
-         ->where('services_offered.user_id',$user_id)
-         ->where('services_offered.deleted_at',NULL)
-         ->get();
+        $services_details = DB::table('services_offered')
+            ->join('services', 'services_offered.service_id', '=', 'services.id')
+            ->select('services.en_name', 'services.es_name', 'services_offered.service_id', 'services_offered.sub_service_id')
+            ->where('services_offered.user_id', $user_id)
+            ->where('services_offered.deleted_at', NULL)
+            ->get();
 
-      $service_ids = array();
-        if(isset($services_details) && count($services_details) > 0){
+        $service_ids = array();
+        if (isset($services_details) && count($services_details) > 0) {
 
             foreach ($services_details as $key => $value) {
 
 
-                array_push($service_ids,$value->service_id);
+                array_push($service_ids, $value->service_id);
             }
         }
 
-     $sub_service_ids = array();
-        if(isset($services_details) && count($services_details) > 0){
+        $sub_service_ids = array();
+        if (isset($services_details) && count($services_details) > 0) {
 
             foreach ($services_details as $key => $value) {
 
-                array_push($sub_service_ids,$value->sub_service_id);
+                array_push($sub_service_ids, $value->sub_service_id);
             }
         }
 
         //echo "<pre>"; print_r($sub_service_ids); die;
 
-        $services = DB::table('services')->where('status',1)->where('deleted_at',NULL)->get();
+        $services = DB::table('services')->where('status', 1)->where('deleted_at', NULL)->get();
 
-        $sub_services = DB::table('sub_services')->where('status','1')
-            ->where('services_id','!=',NULL)->whereRaw("(deleted_at IS null )")
+        $sub_services = DB::table('sub_services')->where('status', '1')
+            ->where('services_id', '!=', NULL)->whereRaw("(deleted_at IS null )")
             ->get()->toArray();
 
 
         $first_arr = array();
         $combinedData = array();
-        if(!empty($services))
-        {
-            foreach ($services as $service)
-            {
-                $first_arr['id']=isset($service) && !empty($service->id) ? $service->id : '' ;
-                $first_arr['name']=isset($service) && !empty($service->es_name) ? $service->es_name : '' ;
+        if (!empty($services)) {
+            foreach ($services as $service) {
+                $first_arr['id'] = isset($service) && !empty($service->id) ? $service->id : '';
+                $first_arr['name'] = isset($service) && !empty($service->es_name) ? $service->es_name : '';
 
-                $subservices=DB::table('sub_services')->where('status','1')->whereRaw("(services_id = '".$service->id."' AND deleted_at IS null )")->get();
+                $subservices = DB::table('sub_services')->where('status', '1')->whereRaw("(services_id = '" . $service->id . "' AND deleted_at IS null )")->get();
 
-                $options=array();
+                $options = array();
 
-                foreach ($subservices as $subservice)
-                {
-                    $arr_new2['service_id']=isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '' ;
-                    $arr_new2['sub_service_id']=isset($subservice) && !empty($subservice->id) ? $subservice->id : '' ;
-                    $arr_new2['name']=isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '' ;
+                foreach ($subservices as $subservice) {
+                    $arr_new2['service_id'] = isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '';
+                    $arr_new2['sub_service_id'] = isset($subservice) && !empty($subservice->id) ? $subservice->id : '';
+                    $arr_new2['name'] = isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '';
 
                     array_push($options, $arr_new2);
                 }
 
-                $first_arr['subservices']=$options ;
+                $first_arr['subservices'] = $options;
                 array_push($combinedData, $first_arr);
-
             }
         }
 
-   // echo "<pre>"; print_r($combinedData); die('con');
+        // echo "<pre>"; print_r($combinedData); die('con');
 
-        return view('backend.contractors.edit_services_offered',compact('services','service_ids','combinedData','services_details','sub_service_ids','user_id'));
+        return view('backend.contractors.edit_services_offered', compact('services', 'service_ids', 'combinedData', 'services_details', 'sub_service_ids', 'user_id'));
     }
 
 
-     public function updateServicesOffered(Request $request)
+    public function updateServicesOffered(Request $request)
     {
 
-       $userId = $request->user_id;
+        $userId = $request->user_id;
 
         $request->validate([
             'services' => 'required',
@@ -707,124 +672,115 @@ class ContractorsController extends Controller
 
         //echo "<pre>"; print_r($request->services); die;
 
-    if(!empty($request->services))
-    {
-        $serviceOfferedData=$request->services;
-        $getData = DB::table('services_offered')->select('id','user_id','service_id','created_at','updated_at')->whereRaw("(user_id = '".$userId."')")->get()->toArray();
-        if(!empty($getData))
-        {
-            DB::table('services_offered')->where('user_id', '=', $userId)->delete();
-        }
-
-
-        foreach($serviceOfferedData as $key => $value)
-        {
-            $sub_service_id = NULL;
-            $service_id = NULL;
-
-            $serv_subserv = explode(",",$value);
-            $service_id = (int)$serv_subserv[0];
-
-            if(isset($serv_subserv[1])){
-
-                $sub_service_id = (int)$serv_subserv[1];
+        if (!empty($request->services)) {
+            $serviceOfferedData = $request->services;
+            $getData = DB::table('services_offered')->select('id', 'user_id', 'service_id', 'created_at', 'updated_at')->whereRaw("(user_id = '" . $userId . "')")->get()->toArray();
+            if (!empty($getData)) {
+                DB::table('services_offered')->where('user_id', '=', $userId)->delete();
             }
 
-            $serv['user_id']        = $userId;
-            $serv['service_id']     = $service_id;
-            $serv['sub_service_id'] = $sub_service_id;
-            $serv['updated_at']     = Carbon::now();
 
-           // echo "<pre>"; print_r($serv); die;
+            foreach ($serviceOfferedData as $key => $value) {
+                $sub_service_id = NULL;
+                $service_id = NULL;
 
-            $saveserv = DB::table('services_offered')->insert($serv);
+                $serv_subserv = explode(",", $value);
+                $service_id = (int)$serv_subserv[0];
 
+                if (isset($serv_subserv[1])) {
+
+                    $sub_service_id = (int)$serv_subserv[1];
+                }
+
+                $serv['user_id']        = $userId;
+                $serv['service_id']     = $service_id;
+                $serv['sub_service_id'] = $sub_service_id;
+                $serv['updated_at']     = Carbon::now();
+
+                // echo "<pre>"; print_r($serv); die;
+
+                $saveserv = DB::table('services_offered')->insert($serv);
+            }
         }
+
+        //  return redirect()->route('admin.contractors.index')->with('success','services updated successfully.');
+        return redirect()->route('admin.contractors.show_services_offered', ['id' => $userId]);
     }
 
-   //  return redirect()->route('admin.contractors.index')->with('success','services updated successfully.');
-    return redirect()->route('admin.contractors.show_services_offered', ['id' => $userId]);
-
-    }
-
-     public function showServicesOffered($user_id)
+    public function showServicesOffered($user_id)
     {
 
-     $services_details = DB::table('services_offered')
-         ->join('services','services_offered.service_id','=','services.id')
-         ->join('users','services_offered.user_id','=','users.id')
-         ->select('services.en_name','services.es_name','services_offered.service_id','services_offered.sub_service_id','users.first_name', 'users.last_name', 'users.user_group_id')
-         ->where('services_offered.user_id',$user_id)
-         ->where('services_offered.deleted_at',NULL)
-         ->get();
+        $services_details = DB::table('services_offered')
+            ->join('services', 'services_offered.service_id', '=', 'services.id')
+            ->join('users', 'services_offered.user_id', '=', 'users.id')
+            ->select('services.en_name', 'services.es_name', 'services_offered.service_id', 'services_offered.sub_service_id', 'users.first_name', 'users.last_name', 'users.user_group_id')
+            ->where('services_offered.user_id', $user_id)
+            ->where('services_offered.deleted_at', NULL)
+            ->get();
 
-        
+
 
         $service_ids = array();
-        if(isset($services_details) && count($services_details) > 0){
+        if (isset($services_details) && count($services_details) > 0) {
 
             foreach ($services_details as $key => $value) {
 
 
-                array_push($service_ids,$value->service_id);
+                array_push($service_ids, $value->service_id);
             }
         }
 
 
         $sub_service_ids = array();
-        if(isset($services_details) && count($services_details) > 0){
+        if (isset($services_details) && count($services_details) > 0) {
 
             foreach ($services_details as $key => $value) {
 
-                array_push($sub_service_ids,$value->sub_service_id);
+                array_push($sub_service_ids, $value->sub_service_id);
             }
         }
 
         //echo "<pre>"; print_r($sub_service_ids); die;
 
-        $services = DB::table('services')->where('status',1)->where('deleted_at',NULL)->get();
+        $services = DB::table('services')->where('status', 1)->where('deleted_at', NULL)->get();
 
-        $sub_services = DB::table('sub_services')->where('status','1')
-            ->where('services_id','!=',NULL)->whereRaw("(deleted_at IS null )")
+        $sub_services = DB::table('sub_services')->where('status', '1')
+            ->where('services_id', '!=', NULL)->whereRaw("(deleted_at IS null )")
             ->get()->toArray();
 
 
         $first_arr = array();
         $combinedData = array();
-        if(!empty($services))
-        {
-            foreach ($services as $service)
-            {
-                $first_arr['id']=isset($service) && !empty($service->id) ? $service->id : '' ;
-                $first_arr['name']=isset($service) && !empty($service->es_name) ? $service->es_name : '' ;
+        if (!empty($services)) {
+            foreach ($services as $service) {
+                $first_arr['id'] = isset($service) && !empty($service->id) ? $service->id : '';
+                $first_arr['name'] = isset($service) && !empty($service->es_name) ? $service->es_name : '';
 
-                $subservices=DB::table('sub_services')->where('status','1')->whereRaw("(services_id = '".$service->id."' AND deleted_at IS null )")->get();
+                $subservices = DB::table('sub_services')->where('status', '1')->whereRaw("(services_id = '" . $service->id . "' AND deleted_at IS null )")->get();
 
-                $options=array();
+                $options = array();
 
-                foreach ($subservices as $subservice)
-                {
-                    $arr_new2['service_id']=isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '' ;
-                    $arr_new2['sub_service_id']=isset($subservice) && !empty($subservice->id) ? $subservice->id : '' ;
-                    $arr_new2['name']=isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '' ;
+                foreach ($subservices as $subservice) {
+                    $arr_new2['service_id'] = isset($subservice) && !empty($subservice->services_id) ? $subservice->services_id : '';
+                    $arr_new2['sub_service_id'] = isset($subservice) && !empty($subservice->id) ? $subservice->id : '';
+                    $arr_new2['name'] = isset($subservice) && !empty($subservice->es_name) ? $subservice->es_name : '';
 
                     array_push($options, $arr_new2);
                 }
 
-                $first_arr['subservices']=$options ;
+                $first_arr['subservices'] = $options;
                 array_push($combinedData, $first_arr);
-
             }
         }
 
-   // echo "<pre>"; print_r($combinedData); die('con');
+        // echo "<pre>"; print_r($combinedData); die('con');
 
-        return view('backend.contractors.edit_show_offered_services',compact('services','service_ids','combinedData','services_details','sub_service_ids','user_id'));
+        return view('backend.contractors.edit_show_offered_services', compact('services', 'service_ids', 'combinedData', 'services_details', 'sub_service_ids', 'user_id'));
     }
 
     public function addContractorDocuments($user_id)
     {
-        return view('backend.contractors.add_contractor_documents',compact('user_id'));
+        return view('backend.contractors.add_contractor_documents', compact('user_id'));
     }
 
     public function storeContractorDocuments(Request $request)
@@ -835,24 +791,22 @@ class ContractorsController extends Controller
         ]);
 
         $doc_name = $request->doc_name;
-        if(isset($doc_name) && !empty($doc_name)) {
+        if (isset($doc_name) && !empty($doc_name)) {
             //die('jgfg');
             foreach ($doc_name as $doc_name) {
 
-                $imagename_doc=""; $storeDocName="";
+                $imagename_doc = "";
+                $storeDocName = "";
                 $destinationPath = public_path('/img/contractor/docs');
                 $image = $doc_name;
-                $imagename_doc = date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
+                $imagename_doc = date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
                 //echo $image->getClientOriginalExtension(); die;
 
-                $storeDocName=  'contractor/docs/'.date('Y-m-d').time(). '-img'.'.' . $image->getClientOriginalExtension();
-                if(file_exists(public_path().$destinationPath.$imagename_doc))
-                {
-                    unlink(public_path().$destinationPath.$imagename_doc);
+                $storeDocName =  'contractor/docs/' . date('Y-m-d') . time() . '-img' . '.' . $image->getClientOriginalExtension();
+                if (file_exists(public_path() . $destinationPath . $imagename_doc)) {
+                    unlink(public_path() . $destinationPath . $imagename_doc);
                     $image->move($destinationPath, $imagename_doc);
-                }
-                 else
-                {
+                } else {
                     $image->move($destinationPath, $imagename_doc);
                 }
 
@@ -870,138 +824,135 @@ class ContractorsController extends Controller
         }
 
 
-        return redirect()->route('admin.contractors.index')->with('success','services added successfully.');
+        return redirect()->route('admin.contractors.index')->with('success', 'services added successfully.');
     }
 
     public function allContractorDocuments($user_id)
     {
-        $all_documents = DB::table('users_document')->where('user_id',$user_id)->where('deleted_at',NULL)->get();
-        return view('backend.contractors.all_contractor_documents',compact('all_documents'));
+        $all_documents = DB::table('users_document')->where('user_id', $user_id)->where('deleted_at', NULL)->get();
+        return view('backend.contractors.all_contractor_documents', compact('all_documents'));
     }
 
     public function allWorkers($user_id)
     {
         //die('AllWorkers');
         $all_workers = '';
-        $all_workers = DB::table('workers')->where('user_id',$user_id)->where('deleted_at',NULL)->get();
+        $all_workers = DB::table('workers')->where('user_id', $user_id)->where('deleted_at', NULL)->get();
         //echo "<pre>"; print_r($all_workers); die;
-        return view('backend.contractors.all_workers',compact('user_id','all_workers'));
+        return view('backend.contractors.all_workers', compact('user_id', 'all_workers'));
     }
 
-     public function viewWorker($worker_id)
+    public function viewWorker($worker_id)
     {
         //die('asdasd');
-        $worker_details = DB::table('workers')->where('id',$worker_id)->first();
-        $worker_details->document = DB::table('workers_document')->where('user_id',$worker_id)->where('deleted_at',NULL)->get();
+        $worker_details = DB::table('workers')->where('id', $worker_id)->first();
+        $worker_details->document = DB::table('workers_document')->where('user_id', $worker_id)->where('deleted_at', NULL)->get();
 
 
-        return view('backend.contractors.view_worker',compact('worker_details'));
+        return view('backend.contractors.view_worker', compact('worker_details'));
     }
 
 
     public function destroyWorker($worker_id)
     {
         $updateArr['deleted_at'] = Carbon::now();
-        DB::table('workers')->where('id',$worker_id)->update($updateArr);
-        return redirect()->route('admin.contractors.index')->with('success','Worker deleted successfully');
+        DB::table('workers')->where('id', $worker_id)->update($updateArr);
+        return redirect()->route('admin.contractors.index')->with('success', 'Worker deleted successfully');
     }
 
     public function destroy($user_id)
     {
         $updateArr['deleted_at'] = Carbon::now();
-        DB::table('users')->where('id',$user_id)->update($updateArr);
-        return redirect()->route('admin.contractors.deleted')->with('success','Contractor deleted successfully');
+        DB::table('users')->where('id', $user_id)->update($updateArr);
+        return redirect()->route('admin.contractors.deleted')->with('success', 'Contractor deleted successfully');
     }
 
-    public function get_districts(Request $request) {
+    public function get_districts(Request $request)
+    {
 
         $city_id = $request->input('city_id');
-        $districts = DB::table('districts')->where('city_id',$city_id)->where('deleted_at',NULL)->get();
+        $districts = DB::table('districts')->where('city_id', $city_id)->where('deleted_at', NULL)->get();
         $html = view('backend.contractors.get_districts')->with(compact('districts'))->render();
         return response()->json(['success' => true, 'html' => $html]);
     }
 
-    public function editCoverageArea($userId) {
+    public function editCoverageArea($userId)
+    {
 
-        $user_ser_country = DB::table('users_services_area')->where('user_id',$userId)->where('whole_country',1)->count();
-        if($user_ser_country == 1){
+        $user_ser_country = DB::table('users_services_area')->where('user_id', $userId)->where('whole_country', 1)->count();
+        if ($user_ser_country == 1) {
             $whole_country = 'Yes';
-
         } else {
             $whole_country = 'No';
-
         }
 
-        $user_ser_area = DB::table('users_services_area')->where('user_id',$userId)->get();
+        $user_ser_area = DB::table('users_services_area')->where('user_id', $userId)->get();
         $user_province_ids = array();
         $user_city_ids = array();
-        $user_province = DB::table('users_services_area')->where('user_id',$userId)->where('province_id','!=',NULL)->get();
+        $user_province = DB::table('users_services_area')->where('user_id', $userId)->where('province_id', '!=', NULL)->get();
 
         foreach ($user_province as $k_province => $v_province) {
 
-            array_push($user_province_ids,$v_province->province_id);
+            array_push($user_province_ids, $v_province->province_id);
         }
 
-        $user_city = DB::table('users_services_area')->where('user_id',$userId)->where('city_id','!=',NULL)->get();
+        $user_city = DB::table('users_services_area')->where('user_id', $userId)->where('city_id', '!=', NULL)->get();
         foreach ($user_city as $k_city => $v_city) {
 
-            array_push($user_city_ids,$v_city->city_id);
+            array_push($user_city_ids, $v_city->city_id);
         }
 
-        $services = DB::table('services')->where('deleted_at',NULL)->get();
-        $services_offered = DB::table('services_offered')->join('services','services_offered.service_id','=','services.id')->select('services.*','services_offered.service_id')->where('services_offered.user_id',$userId)->where('services_offered.deleted_at',NULL)->get();
+        $services = DB::table('services')->where('deleted_at', NULL)->get();
+        $services_offered = DB::table('services_offered')->join('services', 'services_offered.service_id', '=', 'services.id')->select('services.*', 'services_offered.service_id')->where('services_offered.user_id', $userId)->where('services_offered.deleted_at', NULL)->get();
         $serice_ids = array();
 
-        if(isset($services_offered) && !empty($services_offered)) {
+        if (isset($services_offered) && !empty($services_offered)) {
             foreach ($services_offered as $key => $value) {
-                array_push($serice_ids,$value->service_id);
+                array_push($serice_ids, $value->service_id);
             }
         }
 
         //$provinces=DB::table('provinces')->where('status','1')->whereRaw("(deleted_at IS null )")->get()->toArray();
 
 
-        $cities=DB::table('cities')->where('status','1')->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $cities = DB::table('cities')->where('status', '1')->whereRaw("(deleted_at IS null )")->get()->toArray();
 
         // echo "<pre>"; print_r($user_details); die('con');
 
-        $provinces=DB::table('provinces')->where('status','1')->whereRaw("(deleted_at IS null )")->get();
+        $provinces = DB::table('provinces')->where('status', '1')->whereRaw("(deleted_at IS null )")->get();
 
-                $cities=DB::table('cities')->where('status','1')->whereRaw("(deleted_at IS null )")->get()->toArray();
-                $arr=array();
-                $allData=array();
-                if(!empty($provinces))
-                {
-                  foreach ($provinces as $provience)
-                    {
-                            $arr['id']=isset($provience) && !empty($provience->id) ? $provience->id : '' ;
-                            $arr['name']=isset($provience) && !empty($provience->name) ? $provience->name : '' ;
+        $cities = DB::table('cities')->where('status', '1')->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $arr = array();
+        $allData = array();
+        if (!empty($provinces)) {
+            foreach ($provinces as $provience) {
+                $arr['id'] = isset($provience) && !empty($provience->id) ? $provience->id : '';
+                $arr['name'] = isset($provience) && !empty($provience->name) ? $provience->name : '';
 
-                          $city=DB::table('cities')->where('status','1')->whereRaw("(province_id = '".$provience->id."' AND deleted_at IS null )")->get();
+                $city = DB::table('cities')->where('status', '1')->whereRaw("(province_id = '" . $provience->id . "' AND deleted_at IS null )")->get();
 
-                            $options=array();
+                $options = array();
 
-                            foreach ($city as $cit)
-                            {
-                                $arr2['province_id']=isset($cit) && !empty($cit->province_id) ? $cit->province_id : '' ;
-                                $arr2['city_id']=isset($cit) && !empty($cit->id) ? $cit->id : '' ;
-                                $arr2['name']=isset($cit) && !empty($cit->name) ? $cit->name : '' ;
+                foreach ($city as $cit) {
+                    $arr2['province_id'] = isset($cit) && !empty($cit->province_id) ? $cit->province_id : '';
+                    $arr2['city_id'] = isset($cit) && !empty($cit->id) ? $cit->id : '';
+                    $arr2['name'] = isset($cit) && !empty($cit->name) ? $cit->name : '';
 
-                                array_push($options, $arr2);
-                            }
-
-                        $arr['cities']=$options ;
-                        array_push($allData, $arr);
-
-                    }
+                    array_push($options, $arr2);
                 }
 
+                $arr['cities'] = $options;
+                array_push($allData, $arr);
+            }
+        }
 
 
-        return view('backend.contractors.edit_coverage_area',compact('provinces','cities','services','services_offered','serice_ids','userId','whole_country','user_ser_area','user_province_ids','user_city_ids'))->withMixdata($allData);
+
+        return view('backend.contractors.edit_coverage_area', compact('provinces', 'cities', 'services', 'services_offered', 'serice_ids', 'userId', 'whole_country', 'user_ser_area', 'user_province_ids', 'user_city_ids'))->withMixdata($allData);
     }
 
-    public function updateCoverageArea(request $request) {
+    public function updateCoverageArea(request $request)
+    {
 
 
         $userId = $request->user_id;
@@ -1073,124 +1024,112 @@ class ContractorsController extends Controller
         // }
 
 
-        $whole_country=!empty($request->whole_country) ? $request->whole_country : '0' ;
-        print_r($whole_country); die('con');
-        $proviences=!empty($request->proviences) ? $request->proviences : '' ;
+        $whole_country = !empty($request->whole_country) ? $request->whole_country : '0';
+        print_r($whole_country);
+        die('con');
+        $proviences = !empty($request->proviences) ? $request->proviences : '';
 
-        if(!empty($whole_country) && $whole_country==1)
-        {
-           DB::table('users_services_area')->where('user_id', '=', $userId)->delete();
+        if (!empty($whole_country) && $whole_country == 1) {
+            DB::table('users_services_area')->where('user_id', '=', $userId)->delete();
             $forCountry['user_id'] = $userId;
             $forCountry['whole_country'] = $whole_country;
             $forCountry['created_at'] = Carbon::now()->toDateTimeString();
             $saveforCountry = DB::table('users_services_area')->insert($forCountry);
         }
 
-        if(!empty($proviences))
-        {
-            $anotehr=array();
+        if (!empty($proviences)) {
+            $anotehr = array();
 
             DB::table('users_services_area')->where('user_id', '=', $userId)->delete();
 
-             foreach ($proviences as $pps)
-             {
-                $anotehr[]=explode(',', $pps);
-             }
-             foreach ($anotehr as $key => $value)
-             {
-               $provience_id=isset($value[0]) && !empty($value[0]) ? $value[0] : NULL ;
-               $city_id=isset($value[1]) && !empty($value[1]) ? $value[1] : NULL ;
+            foreach ($proviences as $pps) {
+                $anotehr[] = explode(',', $pps);
+            }
+            foreach ($anotehr as $key => $value) {
+                $provience_id = isset($value[0]) && !empty($value[0]) ? $value[0] : NULL;
+                $city_id = isset($value[1]) && !empty($value[1]) ? $value[1] : NULL;
 
                 $forProvince['user_id'] = $userId;
                 $forProvince['whole_country'] = 0;
-                $forProvince['province_id']=$provience_id;
-                $forProvince['city_id']=$city_id;
+                $forProvince['province_id'] = $provience_id;
+                $forProvince['city_id'] = $city_id;
                 $forProvince['created_at'] = Carbon::now()->toDateTimeString();
                 $saveForProvince = DB::table('users_services_area')->insert($forProvince);
-
-             }
+            }
         }
 
-        return redirect()->back()->with('success','Updated successfully');
-
+        return redirect()->back()->with('success', 'Updated successfully');
     }
 
 
-    public function editPaymentMethod($userId) {
+    public function editPaymentMethod($userId)
+    {
         //die('here');
-        $paymentMethods = DB::table('payment_methods')->where('deleted_at',NULL)->get();
-        $user_payment_methods = DB::table('user_payment_methods')->where('deleted_at',NULL)->where('user_id',$userId)->get();
+        $paymentMethods = DB::table('payment_methods')->where('deleted_at', NULL)->get();
+        $user_payment_methods = DB::table('user_payment_methods')->where('deleted_at', NULL)->where('user_id', $userId)->get();
 
         $user_pay_menthod_ids = array();
         foreach ($user_payment_methods as $key => $value) {
-            array_push($user_pay_menthod_ids,$value->payment_method_id);
+            array_push($user_pay_menthod_ids, $value->payment_method_id);
         }
 
         //echo "<pre>"; print_r($user_pay_menthod_ids); die('con');
 
 
-        return view('backend.contractors.edit_payment_method',compact('paymentMethods','user_pay_menthod_ids','userId'));
+        return view('backend.contractors.edit_payment_method', compact('paymentMethods', 'user_pay_menthod_ids', 'userId'));
     }
 
-    public function updatePaymentMethods(request $request) {
+    public function updatePaymentMethods(request $request)
+    {
 
-        if(isset($request->payment_method_id) && !empty($request->payment_method_id))
-        {
-            DB::table('user_payment_methods')->where('user_id',$request->user_id)->delete();
+        if (isset($request->payment_method_id) && !empty($request->payment_method_id)) {
+            DB::table('user_payment_methods')->where('user_id', $request->user_id)->delete();
 
-            foreach($request->payment_method_id as $pay_method)
-            {
+            foreach ($request->payment_method_id as $pay_method) {
                 $payment_method_arr['status'] = 1;
                 $payment_method_arr['user_id'] = $request->user_id;
                 $payment_method_arr['payment_method_id'] = $pay_method;
                 $payment_method_arr['created_at'] = Carbon::now();
                 DB::table('user_payment_methods')->insert($payment_method_arr);
             }
-
         }
 
-        return redirect()->back()->with('success','Updated successfully');
-
+        return redirect()->back()->with('success', 'Updated successfully');
     }
 
-    public function addContractorCertificate($user_id) {
+    public function addContractorCertificate($user_id)
+    {
 
-        return view('backend.contractors.add_contractor_certifications',compact('user_id'));
+        return view('backend.contractors.add_contractor_certifications', compact('user_id'));
     }
 
-    public function storeContractorCertificate(request $request){
-         // start certification courses
+    public function storeContractorCertificate(request $request)
+    {
+        // start certification courses
 
 
 
         $userId = $request->user_id;
-        if(isset($request->certification_type) && isset($request->certification_courses))
-        {
-            $certification_courses=$request->certification_courses;
-            $certification_type=$request->certification_type;
+        if (isset($request->certification_type) && isset($request->certification_courses)) {
+            $certification_courses = $request->certification_courses;
+            $certification_type = $request->certification_type;
 
-            if(!empty($certification_courses) && ($certification_type==0 ||$certification_type==1))
-            {
+            if (!empty($certification_courses) && ($certification_type == 0 || $certification_type == 1)) {
                 $fileNames = array_filter($_FILES['certification_courses']['name']);
 
-                if($certification_type=='0' || $certification_type==0)
-                {
-                    $allowTypes = array('jpg','png','jpeg');
-                }
-                else if($certification_type=='1' || $certification_type==1)
-                {
-                    $allowTypes = array('pdf','doc','docx','txt','rtf','odf','msword');
+                if ($certification_type == '0' || $certification_type == 0) {
+                    $allowTypes = array('jpg', 'png', 'jpeg');
+                } else if ($certification_type == '1' || $certification_type == 1) {
+                    $allowTypes = array('pdf', 'doc', 'docx', 'txt', 'rtf', 'odf', 'msword');
                 }
 
                 $statusMsg = $errorMsg =  $errorUpload = $errorUploadType = '';
 
-                if(!empty($fileNames) && $_FILES["certification_courses"]["error"] !== 4)
-                {
-                                //Delete Old
-                    $getAll = DB::table('user_certifications')->whereRaw("(user_id = '".$userId."' AND deleted_at IS null)")->whereRaw("(certification_type = '0')")->get()->toArray();
+                if (!empty($fileNames) && $_FILES["certification_courses"]["error"] !== 4) {
+                    //Delete Old
+                    $getAll = DB::table('user_certifications')->whereRaw("(user_id = '" . $userId . "' AND deleted_at IS null)")->whereRaw("(certification_type = '0')")->get()->toArray();
 
-                    if(!empty($getAll))
-                    {
+                    if (!empty($getAll)) {
                         //Delete Old
 
                         // DB::table('user_certifications')->where('user_id', '=', $userId)->where('certification_type', '=', '0')->delete();
@@ -1198,31 +1137,28 @@ class ContractorsController extends Controller
                         // $deleteOld = $this->delete_directory(public_path() . '/img/contractor/certifications/'.$userId);
                     }
 
-                    $check_folder_exist = public_path() . '/img/contractor/certifications/'.$userId;
+                    $check_folder_exist = public_path() . '/img/contractor/certifications/' . $userId;
 
-                    if(!is_dir($check_folder_exist)) {
+                    if (!is_dir($check_folder_exist)) {
 
-                        mkdir(public_path() . '/img/contractor/certifications/'.$userId, 0777, true);
+                        mkdir(public_path() . '/img/contractor/certifications/' . $userId, 0777, true);
                     }
 
 
 
 
-                    $targetDir = public_path() . '/img/contractor/certifications/'.$userId.'/';
+                    $targetDir = public_path() . '/img/contractor/certifications/' . $userId . '/';
 
-                    foreach($_FILES['certification_courses']['name'] as $key=>$val)
-                    {
+                    foreach ($_FILES['certification_courses']['name'] as $key => $val) {
 
-                        $fileName = rand(0000,9999).basename($_FILES['certification_courses']['name'][$key]);
+                        $fileName = rand(0000, 9999) . basename($_FILES['certification_courses']['name'][$key]);
                         $targetFilePath = $targetDir . $fileName;
 
                         // Check whether file type is valid
                         $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
-                        if(in_array($fileType, $allowTypes))
-                        {
+                        if (in_array($fileType, $allowTypes)) {
                             // Upload file to server
-                            if(move_uploaded_file($_FILES["certification_courses"]["tmp_name"][$key], $targetFilePath))
-                            {
+                            if (move_uploaded_file($_FILES["certification_courses"]["tmp_name"][$key], $targetFilePath)) {
                                 $insert['file_name'] = $fileName;
                                 //$insert['file_type'] = $fileType;
                                 $insert['file_type'] = $certification_type;
@@ -1233,166 +1169,153 @@ class ContractorsController extends Controller
                                 $insert['status'] = 1;
                                 $insert['created_at'] = Carbon::now();
                                 DB::table('user_certifications')->insertGetId($insert);
-                            }else
-                            {
-                                 $errorUpload .= 'certification file not uploaded.';
+                            } else {
+                                $errorUpload .= 'certification file not uploaded.';
                             }
-                        }else {
-                                $errorUploadType .='File Type Not Match';
+                        } else {
+                            $errorUploadType .= 'File Type Not Match';
                         }
                     }
                 }
             }
 
 
-            if(!empty($errorUpload))
-            {
-                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));exit;
+            if (!empty($errorUpload)) {
+                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));
+                exit;
             }
 
-            if(!empty($errorUploadType))
-            {
-                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));exit;
+            if (!empty($errorUploadType)) {
+                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));
+                exit;
             }
 
-            if(empty($errorUpload) && empty($errorUploadType)){
-                 return redirect()->route('admin.contractors.index')->with('success','add Successfully');
+            if (empty($errorUpload) && empty($errorUploadType)) {
+                return redirect()->route('admin.contractors.index')->with('success', 'add Successfully');
             }
         } else {
 
-            return redirect()->route('admin.contractors.index')->with('success','Please add Files');
+            return redirect()->route('admin.contractors.index')->with('success', 'Please add Files');
         }
 
 
-      // End certification courses
+        // End certification courses
     }
 
     function delete_directory($dirname)
     {
-         if (is_dir($dirname))
-               $dir_handle = opendir($dirname);
-         if (!$dir_handle)
-              return false;
-         while($file = readdir($dir_handle)) {
-               if ($file != "." && $file != "..") {
-                    if (!is_dir($dirname."/".$file))
-                         unlink($dirname."/".$file);
-                    else
-                         delete_directory($dirname.'/'.$file);
-               }
-         }
-         closedir($dir_handle);
-         rmdir($dirname);
-         return true;
+        if (is_dir($dirname))
+            $dir_handle = opendir($dirname);
+        if (!$dir_handle)
+            return false;
+        while ($file = readdir($dir_handle)) {
+            if ($file != "." && $file != "..") {
+                if (!is_dir($dirname . "/" . $file))
+                    unlink($dirname . "/" . $file);
+                else
+                    delete_directory($dirname . '/' . $file);
+            }
+        }
+        closedir($dir_handle);
+        rmdir($dirname);
+        return true;
     }
 
     public function allContractorCertificates($user_id)
     {
         //die('asfa');
         $userId = $user_id;
-        $allCertificates=DB::table('user_certifications')->select('id','user_id','file_name','file_type','is_verified','status','created_at')->where('user_id',$userId)->where('certification_type','0')->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $allCertificates = DB::table('user_certifications')->select('id', 'user_id', 'file_name', 'file_type', 'is_verified', 'status', 'created_at')->where('user_id', $userId)->where('certification_type', '0')->whereRaw("(deleted_at IS null )")->get()->toArray();
         $cetifications = array();
-        $certi2=array();
+        $certi2 = array();
         //$policeR2=array();
-        if(!empty($allCertificates))
-        {
-            $path='/img/contractor/certifications/'.$userId.'/';
-            foreach ($allCertificates as $key => $value)
-            {
-                $allImages1['id']=$value->id;
-                $allImages1['user_id']=$value->user_id;
-                $allImages1['file_name']=url($path.$value->file_name);
-                $allImages1['is_verified']=$value->is_verified;
-                $allImages1['file_type']=$value->file_type;
-                $allImages1['status']=$value->status;
-                $allImages1['created_at']=$value->created_at;
+        if (!empty($allCertificates)) {
+            $path = '/img/contractor/certifications/' . $userId . '/';
+            foreach ($allCertificates as $key => $value) {
+                $allImages1['id'] = $value->id;
+                $allImages1['user_id'] = $value->user_id;
+                $allImages1['file_name'] = url($path . $value->file_name);
+                $allImages1['is_verified'] = $value->is_verified;
+                $allImages1['file_type'] = $value->file_type;
+                $allImages1['status'] = $value->status;
+                $allImages1['created_at'] = $value->created_at;
                 array_push($certi2, $allImages1);
             }
 
             $cetifications = $certi2;
-        }
-        else
-        {
-            $cetifications=[];
+        } else {
+            $cetifications = [];
         }
         //echo "<pre>"; print_r($cetifications);die;
         //$all_certificates = DB::table('user_certifications')->where('user_id',$user_id)->where('deleted_at',NULL)->get();
-        return view('backend.contractors.all_contractor_certificates',compact('cetifications','user_id'));
+        return view('backend.contractors.all_contractor_certificates', compact('cetifications', 'user_id'));
     }
 
-    public function addContractorPoliceRecords($user_id) {
+    public function addContractorPoliceRecords($user_id)
+    {
         //die('asdas');
 
-        return view('backend.contractors.add_contractor_police_record',compact('user_id'));
+        return view('backend.contractors.add_contractor_police_record', compact('user_id'));
     }
 
-    public function storeContractorPoliceRecords(request $request) {
+    public function storeContractorPoliceRecords(request $request)
+    {
 
 
         $userId = $request->user_id;
-         // start Police Record
+        // start Police Record
 
-        if(isset($request->record_type) && isset($request->police_records))
-        {
+        if (isset($request->record_type) && isset($request->police_records)) {
 
-            $police_records=$request->police_records;
-            $record_type=$request->record_type;
+            $police_records = $request->police_records;
+            $record_type = $request->record_type;
 
 
-            if(!empty($police_records) && ($record_type==0 ||$record_type==1))
-            {
+            if (!empty($police_records) && ($record_type == 0 || $record_type == 1)) {
 
                 $fileNames = array_filter($_FILES['police_records']['name']);
 
-                if($record_type=='0' || $record_type==0)
-                {
-                    $allowTypes = array('jpg','png','jpeg');
-                }
-                else if($record_type=='1' || $record_type==1)
-                {
-                    $allowTypes = array('pdf','doc','docx','txt','rtf','odf','msword');
+                if ($record_type == '0' || $record_type == 0) {
+                    $allowTypes = array('jpg', 'png', 'jpeg');
+                } else if ($record_type == '1' || $record_type == 1) {
+                    $allowTypes = array('pdf', 'doc', 'docx', 'txt', 'rtf', 'odf', 'msword');
                 }
 
                 $statusMsg = $errorMsg =  $errorUpload = $errorUploadType = '';
 
-                if(!empty($fileNames) && $_FILES["police_records"]["error"] !== 4)
-                {
-                        //Delete Old
-                    $getAll = DB::table('user_certifications')->whereRaw("(user_id = '".$userId."' AND deleted_at IS null)")->whereRaw("(certification_type = '1')")->get()->toArray();
+                if (!empty($fileNames) && $_FILES["police_records"]["error"] !== 4) {
+                    //Delete Old
+                    $getAll = DB::table('user_certifications')->whereRaw("(user_id = '" . $userId . "' AND deleted_at IS null)")->whereRaw("(certification_type = '1')")->get()->toArray();
 
-                    if(!empty($getAll))
-                    {
+                    if (!empty($getAll)) {
                         //Delete Old
                         // DB::table('user_certifications')->where('user_id', '=', $userId)->where('certification_type', '=', '1')->delete();
 
                         // $deleteOld = $this->delete_directory(public_path() . '/img/contractor/police_records/'.$userId);
                     }
 
-                    $check_folder_exist = public_path() . '/img/contractor/police_records/'.$userId;
+                    $check_folder_exist = public_path() . '/img/contractor/police_records/' . $userId;
 
-                    if(!is_dir($check_folder_exist)) {
+                    if (!is_dir($check_folder_exist)) {
 
                         //crete new folder
-                        mkdir(public_path() . '/img/contractor/police_records/'.$userId, 0777, true);
+                        mkdir(public_path() . '/img/contractor/police_records/' . $userId, 0777, true);
                     }
 
 
 
-                    $targetDir = public_path() . '/img/contractor/police_records/'.$userId.'/';
+                    $targetDir = public_path() . '/img/contractor/police_records/' . $userId . '/';
 
-                    foreach($_FILES['police_records']['name'] as $key=>$val)
-                    {
+                    foreach ($_FILES['police_records']['name'] as $key => $val) {
 
-                        $fileName = rand(0000,9999).basename($_FILES['police_records']['name'][$key]);
+                        $fileName = rand(0000, 9999) . basename($_FILES['police_records']['name'][$key]);
                         $targetFilePath = $targetDir . $fileName;
 
                         // Check whether file type is valid
                         $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
-                        if(in_array($fileType, $allowTypes))
-                        {
+                        if (in_array($fileType, $allowTypes)) {
                             // Upload file to server
-                            if(move_uploaded_file($_FILES["police_records"]["tmp_name"][$key], $targetFilePath))
-                            {
+                            if (move_uploaded_file($_FILES["police_records"]["tmp_name"][$key], $targetFilePath)) {
                                 $insert['file_name'] = $fileName;
                                 //$insert['file_type'] = $fileType;
                                 $insert['file_type'] = $record_type;
@@ -1402,38 +1325,34 @@ class ContractorsController extends Controller
                                 $insert['status'] = 1;
                                 $insert['created_at'] = Carbon::now();
                                 DB::table('user_certifications')->insertGetId($insert);
-
-
-                            }else
-                            {
-                                 $errorUpload .= 'record file not uploaded.';
+                            } else {
+                                $errorUpload .= 'record file not uploaded.';
                             }
-                        }else
-                        {
-                            $errorUploadType .='File Type Not Match';
+                        } else {
+                            $errorUploadType .= 'File Type Not Match';
                         }
                     }
                 }
             }
 
-            if(!empty($errorUpload))
-            {
-                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));exit;
+            if (!empty($errorUpload)) {
+                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));
+                exit;
             }
 
-            if(!empty($errorUploadType))
-            {
-                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));exit;
+            if (!empty($errorUploadType)) {
+                return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));
+                exit;
             }
 
-            if(empty($errorUpload) && empty($errorUploadType)){
-                 return redirect()->route('admin.contractors.index')->with('success','add Successfully');
+            if (empty($errorUpload) && empty($errorUploadType)) {
+                return redirect()->route('admin.contractors.index')->with('success', 'add Successfully');
             }
         } else {
-            return redirect()->route('admin.contractors.index')->with('success','Please add File');
+            return redirect()->route('admin.contractors.index')->with('success', 'Please add File');
         }
 
-    // End Police Record
+        // End Police Record
     }
 
     public function allContractorPoliceRecords($user_id)
@@ -1441,277 +1360,255 @@ class ContractorsController extends Controller
         //die('allContractorPoliceRecords');
         $userId = $user_id;
         $police_records = array();
-        $policeR2=array();
-        $allPoliceRec=DB::table('user_certifications')->select('id','user_id','file_name','file_type','is_verified','status','created_at')->where('user_id',$userId)->where('certification_type','1')->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $policeR2 = array();
+        $allPoliceRec = DB::table('user_certifications')->select('id', 'user_id', 'file_name', 'file_type', 'is_verified', 'status', 'created_at')->where('user_id', $userId)->where('certification_type', '1')->whereRaw("(deleted_at IS null )")->get()->toArray();
 
-                 if(!empty($allPoliceRec))
-                 {
-                   $path='/img/contractor/police_records/'.$userId.'/';
-                    foreach ($allPoliceRec as $key => $value)
-                    {
-                        $allVideo1['id']=$value->id;
-                        $allVideo1['user_id']=$value->user_id;
-                        $allVideo1['file_name']=url($path.$value->file_name);
-                        $allVideo1['is_verified']=$value->is_verified;
-                        $allVideo1['file_type']=$value->file_type;
-                        $allVideo1['status']=$value->status;
-                        $allVideo1['created_at']=$value->created_at;
-                        array_push($policeR2, $allVideo1);
-                    }
-                   $police_records = $policeR2;
-                 }
-                 else
-                 {
-                    $police_records=[];
-                 }
+        if (!empty($allPoliceRec)) {
+            $path = '/img/contractor/police_records/' . $userId . '/';
+            foreach ($allPoliceRec as $key => $value) {
+                $allVideo1['id'] = $value->id;
+                $allVideo1['user_id'] = $value->user_id;
+                $allVideo1['file_name'] = url($path . $value->file_name);
+                $allVideo1['is_verified'] = $value->is_verified;
+                $allVideo1['file_type'] = $value->file_type;
+                $allVideo1['status'] = $value->status;
+                $allVideo1['created_at'] = $value->created_at;
+                array_push($policeR2, $allVideo1);
+            }
+            $police_records = $policeR2;
+        } else {
+            $police_records = [];
+        }
 
-        return view('backend.contractors.all_contractor_police_records',compact('police_records','user_id'));
+        return view('backend.contractors.all_contractor_police_records', compact('police_records', 'user_id'));
     }
 
-    public function addContractorGallery($user_id) {
+    public function addContractorGallery($user_id)
+    {
         //die('addContractorGallery');
-         return view('backend.contractors.add_contractor_gallery',compact('user_id'));
+        return view('backend.contractors.add_contractor_gallery', compact('user_id'));
     }
 
-    public function storeContractorGallery(request $request) {
+    public function storeContractorGallery(request $request)
+    {
         //dd('ss');
-       //die('storeContractorGallery');
+        //die('storeContractorGallery');
 
-       $userId= $request->user_id;
+        $userId = $request->user_id;
         //Multiple
-       $images_gallery=!empty($request->images_gallery) ? $request->images_gallery : '' ;
-       $videos_gallery=!empty($request->videos_gallery) ? $request->videos_gallery : '' ;
+        $images_gallery = !empty($request->images_gallery) ? $request->images_gallery : '';
+        $videos_gallery = !empty($request->videos_gallery) ? $request->videos_gallery : '';
         // Add Gallery Images
 
-        if(!empty($images_gallery))
-        {
+        if (!empty($images_gallery)) {
             $fileNames = array_filter($_FILES['images_gallery']['name']);
-            $allowTypes = array('jpg','png','jpeg');
+            $allowTypes = array('jpg', 'png', 'jpeg');
             $statusMsg = $errorMsg =  $errorUpload = $errorUploadType = '';
 
-            if(!empty($fileNames) && $_FILES["images_gallery"]["error"] !== 4)
-            {
+            if (!empty($fileNames) && $_FILES["images_gallery"]["error"] !== 4) {
                 //Delete Old
-                $getAll = DB::table('users_images_gallery')->whereRaw("(user_id = '".$userId."' AND deleted_at IS null)")->get()->toArray();
-                if(!empty($getAll))
-                {
+                $getAll = DB::table('users_images_gallery')->whereRaw("(user_id = '" . $userId . "' AND deleted_at IS null)")->get()->toArray();
+                if (!empty($getAll)) {
                     //Delete Old
                     // DB::table('users_images_gallery')->where('user_id', '=', $userId)->delete();
 
                     // $deleteOld = $this->delete_directory(public_path() . '/img/contractor/gallery/images/'.$userId);
                 }
 
-                $check_folder_exist = public_path() . '/img/contractor/gallery/images/'.$userId;
+                $check_folder_exist = public_path() . '/img/contractor/gallery/images/' . $userId;
 
-                if(!is_dir($check_folder_exist)) {
+                if (!is_dir($check_folder_exist)) {
 
                     //crete new folder
-                    mkdir(public_path() . '/img/contractor/gallery/images/'.$userId, 0777, true);
+                    mkdir(public_path() . '/img/contractor/gallery/images/' . $userId, 0777, true);
                 }
 
 
-                $targetDir = public_path() . '/img/contractor/gallery/images/'.$userId.'/';
+                $targetDir = public_path() . '/img/contractor/gallery/images/' . $userId . '/';
 
-                foreach($_FILES['images_gallery']['name'] as $key=>$val)
-                {
+                foreach ($_FILES['images_gallery']['name'] as $key => $val) {
 
-                    $fileName = rand(0000,9999).basename($_FILES['images_gallery']['name'][$key]);
+                    $fileName = rand(0000, 9999) . basename($_FILES['images_gallery']['name'][$key]);
                     $targetFilePath = $targetDir . $fileName;
 
                     // Check whether file type is valid
                     $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
-                    if(in_array($fileType, $allowTypes))
-                    {
+                    if (in_array($fileType, $allowTypes)) {
                         // Upload file to server
-                        if(move_uploaded_file($_FILES["images_gallery"]["tmp_name"][$key], $targetFilePath))
-                        {
+                        if (move_uploaded_file($_FILES["images_gallery"]["tmp_name"][$key], $targetFilePath)) {
                             $insert['file_name'] = $fileName;
                             $insert['file_type'] = $fileType;
                             $insert['user_id'] = $userId;
                             $insert['status'] = 1;
                             $insert['created_at'] = Carbon::now();
                             DB::table('users_images_gallery')->insertGetId($insert);
-                        }else
-                        {
-                             $errorUpload .= 'Image not uploaded.';
+                        } else {
+                            $errorUpload .= 'Image not uploaded.';
                         }
-                    }else
-                    {
-                        $errorUploadType .='Images Type Allowed Only (.jpg,.png,.jpeg).';
+                    } else {
+                        $errorUploadType .= 'Images Type Allowed Only (.jpg,.png,.jpeg).';
                     }
                 }
             }
         }
 
-        if(!empty($errorUpload))
-        {
-        return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));exit;
+        if (!empty($errorUpload)) {
+            return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));
+            exit;
         }
-         if(!empty($errorUploadType))
-        {
-        return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));exit;
+        if (!empty($errorUploadType)) {
+            return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));
+            exit;
         }
         // Add Gallery Images
 
         // Add Gallery Videos
 
-        if(!empty($videos_gallery))
-        {
+        if (!empty($videos_gallery)) {
 
             $fileNames = array_filter($_FILES['videos_gallery']['name']);
             $allowTypes = array("webm", "mp4", "ogv");
             $statusMsg = $errorMsg =  $errorUpload = $errorUploadType = '';
 
-            if(!empty($fileNames) && $_FILES["videos_gallery"]["error"] !== 4)
-            {
+            if (!empty($fileNames) && $_FILES["videos_gallery"]["error"] !== 4) {
                 //Delete Old
-                $getAll = DB::table('users_videos_gallery')->whereRaw("(user_id = '".$userId."' AND deleted_at IS null)")->get()->toArray();
-                if(!empty($getAll))
-                {
+                $getAll = DB::table('users_videos_gallery')->whereRaw("(user_id = '" . $userId . "' AND deleted_at IS null)")->get()->toArray();
+                if (!empty($getAll)) {
                     //Delete Old
                     // DB::table('users_videos_gallery')->where('user_id', '=', $userId)->delete();
 
                     // $deleteOld = $this->delete_directory(public_path() . '/img/contractor/gallery/videos/'.$userId);
                 }
 
-                $check_folder_exist = public_path() . '/img/contractor/gallery/videos/'.$userId;
+                $check_folder_exist = public_path() . '/img/contractor/gallery/videos/' . $userId;
 
-                if(!is_dir($check_folder_exist)) {
+                if (!is_dir($check_folder_exist)) {
 
                     //crete new folder
-                     mkdir(public_path() . '/img/contractor/gallery/videos/'.$userId, 0777, true);
+                    mkdir(public_path() . '/img/contractor/gallery/videos/' . $userId, 0777, true);
                 }
 
 
                 //create new folder
 
 
-                $targetDir = public_path() . '/img/contractor/gallery/videos/'.$userId.'/';
+                $targetDir = public_path() . '/img/contractor/gallery/videos/' . $userId . '/';
 
-                foreach($_FILES['videos_gallery']['name'] as $key=>$val)
-                {
+                foreach ($_FILES['videos_gallery']['name'] as $key => $val) {
 
-                    $fileName = rand(0000,9999).basename($_FILES['videos_gallery']['name'][$key]);
+                    $fileName = rand(0000, 9999) . basename($_FILES['videos_gallery']['name'][$key]);
                     $targetFilePath = $targetDir . $fileName;
 
                     // Check whether file type is valid
                     $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
-                    if(in_array($fileType, $allowTypes))
-                    {
-                                        // Upload file to server
-                        if(move_uploaded_file($_FILES["videos_gallery"]["tmp_name"][$key], $targetFilePath))
-                        {
+                    if (in_array($fileType, $allowTypes)) {
+                        // Upload file to server
+                        if (move_uploaded_file($_FILES["videos_gallery"]["tmp_name"][$key], $targetFilePath)) {
                             $insert['file_name'] = $fileName;
                             $insert['file_type'] = $fileType;
                             $insert['user_id'] = $userId;
                             $insert['status'] = 1;
                             $insert['created_at'] = Carbon::now();
                             DB::table('users_videos_gallery')->insertGetId($insert);
-                        }else
-                        {
-                             $errorUpload .= 'Video not uploaded.';
+                        } else {
+                            $errorUpload .= 'Video not uploaded.';
                         }
-                    }else
-                    {
-                        $errorUploadType .='Video Type Allowed Only (.webm,.mp4,.ogv).';
+                    } else {
+                        $errorUploadType .= 'Video Type Allowed Only (.webm,.mp4,.ogv).';
                     }
                 }
             }
         }
 
-        if(!empty($errorUpload))
-        {
-        return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));exit;
+        if (!empty($errorUpload)) {
+            return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUpload));
+            exit;
         }
-        if(!empty($errorUploadType))
-        {
-        return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));exit;
+        if (!empty($errorUploadType)) {
+            return redirect()->route('admin.contractors.index')->withFlashDanger(__($errorUploadType));
+            exit;
         }
-                // Add Gallery Videos
+        // Add Gallery Videos
 
         return redirect()->back();
-
     }
 
-    public function allContractorImagesGallery($userId) {
+    public function allContractorImagesGallery($userId)
+    {
         //die('allContractorImagesGallery');
         //$userId = $user_id;
-        $allImages=DB::table('users_images_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userId)->whereRaw("(deleted_at IS null )")->get()->toArray();
-        $allImages2=array();
+        $allImages = DB::table('users_images_gallery')->select('id', 'user_id', 'file_name', 'file_type', 'status', 'created_at')->where('user_id', $userId)->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $allImages2 = array();
         $gallery = array();
 
-        if(!empty($allImages))
-        {
-            $path='/img/contractor/gallery/images/'.$userId.'/';
-            foreach ($allImages as $key => $value)
-            {
-                $allImages1['id']=$value->id;
-                $allImages1['user_id']=$value->user_id;
-                $allImages1['file_name']=url($path.$value->file_name);
-                $allImages1['file_type']=$value->file_type;
-                $allImages1['status']=$value->status;
-                $allImages1['created_at']=$value->created_at;
+        if (!empty($allImages)) {
+            $path = '/img/contractor/gallery/images/' . $userId . '/';
+            foreach ($allImages as $key => $value) {
+                $allImages1['id'] = $value->id;
+                $allImages1['user_id'] = $value->user_id;
+                $allImages1['file_name'] = url($path . $value->file_name);
+                $allImages1['file_type'] = $value->file_type;
+                $allImages1['status'] = $value->status;
+                $allImages1['created_at'] = $value->created_at;
                 array_push($allImages2, $allImages1);
             }
 
             $gallery = $allImages2;
-        }
-         else
-        {
-            $gallery=[];
+        } else {
+            $gallery = [];
         }
 
 
-        return view('backend.contractors.all_contractor_images_gallery', compact('gallery','userId'));
+        return view('backend.contractors.all_contractor_images_gallery', compact('gallery', 'userId'));
     }
 
-    public function allContractorVideosGallery($userId) {
+    public function allContractorVideosGallery($userId)
+    {
 
         //die('allContractorVideosGallery');
 
-        $allVideos=DB::table('users_videos_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userId)->whereRaw("(deleted_at IS null )")->get()->toArray();
-        $allVideo2=array();
+        $allVideos = DB::table('users_videos_gallery')->select('id', 'user_id', 'file_name', 'file_type', 'status', 'created_at')->where('user_id', $userId)->whereRaw("(deleted_at IS null )")->get()->toArray();
+        $allVideo2 = array();
         $gallery = array();
 
-        if(!empty($allVideos))
-        {
-            $path='/img/contractor/gallery/videos/'.$userId.'/';
-            foreach ($allVideos as $key => $value)
-            {
-                $allVideo1['id']=$value->id;
-                $allVideo1['user_id']=$value->user_id;
-                $allVideo1['file_name']=url($path.$value->file_name);
-                $allVideo1['file_type']=$value->file_type;
-                $allVideo1['status']=$value->status;
-                $allVideo1['created_at']=$value->created_at;
+        if (!empty($allVideos)) {
+            $path = '/img/contractor/gallery/videos/' . $userId . '/';
+            foreach ($allVideos as $key => $value) {
+                $allVideo1['id'] = $value->id;
+                $allVideo1['user_id'] = $value->user_id;
+                $allVideo1['file_name'] = url($path . $value->file_name);
+                $allVideo1['file_type'] = $value->file_type;
+                $allVideo1['status'] = $value->status;
+                $allVideo1['created_at'] = $value->created_at;
                 array_push($allVideo2, $allVideo1);
             }
-               $gallery = $allVideo2;
+            $gallery = $allVideo2;
         } else {
-            $gallery=[];
+            $gallery = [];
         }
 
-        return view('backend.contractors.all_contractor_videos_gallery',compact('gallery','userId'));
+        return view('backend.contractors.all_contractor_videos_gallery', compact('gallery', 'userId'));
     }
 
-    public function verifyCertificate($certificate_id) {
+    public function verifyCertificate($certificate_id)
+    {
         // echo $certificate_id;
         // die('verifyCertificate');
-        $old_detail = DB::table('user_certifications')->where('id',$certificate_id)->first();
+        $old_detail = DB::table('user_certifications')->where('id', $certificate_id)->first();
 
-        if(isset($old_detail) > 0) {
-            if($old_detail->is_verified == 1) {
+        if (isset($old_detail) > 0) {
+            if ($old_detail->is_verified == 1) {
 
                 $update_arr['is_verified'] = 0;
-            }else {
+            } else {
                 $update_arr['is_verified'] = 1;
             }
 
             $update_arr['updated_at'] = Carbon::now();
-            DB::table('user_certifications')->where('id',$certificate_id)->update($update_arr);
+            DB::table('user_certifications')->where('id', $certificate_id)->update($update_arr);
             //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
             return redirect()->back();
-        } else{
+        } else {
 
             return redirect()->back();
         }
@@ -1719,293 +1616,295 @@ class ContractorsController extends Controller
         //return redirect()->back();
     }
 
-    public function deleteCertificate($certificate_id) {
-
-        $update_arr['deleted_at'] = Carbon::now();
-        $update_arr['updated_at'] = Carbon::now();
-        DB::table('user_certifications')->where('id',$certificate_id)->update($update_arr);
-        return redirect()->back();
-
-        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
-
-    }
-
-    public function deleteGalleryImage($id) {
-
-        $update_arr['deleted_at'] = Carbon::now();
-        $update_arr['updated_at'] = Carbon::now();
-        DB::table('users_images_gallery')->where('id',$id)->update($update_arr);
-        return redirect()->back();
-
-        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
-
-    }
-
-    public function deleteGalleryVideo($id) {
-
-        $update_arr['deleted_at'] = Carbon::now();
-        $update_arr['updated_at'] = Carbon::now();
-        DB::table('users_videos_gallery')->where('id',$id)->update($update_arr);
-        return redirect()->back();
-
-        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
-
-    }
-
-    public function serviceRequests($user_id) {
-
-      $service_requests = DB::table('service_request')
-        ->join('category','service_request.category_id','=','category.id')
-        ->join('services','service_request.service_id','=','services.id')
-        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-        ->select('service_request.*','category.es_name as es_category_name','services.es_name as es_service_name','sub_services.es_name as es_subservice_name','child_sub_services.es_name as es_childsubservices_name')
-        ->where('service_request.user_id',$user_id)
-        ->paginate(25);
-
-      return view('backend.contractors.service_request',compact('service_requests','user_id'));
-    }
-
-
-
-
-    public function allRequestsByStatus($status,$user_id)
+    public function deleteCertificate($certificate_id)
     {
-        if($status == 'all') {
+
+        $update_arr['deleted_at'] = Carbon::now();
+        $update_arr['updated_at'] = Carbon::now();
+        DB::table('user_certifications')->where('id', $certificate_id)->update($update_arr);
+        return redirect()->back();
+
+        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
+
+    }
+
+    public function deleteGalleryImage($id)
+    {
+
+        $update_arr['deleted_at'] = Carbon::now();
+        $update_arr['updated_at'] = Carbon::now();
+        DB::table('users_images_gallery')->where('id', $id)->update($update_arr);
+        return redirect()->back();
+
+        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
+
+    }
+
+    public function deleteGalleryVideo($id)
+    {
+
+        $update_arr['deleted_at'] = Carbon::now();
+        $update_arr['updated_at'] = Carbon::now();
+        DB::table('users_videos_gallery')->where('id', $id)->update($update_arr);
+        return redirect()->back();
+
+        //return redirect()->route('admin.contractors.all_contractor_certificates',$old_detail->user_id)->with('success','Succefully updated');
+
+    }
+
+    public function serviceRequests($user_id)
+    {
+
+        $service_requests = DB::table('service_request')
+            ->join('category', 'service_request.category_id', '=', 'category.id')
+            ->join('services', 'service_request.service_id', '=', 'services.id')
+            ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+            ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+            ->select('service_request.*', 'category.es_name as es_category_name', 'services.es_name as es_service_name', 'sub_services.es_name as es_subservice_name', 'child_sub_services.es_name as es_childsubservices_name')
+            ->where('service_request.user_id', $user_id)
+            ->paginate(25);
+
+        return view('backend.contractors.service_request', compact('service_requests', 'user_id'));
+    }
+
+
+
+
+    public function allRequestsByStatus($status, $user_id)
+    {
+        if ($status == 'all') {
 
             $service_requests = DB::table('service_request')
-            ->join('category','service_request.category_id','=','category.id')
-            ->join('services','service_request.service_id','=','services.id')
-            ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-            ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-            ->select('service_request.*','category.es_name as es_category_name','services.es_name as es_service_name','sub_services.es_name as es_subservice_name','child_sub_services.es_name as es_childsubservices_name')
-            ->where('service_request.user_id',$user_id)
-            ->get();
-
+                ->join('category', 'service_request.category_id', '=', 'category.id')
+                ->join('services', 'service_request.service_id', '=', 'services.id')
+                ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                ->select('service_request.*', 'category.es_name as es_category_name', 'services.es_name as es_service_name', 'sub_services.es_name as es_subservice_name', 'child_sub_services.es_name as es_childsubservices_name')
+                ->where('service_request.user_id', $user_id)
+                ->get();
         } else {
             $service_requests = DB::table('service_request')
-            ->join('category','service_request.category_id','=','category.id')
-            ->join('services','service_request.service_id','=','services.id')
-            ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-            ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-            ->select('service_request.*','category.es_name as es_category_name','services.es_name as es_service_name','sub_services.es_name as es_subservice_name','child_sub_services.es_name as es_childsubservices_name')
-            ->where('service_request.status',$status)
-            ->where('service_request.user_id',$user_id)
-            ->paginate(25);
+                ->join('category', 'service_request.category_id', '=', 'category.id')
+                ->join('services', 'service_request.service_id', '=', 'services.id')
+                ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                ->select('service_request.*', 'category.es_name as es_category_name', 'services.es_name as es_service_name', 'sub_services.es_name as es_subservice_name', 'child_sub_services.es_name as es_childsubservices_name')
+                ->where('service_request.status', $status)
+                ->where('service_request.user_id', $user_id)
+                ->paginate(25);
         }
 
-    return view('backend.contractors.showservice_status',compact('service_requests','user_id'));
-
+        return view('backend.contractors.showservice_status', compact('service_requests', 'user_id'));
     }
 
-         public function showServiceRequest($request_id)
-     {
+    public function showServiceRequest($request_id)
+    {
 
-       $show_service = DB::table('service_request')
-        ->join('services','service_request.service_id','=','services.id')
-        ->leftjoin('sub_services','service_request.sub_service_id','=','sub_services.id')
-        ->leftjoin('category','service_request.category_id','=','category.id')
-        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-        ->select('service_request.*','sub_services.en_name as en_subservice_name','sub_services.es_name as es_subservice_name','services.en_name as en_service_name','services.es_name as es_service_name','category.en_name as en_category_name','child_sub_services.es_name as es_child_subservice_name')
-        ->where('service_request.id',$request_id)
-        ->first();
+        $show_service = DB::table('service_request')
+            ->join('services', 'service_request.service_id', '=', 'services.id')
+            ->leftjoin('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+            ->leftjoin('category', 'service_request.category_id', '=', 'category.id')
+            ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+            ->select('service_request.*', 'sub_services.en_name as en_subservice_name', 'sub_services.es_name as es_subservice_name', 'services.en_name as en_service_name', 'services.es_name as es_service_name', 'category.en_name as en_category_name', 'child_sub_services.es_name as es_child_subservice_name')
+            ->where('service_request.id', $request_id)
+            ->first();
 
-        if($show_service) {
+        if ($show_service) {
 
             $show_service->question_detail = DB::table('service_request_questions')
-            ->join('questions','service_request_questions.question_id','=','questions.id')
-            ->join('question_options','service_request_questions.option_id','=','question_options.id')
-            ->select('service_request_questions.*','questions.en_title as en_question_title','questions.es_title as es_question_title','question_options.en_option as en_option_name','question_options.es_option as es_option_name')
-            ->where('service_request_questions.deleted_at',NULL)
-            ->where('service_request_questions.service_request_id',$request_id)
+                ->join('questions', 'service_request_questions.question_id', '=', 'questions.id')
+                ->join('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+                ->select('service_request_questions.*', 'questions.en_title as en_question_title', 'questions.es_title as es_question_title', 'question_options.en_option as en_option_name', 'question_options.es_option as es_option_name')
+                ->where('service_request_questions.deleted_at', NULL)
+                ->where('service_request_questions.service_request_id', $request_id)
+                ->get();
+        }
+
+        $user_details = DB::table('buy_requested_services')
+            ->join('users', 'buy_requested_services.user_id', '=', 'users.id')
+            ->select('users.username', 'buy_requested_services.amount', 'buy_requested_services.tranx_id')
+            ->where('buy_requested_services.requested_service_id', $request_id)
             ->get();
-      }
 
-       $user_details = DB::table('buy_requested_services')
-            ->join('users','buy_requested_services.user_id','=','users.id')
-            ->select('users.username','buy_requested_services.amount','buy_requested_services.tranx_id')
-            ->where('buy_requested_services.requested_service_id',$request_id)
-            ->get();
-
-      return view('backend.contractors.show_service_request',compact('show_service','user_details'));
-
+        return view('backend.contractors.show_service_request', compact('show_service', 'user_details'));
     }
 
-    public function getDeleted() {
+    public function getDeleted()
+    {
 
-     $users = DB::table('users')->latest()->whereNotNull('deleted_at')
-             ->where('user_group_id',3)->paginate(25);
+        $users = DB::table('users')->latest()->whereNotNull('deleted_at')
+            ->where('user_group_id', 3)->paginate(25);
 
-        return view('backend.contractors.deleted',compact('users'));
+        return view('backend.contractors.deleted', compact('users'));
     }
 
 
-     public function restore($user_id) {
+    public function restore($user_id)
+    {
 
         $restore_arr['updated_at'] = Carbon::now();
         $restore_arr['deleted_at'] = null;
 
-        $restore_contractor = DB::table('users')->where('id',$user_id)->update($restore_arr);
+        $restore_contractor = DB::table('users')->where('id', $user_id)->update($restore_arr);
 
-       return redirect()->route('admin.contractors.index')->with('success','contractor restored successfully.');
-   }
+        return redirect()->route('admin.contractors.index')->with('success', 'contractor restored successfully.');
+    }
 
-      public function delete($user_id) {
+    public function delete($user_id)
+    {
 
-    DB::table('users')->where('id', '=', $user_id)->delete();
+        DB::table('users')->where('id', '=', $user_id)->delete();
 
 
-        return redirect()->route('admin.contractors.index')->with('success','contractor deleted successfully.');
-   }
+        return redirect()->route('admin.contractors.index')->with('success', 'contractor deleted successfully.');
+    }
 
     public function aplicacions1()
-    { 
+    {
 
         // $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
 
         // $first = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
 
         $users = DB::table('users_services_area')
-                ->join('users', 'users_services_area.user_id', '=', 'users.id')
-                ->latest('users.created_at')->where('users.deleted_at',NULL)
-                ->where('users.approval_status',0)
-                ->whereIN('users.user_group_id',[3,4])->where('users.mobile_number','!=', NULL)
-                ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
-                ->select('users.id', 'users.username', 'users.email','users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
-                ->get();
+            ->join('users', 'users_services_area.user_id', '=', 'users.id')
+            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->where('users.approval_status', 0)
+            ->whereIN('users.user_group_id', [3, 4])->where('users.mobile_number', '!=', NULL)
+            ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->get();
 
         foreach ($users as $key => $value) {
-        $value->total_service_requests = DB::table('service_request')
-        ->join('category','service_request.category_id','=','category.id')
-        ->join('services','service_request.service_id','=','services.id')
-        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-        ->where('service_request.user_id',$value->id)
-        ->count();
+            $value->total_service_requests = DB::table('service_request')
+                ->join('category', 'service_request.category_id', '=', 'category.id')
+                ->join('services', 'service_request.service_id', '=', 'services.id')
+                ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                ->where('service_request.user_id', $value->id)
+                ->count();
+        }
+        // echo "<pre>"; print_r($users->toArray());die;
 
-
-      }
-      // echo "<pre>"; print_r($users->toArray());die;
-
-        return view('backend.aplicaciones.index',compact('users'));
+        return view('backend.aplicaciones.index', compact('users'));
     }
     public function aplicacions()
-    { 
+    {
 
-        $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
+        $users = DB::table('users')
+            ->latest()->where('deleted_at', NULL)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('users_services_area')
+                    ->whereRaw('users_services_area.user_id = users.id AND users_services_area.city_id IS NOT NULL');
+            })
+            ->where('approval_status', 0)
+            ->whereIN('user_group_id', [3, 4])
+            ->where('mobile_number', '!=', NULL)
+            ->get();
 
         foreach ($users as $key => $value) {
-        $value->total_service_requests = DB::table('service_request')
-        ->join('category','service_request.category_id','=','category.id')
-        ->join('services','service_request.service_id','=','services.id')
-        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
-        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
-        ->where('service_request.user_id',$value->id)
-        ->count();
-
-
-      }
-      // echo "<pre>"; print_r($users->toArray());die;
-
-        return view('backend.aplicaciones.indexs',compact('users'));
-    }
-
-
-    public function  aplicacionsAccept($id=null)
-    {
-        $checkprofile=DB::table('users')->where('id',$id)->where('is_confirm_reg_step',1)->first();
-        if(empty($checkprofile))
-        {
-             return redirect()->route('admin.aplicacions')->withFlashDanger('Profile not update please update your profile after accept');
+            $value->total_service_requests = DB::table('service_request')
+                ->join('category', 'service_request.category_id', '=', 'category.id')
+                ->join('services', 'service_request.service_id', '=', 'services.id')
+                ->join('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                ->where('service_request.user_id', $value->id)
+                ->count();
         }
-            DB::table('users')->where('id', '=', $id)->update(['approval_status'=>1]);
-            $userdata= DB::table('users')->where('id', '=', $id)->first();
-             $image='';
-            if($userdata->user_group_id==3)
-            {
-                $image= url('img/contractor/profile/'.$userdata->avatar_location);
-            }
-            if($userdata->user_group_id==4)
-            {
-                $image= url('img/company/profile/'.$userdata->avatar_location);
-            }
+        // echo "<pre>"; print_r($users->toArray());die;
 
-             $data = array(
-            'username'=>$userdata->username,
-            'receiver'=>$userdata->email,
-            'message'=>'Tu aplicación ha sido verficada y APROBADA, desde ahora eres parte de la red de profesionales de BÚSKALO, puedes ingresar a tu cuenta por el siguiente link:',
-            'submsg'=>'Felicitaciones y bienvenido a Búskalo',
-            'logo'=>url('img/logo/logo-svg.png'),
-            'weburl'=>'www.buskalo.com/login',
-            'footer_logo'=>url('img/logo/footer-logo.png'),
-            'user_icon'=>$image,
-            );
-        $email=$userdata->email;
-        Mail::send('frontend.mail.approvel_and_reject',  ['data' => $data], function($message) use ($email){
-             $message->to($email)->subject(__('Felicidades tu solicitud ha sido aprobada', ['app_name' => app_name()]));
-        });
-        return redirect()->route('admin.aplicacions')->with('success','Approvel successfully');
+        return view('backend.aplicaciones.indexs', compact('users'));
     }
 
-    public function  aplicacionsDecline($id=null)
-    {
-            DB::table('users')->where('id', '=', $id)->update(['approval_status'=>2]);
-              $userdata= DB::table('users')->where('id', '=', $id)->first();
-             $image='';
-            if($userdata->user_group_id==3)
-            {
-                $image= url('img/contractor/profile/'.$userdata->avatar_location);
-            }
-            if($userdata->user_group_id==4)
-            {
-                $image= url('img/company/profile/'.$userdata->avatar_location);
-            }
 
-             $data = array(
-            'username'=>$userdata->username,
-            'receiver'=>$userdata->email,
-            'message'=>'Tu aplicación para ser parte de la red de profesionales de Búskalo ha sido RECHAZADA, el equipo de Búskalo requiere mayor detalle de información, intenta registrarte nuevamente en el siguiente link:',
-            'submsg'=>'',
-            'weburl'=>'www.buskalo.com',
-            'logo'=>url('img/logo/logo-svg.png'),
-            'footer_logo'=>url('img/logo/footer-logo.png'),
-            'user_icon'=>$image,
-            );
-        $email=$userdata->email;
-        Mail::send('frontend.mail.approvel_and_reject',  ['data' => $data], function($message) use ($email){
-             $message->to($email)->subject(__('Registro de Buskalo rechazado', ['app_name' => app_name()]));
+    public function  aplicacionsAccept($id = null)
+    {
+        $checkprofile = DB::table('users')->where('id', $id)->where('is_confirm_reg_step', 1)->first();
+        if (empty($checkprofile)) {
+            return redirect()->route('admin.aplicacions')->withFlashDanger('Profile not update please update your profile after accept');
+        }
+        DB::table('users')->where('id', '=', $id)->update(['approval_status' => 1]);
+        $userdata = DB::table('users')->where('id', '=', $id)->first();
+        $image = '';
+        if ($userdata->user_group_id == 3) {
+            $image = url('img/contractor/profile/' . $userdata->avatar_location);
+        }
+        if ($userdata->user_group_id == 4) {
+            $image = url('img/company/profile/' . $userdata->avatar_location);
+        }
+
+        $data = array(
+            'username' => $userdata->username,
+            'receiver' => $userdata->email,
+            'message' => 'Tu aplicación ha sido verficada y APROBADA, desde ahora eres parte de la red de profesionales de BÚSKALO, puedes ingresar a tu cuenta por el siguiente link:',
+            'submsg' => 'Felicitaciones y bienvenido a Búskalo',
+            'logo' => url('img/logo/logo-svg.png'),
+            'weburl' => 'www.buskalo.com/login',
+            'footer_logo' => url('img/logo/footer-logo.png'),
+            'user_icon' => $image,
+        );
+        $email = $userdata->email;
+        Mail::send('frontend.mail.approvel_and_reject',  ['data' => $data], function ($message) use ($email) {
+            $message->to($email)->subject(__('Felicidades tu solicitud ha sido aprobada', ['app_name' => app_name()]));
         });
-        return redirect()->route('admin.aplicacions')->with('success','Not Approvel');
+        return redirect()->route('admin.aplicacions')->with('success', 'Approvel successfully');
     }
 
-    public function creditPackage($id=null)
+    public function  aplicacionsDecline($id = null)
     {
-        $id=$id;
-        $packages= DB::table('package')->get();
-        return view('backend.package.credit',compact('id','packages'));
+        DB::table('users')->where('id', '=', $id)->update(['approval_status' => 2]);
+        $userdata = DB::table('users')->where('id', '=', $id)->first();
+        $image = '';
+        if ($userdata->user_group_id == 3) {
+            $image = url('img/contractor/profile/' . $userdata->avatar_location);
+        }
+        if ($userdata->user_group_id == 4) {
+            $image = url('img/company/profile/' . $userdata->avatar_location);
+        }
+
+        $data = array(
+            'username' => $userdata->username,
+            'receiver' => $userdata->email,
+            'message' => 'Tu aplicación para ser parte de la red de profesionales de Búskalo ha sido RECHAZADA, el equipo de Búskalo requiere mayor detalle de información, intenta registrarte nuevamente en el siguiente link:',
+            'submsg' => '',
+            'weburl' => 'www.buskalo.com',
+            'logo' => url('img/logo/logo-svg.png'),
+            'footer_logo' => url('img/logo/footer-logo.png'),
+            'user_icon' => $image,
+        );
+        $email = $userdata->email;
+        Mail::send('frontend.mail.approvel_and_reject',  ['data' => $data], function ($message) use ($email) {
+            $message->to($email)->subject(__('Registro de Buskalo rechazado', ['app_name' => app_name()]));
+        });
+        return redirect()->route('admin.aplicacions')->with('success', 'Not Approvel');
+    }
+
+    public function creditPackage($id = null)
+    {
+        $id = $id;
+        $packages = DB::table('package')->get();
+        return view('backend.package.credit', compact('id', 'packages'));
     }
 
     public function creditPackageStore(Request $request)
     {
-        $checkpackeage=DB::table('package')->where('id',$request->package_id)->first();
-        if(!empty($checkpackeage))
-        {
-            $datainsert=array('user_id'=>$request->user_id,'trans_id'=>$request->trans_id,'amount'=>$request->price,'payment_type'=>'online','credits'=>$checkpackeage->credit,'package_id'=>$checkpackeage->id,'status'=>'success');
-                DB::table('payment_history')->insert($datainsert);
-                $user= DB::table('users')->where('id',$request->user_id)->first();
-                $newamount=  $user->pro_credit+$checkpackeage->credit;
-                DB::table('users')->where('id',$request->user_id)->update(['pro_credit'=> $newamount]);
+        $checkpackeage = DB::table('package')->where('id', $request->package_id)->first();
+        if (!empty($checkpackeage)) {
+            $datainsert = array('user_id' => $request->user_id, 'trans_id' => $request->trans_id, 'amount' => $request->price, 'payment_type' => 'online', 'credits' => $checkpackeage->credit, 'package_id' => $checkpackeage->id, 'status' => 'success');
+            DB::table('payment_history')->insert($datainsert);
+            $user = DB::table('users')->where('id', $request->user_id)->first();
+            $newamount =  $user->pro_credit + $checkpackeage->credit;
+            DB::table('users')->where('id', $request->user_id)->update(['pro_credit' => $newamount]);
             return redirect()->route('admin.contractors.index')->withFlashSuccess('Package create successfully');
-        }else
-        {
+        } else {
             return redirect()->route('admin.contractors.index')->withFlashDanger('Package  Not match');
         }
     }
 
     public function creditPackagePrice(Request $request)
     {
-        $checkpackeage=DB::table('package')->where('id',$request->id)->first();
+        $checkpackeage = DB::table('package')->where('id', $request->id)->first();
         return $checkpackeage->price;
     }
-
 }

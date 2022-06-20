@@ -26,7 +26,18 @@ class CompanyController extends Controller
     public function index()
     {
         //die('companyt index');
-        $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('user_group_id',4)->where('approval_status',1)->get();
+        // $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('user_group_id',4)->where('approval_status',1)->get();
+
+        $users = DB::table('users_services_area')
+            ->join('users', 'users_services_area.user_id', '=', 'users.id')
+            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->where('users.approval_status', 1)
+            // ->whereIN('users.user_group_id', [3, 4])
+            ->where('user_group_id', 4)
+            ->where('users.mobile_number', '!=', NULL)
+            ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->get();
 
         foreach ($users as $key => $value) {
         $value->total_service_requests = DB::table('service_request')

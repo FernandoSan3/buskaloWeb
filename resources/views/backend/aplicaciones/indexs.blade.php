@@ -50,6 +50,7 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->profile_title }}</td>
                                 <td>{{ $user->mobile_number }}</td>
+                                <td>{{ $user->name }}</td>
                                 
                                 <td class="btn-td">
                                     <div class="dropdown">
