@@ -82,7 +82,7 @@
                                             <a class="dropdown-item" href="{{ route('admin.contractors.all_contractor_documents',$user->id) }}">All Documents</a> --}}
                                             {{-- <a class="dropdown-item" href="{{ route('admin.contractors.add_contractor_certificate',$user->id) }}">Add Certificates</a> --}}
 
-                                            <a class="dropdown-item" href="{{ route('admin.company.all_company_certificates',$user->id) }}">All Certificates</a>
+                                            <a class="dropdown-item" href="{{ route('admin.company.all_company_certificates',$user->id) }}">@lang('labels.general.actions1.all_company_certificates')</a>
 
                                             {{-- <a class="dropdown-item" href="{{ route('admin.contractors.add_contractor_gallery',$user->id) }}">Add Gallery</a> --}}
                                             <a class="dropdown-item" href="{{ route('admin.company.all_company_images_gallery',$user->id) }}"> @lang('labels.general.actions1.all_contractor_images_gallery') </a>
@@ -98,8 +98,8 @@
                                             <a class="dropdown-item" href="{{ route('admin.company.edit_services_offered',$user->id) }}">Edit Services</a>--}}
 
                                             <a class="dropdown-item" href="{{ route('admin.company.edit_coverage_area',$user->id) }}"> @lang('labels.general.actions1.edit_coverage_area') </a>
-                                            <a class="dropdown-item" href="{{ route('admin.company.all_workers',$user->id) }}">All worker</a>
-                                            <a class="dropdown-item" href="{{ route('admin.company.destroy',$user->id) }}">Delete Company</a>
+                                            <a class="dropdown-item" href="{{ route('admin.company.all_workers',$user->id) }}"> @lang('labels.general.actions1.all_workers') </a>
+                                            <a class="dropdown-item" href="{{ route('admin.company.destroy',$user->id) }}"> @lang('labels.general.actions1.destroyC') </a>
                                             <a class="dropdown-item" href="{{ route('admin.company.creditpackage',$user->id) }}"> @lang('labels.general.actions1.creditpackage') </a>
 
                                             <a class="dropdown-item" href="{{ route('admin.company.serviceRequests',$user->id) }}"> @lang('labels.general.actions1.serviceRequests') <span class="badge" style="background-color: #007bff;color: white;

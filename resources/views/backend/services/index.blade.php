@@ -34,12 +34,12 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> Category </th>
-                            <th> Service  </th>
+                            <th> @lang('labels.backend.services.table.id')       </th>
+                            <th> @lang('labels.backend.services.table.category') </th>
+                            <th> @lang('labels.backend.services.table.service')  </th>
                            <!--  <th> Price  </th> -->
-                            <th>Icon</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.services.table.icon')     </th>
+                            <th> @lang('labels.backend.services.table.action')   </th>
                         </tr>
                         </thead>
                         <tbody>

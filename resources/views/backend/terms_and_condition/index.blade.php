@@ -38,16 +38,16 @@
 
         <ul class="nav nav-mytabs" id="myTab" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" id="Constractor-tab" data-toggle="tab" href="#Constractor" role="tab" aria-controls="Constractor" aria-selected="true">Constractor</a>
+            <a class="nav-link active" id="Constractor-tab" data-toggle="tab" href="#Constractor" role="tab" aria-controls="Constractor" aria-selected="true"> @lang('labels.backend.terms_and_condition.constractor')</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="Company-tab" data-toggle="tab" href="#Company" role="tab" aria-controls="Company" aria-selected="false">Company </a>
+            <a class="nav-link" id="Company-tab" data-toggle="tab" href="#Company" role="tab" aria-controls="Company" aria-selected="false"> @lang('labels.backend.terms_and_condition.company') </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="User-tab" data-toggle="tab" href="#User" role="tab" aria-controls="User" aria-selected="false">User </a>
+            <a class="nav-link" id="User-tab" data-toggle="tab" href="#User" role="tab" aria-controls="User" aria-selected="false"> @lang('labels.backend.terms_and_condition.user') </a>
           </li>
            <li class="nav-item">
-            <a class="nav-link" id="Purchase-tab" data-toggle="tab" href="#Purchase" role="tab" aria-controls="Purchase" aria-selected="false">Purchase</a>
+            <a class="nav-link" id="Purchase-tab" data-toggle="tab" href="#Purchase" role="tab" aria-controls="Purchase" aria-selected="false"> @lang('labels.backend.terms_and_condition.purchase') </a>
           </li>
         </ul>
 
@@ -55,7 +55,7 @@
           <div class="tab-pane fade show active" id="Constractor" role="tabpanel" aria-labelledby="Constractor-tab">
 
              <div class="form-group row">
-               <label class="col-md-2 form-control-label">Description</label>
+               <label class="col-md-2 form-control-label"> @lang('labels.backend.terms_and_condition.description') </label>
                <div class="col-md-10">
                  {{ html()->textarea('description_cons')
                         ->class('form-control')
@@ -84,7 +84,7 @@
            <div class="tab-pane fade" id="Company" role="tabpanel" aria-labelledby="Company-tab">
 
             <div class="form-group row">
-               <label class="col-md-2 form-control-label">Company Description</label>
+               <label class="col-md-2 form-control-label"> @lang('labels.backend.terms_and_condition.company_description')</label>
                <div class="col-md-10">
                  {{ html()->textarea('description_comp')
                         ->class('form-control')
@@ -111,7 +111,7 @@
            <div class="tab-pane fade" id="User" role="tabpanel" aria-labelledby="User-tab">
 
             <div class="form-group row">
-               <label class="col-md-2 form-control-label">User Description</label>
+               <label class="col-md-2 form-control-label"> @lang('labels.backend.terms_and_condition.user_description') </label>
                <div class="col-md-10">
                  {{ html()->textarea('description_user')
                       ->class('form-control')
@@ -138,7 +138,7 @@
           <div class="tab-pane fade" id="Purchase" role="tabpanel" aria-labelledby="Purchase-tab">
 
             <div class="form-group row">
-               <label class="col-md-2 form-control-label">Purchase Description</label>
+               <label class="col-md-2 form-control-label"> @lang('labels.backend.terms_and_condition.purchase_description') </label>
                <div class="col-md-10">
                  {{ html()->textarea('description_purchase')
                       ->class('form-control')

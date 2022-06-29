@@ -52,7 +52,7 @@
                 @if ($user->id !== 1 && $user->id !== auth()->id())
 
                     <a href="{{ route('admin.auth.user.service_request', $user) }}"  class="dropdown-item">
-                        {{-- <i class="fas fa-edit"></i> --}} Servcie Requests<span class="badge" style="background-color: #007bff;color: white;
+                        {{-- <i class="fas fa-edit"></i> --}}@lang('labels.general.actions1.serviceRequests') <span class="badge" style="background-color: #007bff;color: white;
                     ">{{$user->total_service_requests}}</span>
                     </a>
 

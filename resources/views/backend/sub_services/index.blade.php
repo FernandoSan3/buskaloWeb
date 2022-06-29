@@ -33,13 +33,13 @@
                     <table id="example" class="table">
                         <thead>
                         <tr>
-                            <th>@lang('labels.backend.subservices.table.id')</th>
-                            <th>Category</th>
-                            <th>Service</th>
-                            <th>Sub Service</th>                            
-                            <th>Price</th>                            
-                            <th>Icon</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.subservices.table.id')         </th>
+                            <th> @lang('labels.backend.subservices.table.category')   </th>
+                            <th> @lang('labels.backend.subservices.table.service')    </th>
+                            <th> @lang('labels.backend.subservices.table.subservice') </th>                            
+                            <th> @lang('labels.backend.subservices.table.price')      </th>                            
+                            <th> @lang('labels.backend.subservices.table.icon')       </th>
+                            <th> @lang('labels.backend.subservices.table.action')     </th>
                         </tr>
                         </thead>
                         <tbody>

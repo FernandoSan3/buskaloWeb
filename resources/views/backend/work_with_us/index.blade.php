@@ -52,7 +52,7 @@
      
 
      <div class="form-group row">
-       <label class="col-md-2 form-control-label">Description</label>
+       <label class="col-md-2 form-control-label"> @lang('labels.backend.work_with_us.description') </label>
        <div class="col-md-10">
          {{ html()->textarea('description_cons')
               ->class('form-control')
@@ -81,7 +81,7 @@
    <div class="tab-pane fade" id="Company" role="tabpanel" aria-labelledby="Company-tab">
 
     <div class="form-group row">
-       <label class="col-md-2 form-control-label">Description</label>
+       <label class="col-md-2 form-control-label"> @lang('labels.backend.work_with_us.description') </label>
        <div class="col-md-10">
          {{ html()->textarea('description_comp')
               ->class('form-control')

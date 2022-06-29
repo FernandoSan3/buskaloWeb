@@ -19,8 +19,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    {{-- @lang('labels.backend.package.management') --}}
-                   Subscription Package          
+                   @lang('labels.backend.package.management')
                 </h4>
             </div><!--col-->
 
@@ -35,14 +34,14 @@
                 <div class="table-responsive">
                     <table id="example12" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
-                        <tr>
-                            <th> @lang('labels.backend.package.table.id') </th>
-                            <th> @lang('labels.backend.package.table.en_name') </th>
-                            <th> @lang('labels.backend.package.table.es_name') </th>
-                            <th> @lang('labels.backend.package.table.price') </th>
-                            <th> @lang('labels.backend.package.table.credit') </th>
+                        <tr> 
+                            <th> @lang('labels.backend.package.table.id')       </th>
+                            <th> @lang('labels.backend.package.table.en_name')  </th>
+                            <th> @lang('labels.backend.package.table.es_name')  </th>
+                            <th> @lang('labels.backend.package.table.price')    </th>
+                            <th> @lang('labels.backend.package.table.credit')   </th>
                             <th> @lang('labels.backend.package.table.discount') </th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.package.table.action')   </th>
                         </tr>
                         </thead>
                         <tbody>

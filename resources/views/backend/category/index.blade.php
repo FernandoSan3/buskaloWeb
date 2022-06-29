@@ -18,8 +18,8 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    {{-- @lang('labels.backend.category.management') --}}
-                    Categorías Principales                    
+                    @lang('labels.backend.category.management')
+                    <!-- Categorías Principales                     -->
                 </h4>
             </div><!--col-->
 
@@ -35,12 +35,12 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> @lang('labels.backend.services.table.en_name') </th>
-                            <th> @lang('labels.backend.services.table.es_name') </th>
-                            <th>Image</th>
-                            <th>Status</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.category.table.id')      </th>
+                            <th> @lang('labels.backend.category.table.en_name') </th>
+                            <th> @lang('labels.backend.category.table.es_name') </th>
+                            <th> @lang('labels.backend.category.table.image')   </th>
+                            <th> @lang('labels.backend.category.table.status')  </th>
+                            <th> @lang('labels.backend.category.table.action')  </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -69,9 +69,9 @@
 
                                     <td>
                                         @if($category->status==1)
-                                      <a href="{{url('admin/category/status/'.$category->id)}}"> <button class="btn btn-success"> Activate</button></a>
+                                      <a href="{{url('admin/category/status/'.$category->id)}}"> <button class="btn btn-success"> @lang('labels.backend.category.activate') </button></a>
                                         @else
-                                      <a href="{{url('admin/category/status/'.$category->id)}}"> <button class="btn btn-danger"> Deactivate</button></a>
+                                      <a href="{{url('admin/category/status/'.$category->id)}}"> <button class="btn btn-danger">  @lang('labels.backend.category.deactivate') </button></a>
                                         @endif
                                     </td>
                                     <td class="que-btn">

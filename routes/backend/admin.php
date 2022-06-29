@@ -233,19 +233,13 @@ Route::group(['namespace' => 'Contractors'], function ()
 
      Route::get('contractors/delete/{id}', [ContractorsController::class, 'delete'])->name('contractors.delete-permanently');
 
-
-    Route::get('aplicacions', [ContractorsController::class, 'aplicacions'])->name('aplicacions');
-	Route::get('aplicacions', [ContractorsController::class, 'aplicacions1'])->name('aplicacions.index');
-
-	
-    Route::get('aplicacions/accept/{id}', [ContractorsController::class, 'aplicacionsAccept'])->name('aplicacions.accept');
+	Route::get('aplicacions', [ContractorsController::class, 'aplicacions'])->name('aplicacions');
+    Route::get('aplicacions1', [ContractorsController::class, 'aplicacions1'])->name('aplicacions1.index');
+	Route::get('aplicacions/accept/{id}', [ContractorsController::class, 'aplicacionsAccept'])->name('aplicacions.accept');
     Route::get('aplicacions/decline/{id}', [ContractorsController::class, 'aplicacionsDecline'])->name('aplicacions.decline');
     Route::get('contractors/payment/{id}', [ContractorsController::class, 'paymentInfo'])->name('contractors.payment');
 
-
 });
-
-
 
 Route::group(['namespace' => 'newsletter'], function ()
 {

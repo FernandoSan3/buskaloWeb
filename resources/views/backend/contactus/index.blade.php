@@ -35,11 +35,11 @@
 
                            {{--<th><input type="checkbox" id="chk" onchange='checkAll(this)' name="chk" value="Bike">
                             <label for="chk"> Select All</label></th>--}}
-                            <th>Id</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Contact Number</th>
-                            <th>View</th>
+                            <th> @lang('labels.backend.contactus.table.id')</th>
+                            <th> @lang('labels.backend.contactus.table.name')</th>
+                            <th> @lang('labels.backend.contactus.table.email')</th>
+                            <th> @lang('labels.backend.contactus.table.contact_number')</th>
+                            <th> @lang('labels.backend.contactus.table.view') </th>
                           </tr>
                         </thead>
                         <tbody>

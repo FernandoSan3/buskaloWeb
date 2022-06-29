@@ -32,11 +32,11 @@
                     <table class="table" id="example">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.price_range.table.id') </th>
+                            <th> @lang('labels.backend.price_range.table.id')          </th>
                             <th> @lang('labels.backend.price_range.table.start_price') </th>
-                            <th> @lang('labels.backend.price_range.table.end_price') </th>
-                            <th>Percentage</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.price_range.table.end_price')   </th>
+                            <th> @lang('labels.backend.price_range.table.porcentage')  </th>
+                            <th> @lang('labels.backend.price_range.table.action')      </th>
                         </tr>
                         </thead>
                         <tbody>

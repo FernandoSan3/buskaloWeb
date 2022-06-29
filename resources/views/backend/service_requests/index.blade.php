@@ -29,27 +29,25 @@
        <div class="row mt-4">
             <div class="col">
                 <form method="get" action="{{url('admin/service_request')}}">
-                    <label>From Date</label>
+                    <label> @lang('labels.backend.service_request.from_date') </label>
                     <input type="date" name="from">
-                     <label>To Date</label>
-                    <input type="date" name="to">
-                    <input type="submit" name="submit" value="Submit">
+                    <label> @lang('labels.backend.service_request.to_date')   </label>
+                    <input type="date" name="to"> 
+                    <input type="submit" name="submit" value= "@lang('labels.backend.service_request.submit')" >
                     
                 </form>
                 <div class="table-responsive">
                     <table id="example" class="table table-striped table-bordered">
                         <thead>
                         <tr>
-                         <th> @lang('labels.backend.questions.table.id')</th>
-                             <th>Username</th>
-                            <th>Category Name</th>
-
-                            <th> <!-- @lang('labels.backend.questions.table.es_service_name') -->Service Name</th>
-                            <th>Mobile No.</th>
-                            <th>City</th>
-                            <th>Request's date</th>
-
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.service_request.table.id')            </th>
+                            <th> @lang('labels.backend.service_request.table.username')      </th>
+                            <th> @lang('labels.backend.service_request.table.category_name') </th>
+                            <th> @lang('labels.backend.service_request.table.service_name')  </th>
+                            <th> @lang('labels.backend.service_request.table.mobile_number') </th>
+                            <th> @lang('labels.backend.service_request.table.city')          </th>
+                            <th> @lang('labels.backend.service_request.table.request_date')  </th>
+                            <th> @lang('labels.backend.service_request.table.action')        </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -58,7 +56,6 @@
                                     <td>{{$key+1}}</td>
                                     <td>{{ $request->username }}</td>
                                     <td>{{ $request->es_category_name }}</td>
-
                                     <td>{{ $request->es_service_name }}</td>
                                     <td>{{ $request->mobile_number }}</td>
                                     <td>{{ $request->cityname }}</td>
@@ -67,17 +64,17 @@
                                     <td>
                                         <form action="{{ route('admin.service_request.destroy',$request->id) }}" method="POST">
 
-                                            <a class="btn btn-info" href="{{ route('admin.service_request.show',$request->id) }}">Show</a>
+                                            <a class="btn btn-info" href="{{ route('admin.service_request.show',$request->id) }}">  @lang('labels.backend.service_request.table.show') </a>
 
                                             <!-- <a class="btn btn-primary" href="{{ route('admin.questions.edit',$request->id) }}">Edit</a> -->
 
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                            <button type="submit" class="btn btn-danger"> @lang('labels.backend.service_request.table.delete') </button>
                                         </form>
                                         <br/>
-                                         <a class="btn btn-info" href="{{ route('admin.service_request.forward',$request->id) }}">Forward</a>
+                                         <a class="btn btn-info" href="{{ route('admin.service_request.forward',$request->id) }}"> @lang('labels.backend.service_request.table.forward') </a>
                                     </td>
                                 </tr>
                             @endforeach

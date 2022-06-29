@@ -32,11 +32,10 @@
                     <table id="example12" class="table table-striped table-bordered dt-responsive">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.cities.table.id') </th>
-                            <th>Provincia {{-- @lang('labels.backend.cities.table.name') --}} </th>
-                            <th>Ciudad o Cantón {{-- @lang('labels.backend.cities.table.province_name') --}} </th>
-                            
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.cities.table.id')       </th>
+                            <th> @lang('labels.backend.cities.table.province') </th>
+                            <th> @lang('labels.backend.cities.table.city')     </th>
+                            <th> @lang('labels.backend.cities.table.action')   </th>
                         </tr>
                         </thead>
                         <tbody>

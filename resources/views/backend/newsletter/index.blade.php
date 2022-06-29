@@ -27,11 +27,11 @@
                         <thead>
                           <tr>
                            <th><input type="checkbox" id="chk" onchange='checkAll(this)' name="chk[]">
-                            <label for="chk"> Select All</label></th>
-                            <th>Id</th>
-                            <th>Email</th>
-                            <th>user Type</th>
-                            <th>Send Mail</th>
+                            <label for="chk"> @lang('labels.backend.newsletters.select_All') </label></th>
+                            <th> @lang('labels.backend.newsletters.table.id')         </th>
+                            <th> @lang('labels.backend.newsletters.table.email')      </th>
+                            <th> @lang('labels.backend.newsletters.table.user_Type')  </th>
+                            <th> @lang('labels.backend.newsletters.table.send_email') </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -45,7 +45,7 @@
                                 <td>{{ $newsletter->email }}</td>
                                 <td>{{ $newsletter->user_type }}</td>
                                 <td>
-                                <a class="btn btn-info" href="{{ route('admin.newsletter.show',$newsletter->id) }}">Send Mail</a>
+                                <a class="btn btn-info" href="{{ route('admin.newsletter.show',$newsletter->id) }}"> @lang('labels.backend.newsletters.send_mail') </a>
                                 </td>
                             </tr>
                         @endforeach

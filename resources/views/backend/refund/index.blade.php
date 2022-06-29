@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    Refund Management                 
+                    @lang('labels.backend.refund.management')                
                 </h4>
             </div><!--col-->
 
@@ -34,16 +34,16 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> @lang('User Name') </th>
-                            <th> @lang('Email') </th>
-                            <th> @lang('Reason') </th>
-                            <th> @lang('Amount $') </th>
-                            <th> @lang('Transaction Id') </th>
-                            <th>Status</th>
-                            <th>Refund Date</th>
-                            <th>Payment Date</th>
-                            <th>Action</th>
+                            <th> @lang('labels.backend.refund.table.id')             </th>
+                            <th> @lang('labels.backend.refund.table.username')       </th>
+                            <th> @lang('labels.backend.refund.table.email')          </th>
+                            <th> @lang('labels.backend.refund.table.reason')         </th>
+                            <th> @lang('labels.backend.refund.table.amount')         </th>
+                            <th> @lang('labels.backend.refund.table.transaction_id') </th>
+                            <th> @lang('labels.backend.refund.table.status')         </th>
+                            <th> @lang('labels.backend.refund.table.refund_date')    </th>
+                            <th> @lang('labels.backend.refund.table.payment_date')   </th>
+                            <th> @lang('labels.backend.refund.table.action')         </th>
                             <!-- <th>@lang('labels.general.actions')</th> -->
                         </tr>
                         </thead>
@@ -62,12 +62,12 @@
                                    <td class="btn-td">
                                     <div class="dropdown">
                                       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Actions
+                                        @lang('labels.backend.refund.table.action') 
                                       </button>
                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="{{ route('admin.refund.accept',$refund->id) }}">Accept</a>
+                                        <a class="dropdown-item" href="{{ route('admin.refund.accept',$refund->id) }}"> @lang('labels.backend.refund.table.accept') </a>
                                         @if($refund->refund_status!='Processed')
-                                         <a class="dropdown-item" href="{{ route('admin.refund.reject',$refund->id) }}">Reject</a>
+                                         <a class="dropdown-item" href="{{ route('admin.refund.reject',$refund->id) }}"> @lang('labels.backend.refund.table.reject')</a>
                                         @endif
                                       </div>
                                     </div>

@@ -24,6 +24,8 @@ return [
             'show_profile' => 'Ver perfil',
             'edit' => 'Editar',
             'edit_payment_method' => 'Editar método de pago',
+            'all_company_certificates' => 'Certificados',
+            'all_workers' => 'Trabajadores',
             'all_contractor_certificates' => 'Certificados',
             'all_contractor_images_gallery' => 'Galería de imágenes',
             'all_contractor_videos_gallery' => 'Galería de vídeos',
@@ -243,6 +245,7 @@ return [
                     'city' => 'Ciudad',
                     'profession' => 'Profesión',
                     'citiename' => 'Ciudad',  
+                    'action' => 'Acciones ',
                 ],  
 
                 'tabs' => [
@@ -335,6 +338,14 @@ return [
             'update' => 'Actualizar términos y condiciones',
             'edit' => 'Editar términos y condiciones',
             'management' => 'Administración de términos y condiciones',
+            'description' => 'Descripción',
+            'constractor' => 'Constructor',
+            'company_description' => 'Descripción de la empresa',
+            'company' => 'Empresa',
+            'user_description' => 'Descripción del usuario',
+            'user' => 'Usuario',
+            'purchase_description' => 'Descripción de la compra',
+            'purchase' => 'Compra',
 
             'table' => [
                 'id' => 'Id',
@@ -355,6 +366,7 @@ return [
             'update' => 'Actualizar trabaje con nosotros',
             'edit' => 'Editar trabaje con nosotros',
             'management' => 'Administración de trabaje con nosotros ',
+            'description' => 'Descripción',
 
             'table' => [
                 'id' => 'Id',
@@ -375,13 +387,17 @@ return [
             'update' => 'Actualizar categoría',
             'edit' => 'Editar categoría',
             'management' => 'Administración de categorias',
+            'deactivate' => 'Desactivar',
+            'activate' => 'Activar',
 
             'table' => [
                 'id' => 'Id',
                 'sort' => 'Ordenar',
                 'en_name' => 'Nombre (En)',
                 'es_name' => 'Nombre (Es)',
+                'image' => 'Imagen',
                 'status' => 'Estado',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
@@ -428,6 +444,10 @@ return [
                 'en_name' => 'Nombre del servicio(En)',
                 'es_name' => 'Nombre del servicio(Es)',
                 'status' => 'Estado',
+                'category' => 'Categoría',
+                'service' => 'Servicio',
+                'icon' => 'Icono',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
@@ -448,6 +468,12 @@ return [
                 'en_name' => 'Nombre del sub-servicio(En)',
                 'es_name' => 'Nombre del sub-servicio(Es)',
                 'status' => 'Estado',
+                'category' => 'Categoría',
+                'service' => 'Servicio',
+                'subservice' => 'Sub-servicio',
+                'price' => 'Precio',
+                'icon' => 'Icono',
+                'action' => 'Acciones',
                 'en_services_name' => 'Nombre del servicio(En)',
                 'es_services_name' => 'Nombre del servicio(Es)',
                 'created_at' => 'Fecha de Creación ',
@@ -471,6 +497,13 @@ return [
                 'en_name' => 'Nombre del sub-servicio menor(En)',
                 'es_name' => 'Nombre del sub-servicio menor(Es)',
                 'status' => 'Estado',
+                'category' => 'Categoría',
+                'service' => 'Servicio',
+                'subservice' => 'Sub-servicio',
+                'name' => 'Nombre',
+                'price' => 'Precio',
+                'icon' => 'Icono',
+                'action' => 'Acciones',
                 'en_services_name' => 'Nombre del sub-servicio(En)',
                 'es_services_name' => 'SNombre del sub-servicio(Es)',
                 'created_at' => 'Fecha de Creación ',
@@ -545,6 +578,12 @@ return [
                 'en_option' => 'Option(En)',
                 'es_option' => 'Option(Es)',
                 'status' => 'Estado',
+                'category' => 'Categoría',
+                'service' => 'Servicio',
+                'subservice' => 'Sub-servicio',
+                'childsubservice' => 'Sub-servicio menor',
+                'title' => 'Título',
+                'action' => 'Acciones',
                 'en_services_name' => 'Nombre del servicio(En)',
                 'es_services_name' => 'Nombre del servicio(Es)',
                 'en_subservices_name' => 'Nombre del sub-servicio(En)',
@@ -558,10 +597,14 @@ return [
         ],
 
         'service_request' => [
+            'service_requests' => 'Solicitudes de servicio', 
             'create' => 'Crear pregunta',
             'update' => 'Actualizar pregunta',
             'edit' => 'Editar pregunta',
             'management' => 'Administración de solicitudes de servicio',
+            'from_date' => 'Desde',
+            'to_date' => 'Hasta',
+            'submit' => 'Buscar',
 
             'table' => [
                 'id' => 'Id',
@@ -573,7 +616,14 @@ return [
                 'username' => 'Nombre de usuario',
                 'category_name' => 'Nombre de la categoría',
                 'service_name' => 'Nombre del servicio',
+                'mobile_number' => 'Numero de celular',
+                'city' => 'Ciudad',
+                'request_date' => 'Fecha de solicitud',
                 'status' => 'Estado',
+                'action' => 'Acciones',
+                'show' => 'Ver',
+                'delete' => 'Eliminar',
+                'forward' => 'Reenviar',
                 'en_services_name' => 'Nombre del servicio(En)',
                 'es_services_name' => 'Nombre del servicio(Es)',
                 'en_subservices_name' => 'Nombre del sub-servicio(En)',
@@ -602,11 +652,14 @@ return [
             'management' => 'Administración de ciudades',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'sort' => 'Ordenar',
                 'name' => 'Nombre',
+                'province' => 'Provincia',
+                'city' => 'Ciudad o Cantón',
                 'province_name' => 'Nombre de la provincia',
                 'status' => 'Estado',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
@@ -622,14 +675,36 @@ return [
             'management' => 'Administración de provincia',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'sort' => 'Ordenar',
                 'name' => 'Nombre',
                 'status' => 'Estado',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
                 'total' => 'rol total|roles total',
+            ],
+        ],
+
+        'payment_management' => [
+            'payment_management' => 'Administración de pagos',
+            
+            'table' => [
+                'id' => 'ID',
+                'sort' => 'Sort',
+                'name' => 'Name',
+                'status' => 'Status',
+                'profesional_name' => 'Nombre del profesional',
+                'mount' => 'Monto',
+                'credits' => 'Creditos',
+                'transaction_id' => 'Transacción ID',
+                'payment_date' => 'Fecha de pago',
+                'package_name' => 'Nombre del paquete',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
             ],
         ],
 
@@ -654,6 +729,7 @@ return [
         ],
 
         'price_range' => [
+            'price_range' => 'Rango de precios',
             'create' => 'Crear rango de precios',
             'update' => 'Actualizar rango de precios',
             'edit' => 'Editar rango de precios',
@@ -665,6 +741,8 @@ return [
                 'start_price' => 'Precio inicial',
                 'end_price' => 'Precio final',
                 'status' => 'Estado',
+                'porcentage' => 'Porcentaje',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
@@ -674,8 +752,14 @@ return [
 
         'sitesetting' => [
             'create' => 'Crear configuración del sitio',
-
             'management' => 'Configuración del sitio',
+            'social' => 'Social',
+            'other' => 'Otros',
+            'free_credits' => 'Créditos Gratis',
+            'free_credit' => 'Crédito Gratis',
+            'logo' => 'Logo',
+            'terms' => 'Términos',
+            'disclaimer' => 'Descargo de responsabilidad',
 
            /* 'table' => [
                 'id' => 'Id',
@@ -688,6 +772,62 @@ return [
                 'deleted_at' => 'Eliminado en',
                 'total' => 'rol total|roles total',
             ],*/
+        ],
+
+        'newsletters' => [
+            'select_All' => 'Seleccionar todo',
+            'create' => 'Create Newsletter',
+            'management' => 'Newsletter',
+            'send_mail' => 'Enviar correo',
+
+            'table' => [
+                'id' => 'ID',
+                'sort' => 'Sort',
+                'name' => 'Name',
+                'email' => 'Correo electrónico',
+                'user_Type' => 'Tipo de usuario',
+                'send_email' => 'Enviar correo electrónico',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+        ],
+
+        'faq' => [
+            'faq' => 'Preguntas Frecuentes',
+            'management' => 'Gestión de Preguntas Frecuentes',
+            'active' => 'Activo',
+            'inactive' => 'Inactivo',
+
+            'table' => [
+                'id' => 'ID',
+                'question_type' => 'Tipo de pregunta',
+                'question' => 'Pregunta',
+                'answer' => 'Respuesta',
+                'status' => 'Estado',
+                'action' => 'Acciones',
+            ],
+        ],
+
+        'refund' => [
+            'refund' => 'Solicitud de reembolso',
+            'management' => 'Gestión de reembolsos',
+
+            'table' => [
+                'id' => 'ID',
+                'username' => 'Nombre de usuario',
+                'email' => 'Correo electrónico',
+                'reason' => 'Motivo',
+                'amount' => 'Monto $',
+                'transaction_id' => 'Identificación de la transacción',
+                'status' => 'Estado',
+                'refund_date' => 'Fecha de reembolso',
+                'payment_date' => 'Fecha de pago',
+                'action' => 'Acciones',
+                'accept' => 'Aceptar',
+                'reject' => 'Rechazar',
+            ],
         ],
 
 
@@ -704,17 +844,19 @@ return [
             'view' => 'Ver descripción',
             'Send Mail To All' => 'Enviar correo a todos',
 
-           /* 'table' => [
-                'id' => 'Id',
+            'table' => [
+                'id' => 'ID',
                 'sort' => 'Ordenar',
-                'name' => 'Name',
-                'province_name' => 'Province Name',
+                'name' => 'Nombre',
+                'email' => 'Correo electrónico',
+                'contact_number' => 'Número de contacto',
+                'view' => 'Ver',
                 'status' => 'Estado',
                 'created_at' => 'Created At',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',
                 'total' => 'rol total|roles total',
-            ],*/
+            ],
         ],
 
             'newsletter' => [
@@ -740,10 +882,11 @@ return [
         ],
 
         'review' => [
+            'review' => 'Revisión',
             'management' => 'Revisión de la administración',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'Role' => 'Rol',
                 'Mobile Number' => 'Número de teléfono móvil',
                 'User Name' => 'Nombre de usuario',
@@ -759,6 +902,11 @@ return [
                 'Service Name' =>'Nombre del servicio',
                 'Sub Service Name' =>'Nombre del sub-servicio',
                 'Child Sub Service Name' =>'Nombre del sub-serviciomeos',
+                'approval_status' =>'Estado de aprobación',
+                'action' => 'Acciones',
+                'inactive' => 'Inactivo',
+                'active' => 'Activo',
+                'show' => 'Mostrar',
 
            ],
             'view' => 'Revisar',
@@ -796,10 +944,17 @@ return [
 
         'work' => [
             'work' => '¿Cómo funciona?',
-            
             'create' => 'Crear, ¿Cómo funciona?',
-
             'management' => 'Administración de cómo funciona',
+            'description' => 'Descripción',
+            'image' => 'Imagen',
+            'name' => 'Nombre',
+            'compare' => 'Comparar',
+            'other' => 'Otros',
+            'does_work' => 'Como funciona',
+            'user' => 'Usuario',
+            'professional' => 'Profesional'
+
 
            /* 'table' => [
                 'id' => 'Id',
@@ -833,18 +988,20 @@ return [
         ],
 
         'package' => [
+            'package' => 'Paquete',
             'create' => ' Crear paquete de suscripción',
 
             'management' => 'Administración de paquete de suscripción',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'en_name' => 'Nombre del paquete(En)',
                 'es_name' => 'Nombre del paquete(Es)',
                 'price' => 'Precio',
                 'credit' => 'Crédito',
                 'discount' => 'Descuento en %',
                 'status' => 'Estado',
+                'action' => 'Acciones',
                 'created_at' => 'Fecha de Creación ',
                 'updated_at' => 'Actualizado en',
                 'deleted_at' => 'Eliminado en',

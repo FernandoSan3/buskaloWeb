@@ -32,9 +32,9 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.provinces.table.id') </th>
-                            <th> @lang('labels.backend.provinces.table.name') </th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.provinces.table.id')      </th>
+                            <th> @lang('labels.backend.provinces.table.name')    </th>
+                            <th> @lang('labels.backend.provinces.table.action')  </th>
                         </tr>
                         </thead>
                         <tbody>

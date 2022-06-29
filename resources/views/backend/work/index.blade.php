@@ -35,14 +35,14 @@
             </div><!--col-->
 
         </div><!--row-->
-<h3>Usuario</h3>
+<h3> @lang('labels.backend.work.user') </h3>
   {{ html()->form('POST', route('admin.work.updatework'))->attribute('enctype', 'multipart/form-data')->class('form-horizontal')->open() }}
 
 <input type="hidden" name="user" value="1">
   <input type="hidden" name="id" value="1">
 <ul class="nav nav-mytabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#search" role="tab" aria-controls="home" aria-selected="true">Como funciona</a>
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#search" role="tab" aria-controls="home" aria-selected="true"> @lang('labels.backend.work.does_work') </a>
   </li>
  <!--  <li class="nav-item">
     <a class="nav-link" id="history-tab" data-toggle="tab" href="#compare" role="tab" aria-controls="history" aria-selected="false">Compare</a>
@@ -51,7 +51,7 @@
     <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#hire" role="tab" aria-controls="city-attractions" aria-selected="false">Hires</a>
   </li> -->
   <li class="nav-item">
-    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#other" role="tab" aria-controls="city-attractions" aria-selected="false">Other</a>
+    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#other" role="tab" aria-controls="city-attractions" aria-selected="false"> @lang('labels.backend.work.other') </a>
   </li>
 </ul>
 
@@ -71,7 +71,7 @@
      </div> -->
 
     <div class="form-group row">
-     <label class="col-md-2 form-control-label">Description</label>
+     <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
       <div class="col-md-10">
          {{ html()->textarea('search_descriptiom')
             ->class('form-control')
@@ -88,7 +88,7 @@
   <div class="tab-pane fade" id="compare" role="tabpanel" aria-labelledby="history-tab">
   
     <div class="form-group row">
-      <label class="col-md-2 form-control-label">Compare</label>
+      <label class="col-md-2 form-control-label"> @lang('labels.backend.work.compare') </label>
          <div class="col-md-10">
             {{ html()->text('compare')
               ->class('form-control')
@@ -99,7 +99,7 @@
          </div><!--col-->
     </div><!--form-group-->
     <div class="form-group row">
-      <label class="col-md-2 form-control-label">Description</label>
+      <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description')</label>
         <div class="col-md-10">
            {{ html()->textarea('compare_description')
                   ->class('form-control')
@@ -115,7 +115,7 @@
 
   <div class="tab-pane fade" id="hire" role="tabpanel" aria-labelledby="history-tab">
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Name</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.name') </label>
            <div class="col-md-10">
               {{ html()->text('hire')
                 ->class('form-control')
@@ -126,7 +126,7 @@
            </div><!--col-->
       </div><!--form-group-->
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Description</label>
+        <label class="col-md-2 form-control-label">  @lang('labels.backend.work.description') </label>
           <div class="col-md-10">
              {{ html()->textarea('hire_description')
                 ->class('form-control')
@@ -142,7 +142,7 @@
 
 <div class="tab-pane fade" id="other" role="tabpanel" aria-labelledby="history-tab">
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Image</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.image') </label>
            <div class="col-md-10">
               {{ html()->file('image')
                 ->attribute('maxlength', 191)
@@ -154,7 +154,7 @@
       </div><!--form-group-->
 
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Description</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
           <div class="col-md-10">
              {{ html()->textarea('description')
                 ->class('form-control')
@@ -183,13 +183,13 @@
 </div><!--row-->
 
 
-<h3>Profesional</h3>
+<h3> @lang('labels.backend.work.professional') </h3>
   {{ html()->form('POST', route('admin.work.updatework'))->attribute('enctype', 'multipart/form-data')->class('form-horizontal')->open() }}
   <input type="hidden" name="profesional" value="2">
   <input type="hidden" name="id" value="2">
 <ul class="nav nav-mytabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#search1" role="tab" aria-controls="home" aria-selected="true">Como funciona</a>
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#search1" role="tab" aria-controls="home" aria-selected="true"> @lang('labels.backend.work.does_work') </a>
   </li>
  <!--  <li class="nav-item">
     <a class="nav-link" id="history-tab" data-toggle="tab" href="#compare1" role="tab" aria-controls="history" aria-selected="false">Compare</a>
@@ -198,7 +198,7 @@
     <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#hire1" role="tab" aria-controls="city-attractions" aria-selected="false">Hires</a>
   </li> -->
   <li class="nav-item">
-    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#other1" role="tab" aria-controls="city-attractions" aria-selected="false">Other</a>
+    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#other1" role="tab" aria-controls="city-attractions" aria-selected="false"> @lang('labels.backend.work.other') </a>
   </li>
 </ul>
 
@@ -218,7 +218,7 @@
      </div> -->
 
     <div class="form-group row">
-     <label class="col-md-2 form-control-label">Description</label>
+     <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
       <div class="col-md-10">
          {{ html()->textarea('search_descriptiom')
             ->class('form-control')
@@ -247,7 +247,7 @@
          </div><!--col-->
     </div><!--form-group-->
     <div class="form-group row">
-      <label class="col-md-2 form-control-label">Description</label>
+      <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
         <div class="col-md-10">
            {{ html()->textarea('compare_description')
                   ->class('form-control')
@@ -274,7 +274,7 @@
            </div><!--col-->
       </div><!--form-group-->
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Description</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
           <div class="col-md-10">
              {{ html()->textarea('hire_description')
                 ->class('form-control')
@@ -290,7 +290,7 @@
 
 <div class="tab-pane fade" id="other1" role="tabpanel" aria-labelledby="history-tab">
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Image</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.image') </label>
            <div class="col-md-10">
               {{ html()->file('image')
                 ->attribute('maxlength', 191)
@@ -302,7 +302,7 @@
       </div><!--form-group-->
 
       <div class="form-group row">
-        <label class="col-md-2 form-control-label">Description</label>
+        <label class="col-md-2 form-control-label"> @lang('labels.backend.work.description') </label>
           <div class="col-md-10">
              {{ html()->textarea('description')
                 ->class('form-control')

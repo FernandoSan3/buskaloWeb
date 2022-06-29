@@ -24,6 +24,8 @@ return [
             'show_profile' => 'Show Profile',
             'edit' => 'Edit',
             'edit_payment_method' => 'Edit Payment Method',
+            'all_company_certificates' => 'All Certificates',
+            'all_workers' => 'All Workers',
             'all_contractor_certificates' => 'All Certificates',
             'all_contractor_images_gallery' => 'Image Gallery',
             'all_contractor_videos_gallery' => 'Video Gallery',
@@ -117,6 +119,7 @@ return [
                     'city' => 'City',
                     'profession' => 'Profession',
                     'citiename' => 'City', 
+                    'action' => 'Actions',
                 ],  
 
                 'tabs' => [
@@ -209,6 +212,14 @@ return [
             'update' => 'Update Terms And Condition',
             'edit' => 'Edit Terms And Condition',
             'management' => 'Terms And Condition Management',
+            'description' => 'Description',
+            'constractor' => 'Constructor',
+            'company_description' => 'Company Description',
+            'description' => 'Company',
+            'user_description' => 'User Description',
+            'user' => 'User',
+            'purchase_description' => 'Purchase Description',
+            'purchase' => 'Purchase',
 
             'table' => [
                 'id' => 'Id',
@@ -229,6 +240,7 @@ return [
             'update' => 'Update Work With Us',
             'edit' => 'Edit Work With Us',
             'management' => 'Work With Us Management',
+            'description' => 'Description',
 
             'table' => [
                 'id' => 'Id',
@@ -249,13 +261,16 @@ return [
             'update' => 'Update Category',
             'edit' => 'Edit Category',
             'management' => 'Category Management',
+            'deactivate' => 'Deactivate',
+            'activate' => 'Activate',
 
             'table' => [
                 'id' => 'Id',
                 'sort' => 'Sort',
                 'en_name' => 'Name(En)',
-                'es_name' => 'Name(Es)',
+                'image' => 'Image',
                 'status' => 'Status',
+                'action' => 'Actions',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
@@ -277,6 +292,10 @@ return [
                 'en_name' => 'Name(En)',
                 'es_name' => 'Name(Es)',
                 'status' => 'Status',
+                'category' => 'Category',
+                'service' => 'Service',
+                'icon' => 'Icon',
+                'action' => 'Actions',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
@@ -323,6 +342,12 @@ return [
                 'en_name' => 'Name(En)',
                 'es_name' => 'Name(Es)',
                 'status' => 'Status',
+                'category' => 'Category',
+                'service' => 'Service',
+                'subservice' => 'Sub Service',
+                'price' => 'Price',
+                'icon' => 'Icon',
+                'action' => 'Actions',
                 'en_services_name' => 'Service Name(En)',
                 'es_services_name' => 'Service Name(Es)',
                 'created_at' => 'Created At',
@@ -346,6 +371,13 @@ return [
                 'en_name' => 'Name(En)',
                 'es_name' => 'Name(Es)',
                 'status' => 'Status',
+                'category' => 'Category',
+                'service' => 'Service',
+                'subservice' => 'Sub Service',
+                'name' => 'Name',
+                'price' => 'Price',
+                'icon' => 'Icon',
+                'action' => 'Actions',
                 'en_services_name' => 'Service Name(En)',
                 'es_services_name' => 'Service Name(Es)',
                 'created_at' => 'Created At',
@@ -420,8 +452,14 @@ return [
                 'en_option' => 'Option(En)',
                 'es_option' => 'Option(Es)',
                 'status' => 'Status',
+                'category' => 'Category',
+                'service' => 'Service',
+                'subservice' => 'Sub Service',
+                'childsubservice' => 'Child-Sub Service',
                 'en_services_name' => 'Service Name(En)',
                 'es_services_name' => 'Service Name(Es)',
+                'title' => 'Title',
+                'action' => 'Actions',
                 'en_subservices_name' => 'Subservice Name(En)',
                 'es_subservices_name' => 'Subservice Name(Es)',
                 'created_at' => 'Created At',
@@ -433,10 +471,14 @@ return [
         ],
 
         'service_request' => [
+            'service_requests' => 'Service Requests',
             'create' => 'Create Question',
             'update' => 'Update Question',
             'edit' => 'Edit Question',
             'management' => 'Service Requests Management',
+            'from_date' => 'From Date',
+            'to_date' => 'To Date',
+            'submit' => 'Submit',
 
             'table' => [
                 'id' => 'Id',
@@ -448,7 +490,14 @@ return [
                 'username' => 'Username',
                 'category_name' => 'Category Name',
                 'service_name' => 'Service Name',
+                'mobile_number' => 'Mobile No.',
+                'city' => 'City',
+                'request_date' => "Request's date",
                 'status' => 'Status',
+                'action' => 'Actions',
+                'show' => 'Show',
+                'delete' => 'Delete',
+                'forward' => 'Forward',
                 'en_services_name' => 'Service Name(En)',
                 'es_services_name' => 'Service Name(Es)',
                 'en_subservices_name' => 'Subservice Name(En)',
@@ -480,8 +529,11 @@ return [
                 'id' => 'Id',
                 'sort' => 'Sort',
                 'name' => 'Name',
+                'province' => 'Province',
+                'city' => 'City',
                 'province_name' => 'Province Name',
                 'status' => 'Status',
+                'action' => 'Actions',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
@@ -501,6 +553,28 @@ return [
                 'sort' => 'Sort',
                 'name' => 'Name',
                 'status' => 'Status',
+                'action' => 'Actions',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+        ],
+
+        'payment_management' => [
+            'payment_management' => 'Payment Management',
+            
+            'table' => [
+                'id' => 'ID',
+                'sort' => 'Sort',
+                'name' => 'Name',
+                'status' => 'Status',
+                'profesional_name' => 'Professional Name',
+                'mount' => 'Amount',
+                'credits' => 'Credits',
+                'transaction_id' => 'Transaction Id',
+                'payment_date' => 'Payment Date',
+                'package_name' => 'Package Name',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
@@ -529,6 +603,7 @@ return [
         ],
 
         'price_range' => [
+            'price_range' => 'Price Range',
             'create' => 'Create Price Range',
             'update' => 'Update Price Range',
             'edit' => 'Edit Price Range',
@@ -540,6 +615,8 @@ return [
                 'start_price' => 'Start Price',
                 'end_price' => 'End Price',
                 'status' => 'Status',
+                'porcentage' => 'Percentage',
+                'action' => 'Actions',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
@@ -549,8 +626,15 @@ return [
 
         'sitesetting' => [
             'create' => 'Create Site Setting',
-
             'management' => 'Site Setting',
+            'social' => 'Social',
+            'other' => 'Others',
+            'free_credits' => 'Free Credits',
+            'free_credit' => 'Free Credit',
+            'logo' => 'Logo',
+            'terms' => 'Terms',
+            'disclaimer' => 'Disclaimer',
+
 
            /* 'table' => [
                 'id' => 'Id',
@@ -565,6 +649,61 @@ return [
             ],*/
         ],
 
+        'newsletters' => [
+            'select_All' => 'Select All',
+            'create' => 'Create Newsletter',
+            'management' => 'Newsletter',
+            'send_mail' => 'Send Mail',
+
+            'table' => [
+                'id' => 'ID',
+                'sort' => 'Sort',
+                'name' => 'Name',
+                'email' => 'Email',
+                'user_Type' => 'User Type',
+                'send_email' => 'Send Email',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+        ],
+
+        'faq' => [
+            'faq' => 'FAQ',
+            'management' => 'FAQ Management',
+            'active' => 'Active',
+            'inactive' => 'Inactive',
+
+            'table' => [
+                'id' => 'ID',
+                'question_type' => 'Question Type',
+                'question' => 'Question',
+                'answer' => 'Answer',
+                'status' => 'Status',
+                'action' => 'Actions',
+            ],
+        ],
+
+        'refund' => [
+            'refund' => 'Refund Request',
+            'management' => 'Refund Management',
+
+            'table' => [
+                'id' => 'ID',
+                'username' => 'User Name',
+                'email' => 'Email',
+                'reason' => 'Reason',
+                'amount' => 'Amount $',
+                'transaction_id' => 'Transaction Id',
+                'status' => 'Status',
+                'refund_date' => 'Refund Date',
+                'payment_date' => 'Payment Date',
+                'action' => 'Actions',
+                'accept' => 'Accept',
+                'reject' => 'Reject',
+            ],
+        ],
 
         'area_management' => [
             'create' => 'Create Area Management',
@@ -579,26 +718,28 @@ return [
             'view' => 'View Description',
             'Send Mail To All' => 'Send Mail To All',
 
-           /* 'table' => [
-                'id' => 'Id',
+            'table' => [
+                'id' => 'ID',
                 'sort' => 'Sort',
                 'name' => 'Name',
-                'province_name' => 'Province Name',
+                'email' => 'Email',
                 'status' => 'Status',
+                'contact_number' => 'Contact Number',
+                'view' => 'View',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',
                 'total' => 'role total|roles total',
-            ],*/
+            ],
         ],
 
-            'newsletter' => [
-            'create' => 'Create Mail',
+        'newsletter' => [
+        'create' => 'Create Mail',
 
-            'management' => 'Newsletter',
-            'view' => 'View Description',
-            'Send Mail To All' => 'Send Mail To All',
-            'Send' => 'Send',
+        'management' => 'Newsletter',
+        'view' => 'View Description',
+        'Send Mail To All' => 'Send Mail To All',
+        'Send' => 'Send',
 
 
            /* 'table' => [
@@ -615,6 +756,7 @@ return [
         ],
 
         'review' => [
+            'review' => 'Review',
             'management' => 'Review Management',
 
             'table' => [
@@ -634,7 +776,11 @@ return [
                 'Service Name' =>'Service Name',
                 'Sub Service Name' =>'Sub Service Name',
                 'Child Sub Service Name' =>'Child Sub Service Name',
-
+                'approval_status' =>'Approval Status',
+                'action' => 'Actions',
+                'inactive' => 'Inactive',
+                'active' => 'Active',
+                'show' => 'Show',
            ],
             'view' => 'Review',
         ],
@@ -672,6 +818,15 @@ return [
             'work' => 'How does it work',
             'create' => 'Create How does it work',
             'management' => 'How does it work',
+            'description' => 'Description',
+            'image' => 'Image',
+            'name' => 'Name',
+            'compare' => 'Compare',
+            'other' => 'Others',
+            'does_work' => 'How does it work',
+            'user' => 'User',
+            'professional' => 'Professional'
+
 
            /* 'table' => [
                 'id' => 'Id',
@@ -705,18 +860,20 @@ return [
         ],
 
         'package' => [
+            'package' => ' Package',
             'create' => 'Subscription Package',
 
             'management' => 'Subscription Package',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'en_name' => 'Package Name(En)',
                 'es_name' => 'Package Name(Es)',
                 'price' => 'Price',
                 'credit' => 'Credit',
                 'discount' => 'Discount in %',
                 'status' => 'Status',
+                'action' => 'Actions',
                 'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
                 'deleted_at' => 'Deleted At',

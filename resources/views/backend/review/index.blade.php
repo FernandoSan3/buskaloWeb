@@ -32,12 +32,12 @@
                     <table class="table table-striped table-bordered" id="example">
                         <thead>
                          <tr>
-                            <th> @lang('labels.backend.review.table.id')</th>
-                             <th> @lang('labels.backend.review.table.User Name')</th>
-                             <th> @lang('labels.backend.review.table.Provider Name')</th>
-                             <th> @lang('labels.backend.review.table.Mobile Number')</th>
-                              <th>@lang('Approval Status')</th>
-                             <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.review.table.id')              </th>
+                            <th> @lang('labels.backend.review.table.User Name')       </th>
+                            <th> @lang('labels.backend.review.table.Provider Name')   </th>
+                            <th> @lang('labels.backend.review.table.Mobile Number')   </th>
+                            <th> @lang('labels.backend.review.table.approval_status') </th>
+                            <th> @lang('labels.backend.review.table.action')          </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -52,16 +52,16 @@
                                     <td>{{ $request->mobile_number }}</td>
                                     <td>
                                      @if($request->admin_appovel==0)
-                                        <a href="{{url('admin/review/status/'.$request->id)}}"><button class="btn btn-danger"> Inactive</button></a>
+                                        <a href="{{url('admin/review/status/'.$request->id)}}"><button class="btn btn-danger"> @lang('labels.backend.review.table.inactive') </button></a>
                                         @else
-                                         <a href="{{url('admin/review/status/'.$request->id)}}"><button class="btn btn-success"> Active</button></a>
+                                         <a href="{{url('admin/review/status/'.$request->id)}}"><button class="btn btn-success"> @lang('labels.backend.review.table.active') </button></a>
                                         @endif
                                     </td>
 
                                      <td>
                                        <form action="{{ route('admin.questions.destroy',$request->id) }}" method="POST">
 
-                                            <a class="btn btn-info" href="{{ route('admin.review.show',$request->id) }}">Show</a>
+                                            <a class="btn btn-info" href="{{ route('admin.review.show',$request->id) }}"> @lang('labels.backend.review.table.show') </a>
                                             @csrf
                                             @method('DELETE')
 

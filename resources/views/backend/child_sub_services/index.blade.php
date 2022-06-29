@@ -34,14 +34,16 @@
                     <table id="example" class="table">
                         <thead>
                         <tr>
-                            <th>@lang('labels.backend.subservices.table.id')</th>
-                            <th>Category</th>
-                            <th>Service</th>
-                            <th>Sub Service</th>
-                            <th>Name</th>
-                            <th>Price</th>
-                           <!--  <th>Icon</th> -->
-                            <th>@lang('labels.general.actions')</th>
+                           
+
+                            <th> @lang('labels.backend.childsubservices.table.id')         </th>
+                            <th> @lang('labels.backend.childsubservices.table.category')   </th>
+                            <th> @lang('labels.backend.childsubservices.table.service')    </th>
+                            <th> @lang('labels.backend.childsubservices.table.subservice') </th>   
+                            <th> @lang('labels.backend.childsubservices.table.name') </th>                 
+                            <th> @lang('labels.backend.childsubservices.table.price')      </th>    
+                           <!--  <th>Icon</th> -->                         
+                            <th> @lang('labels.backend.childsubservices.table.action')     </th>
                         </tr>
                         </thead>
                         <tbody>

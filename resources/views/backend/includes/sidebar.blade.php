@@ -93,21 +93,22 @@
                     </a>
 
                     <ul class="nav-dropdown-items">
-                        <li class="nav-item">
-                            <a class="nav-link {{
-                            active_class(Route::is('admin/aplicacions'))
-                        }}" href="{{ route('admin.aplicacions.index') }}">
-                              @lang('labels.backend.other.new1')
-                              </a>
-                        </li>
-
-                        <li class="nav-item">
+                        
+                       
+                    <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/aplicacions'))
                         }}" href="{{ route('admin.aplicacions') }}">
-                              @lang('labels.backend.other.new')
+                              @lang('labels.backend.other.new1')
                             </a>
                         </li>
+                        <li class="nav-item">
+                             <a class="nav-link {{
+                             active_class(Route::is('admin/aplicacions1'))
+                         }}" href="{{ route('admin.aplicacions1.index') }}">
+                               @lang('labels.backend.other.new')
+                               </a>
+                         </li>
 
                     </ul>
                         
@@ -147,7 +148,7 @@
                     <a class="nav-link nav-dropdown-toggle {{
                             active_class(Route::is('admin/company*'))
                         }}" href="#">
-                        <i class="nav-icon fas fa-list"></i> Company
+                        <i class="nav-icon fas fa-list"></i> @lang('labels.backend.company.company')
                     </a>
 
                     <ul class="nav-dropdown-items">
@@ -155,14 +156,14 @@
                             <a class="nav-link {{
                             active_class(Route::is('admin/company'))
                         }}" href="{{ route('admin.company.index') }}">
-                              All Companies
+                            @lang('labels.backend.company.company')
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/company*'))
                         }}" href="{{ route('admin.company.create') }}">
-                                Create Company
+                            @lang('labels.backend.company.create')
                             </a>
                         </li>
                     </ul>
@@ -172,7 +173,8 @@
                     <a class="nav-link {{
                         active_class(Route::is('admin/category'))
                     }}" href="{{ route('admin.category.index') }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <!-- <i class="nav-icon fas fa-tachometer-alt"></i> -->
+                        <i class="nav-icon fa-bars"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
                         @lang('labels.backend.category.category')
                     </a>
@@ -182,8 +184,8 @@
                     <a class="nav-link {{
                         active_class(Route::is('admin/services'))
                     }}" href="{{ route('admin.services.index') }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        
+                        <!-- <i class="nav-icon fas fa-tachometer-alt"></i> -->
+                        <i class="nav-icon fa-bars"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
                         @lang('labels.backend.services.services')
                     </a>
@@ -193,7 +195,8 @@
                     <a class="nav-link {{
                         active_class(Route::is('admin/subservices'))
                     }}" href="{{ route('admin.subservices.index') }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <!-- <i class="nav-icon fas fa-tachometer-alt"></i> -->
+                        <i class="nav-icon fa-bars"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
                         @lang('labels.backend.subservices.subservices')
                     </a>
@@ -203,7 +206,8 @@
                     <a class="nav-link {{
                         active_class(Route::is('admin/childsubservices'))
                     }}" href="{{ route('admin.childsubservices.index') }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <!-- <i class="nav-icon fas fa-tachometer-alt"></i> -->
+                        <i class="nav-icon fa-bars"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
                         @lang('labels.backend.childsubservices.childsubservices')
                     </a>
@@ -243,7 +247,7 @@
                     active_class(Route::is('admin/payment'))
                 }}" href="{{ route('admin.payment') }}">
                     <i class="nav-icon fas fa-tachometer-alt"></i>
-                   Payment Management
+                    @lang('labels.backend.payment_management.payment_management')
                     </a>
                 </li>
                 <li class="nav-item">
@@ -261,8 +265,7 @@
                         active_class(Route::is('admin/sitesetting'))
                     }}" href="{{ route('admin.site_setting.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Site Setting
+                        @lang('labels.backend.sitesetting.management')
                     </a>
                 </li>
 
@@ -291,7 +294,8 @@
                     }}" href="{{ route('admin.price_range.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Price Range
+                        @lang('labels.backend.price_range.price_range')
+                        
                     </a>
                 </li>
 
@@ -301,7 +305,7 @@
                     }}" href="{{ route('admin.contactus.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <!-- @lang('menus.backend.sidebar.dashboard') -->
-                        Contact Us
+                        @lang('labels.backend.contactus.management')
                     </a>
                 </li>
 
@@ -321,7 +325,7 @@
                         active_class(Route::is('admin/service_request'))
                     }}" href="{{ route('admin.service_request.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Service Requests
+                        @lang('labels.backend.service_request.service_requests')
                     </a>
                 </li>
                  <li class="nav-item">
@@ -329,7 +333,7 @@
                         active_class(Route::is('admin/review'))
                     }}" href="{{ route('admin.review.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Review
+                        @lang('labels.backend.review.review')
                     </a>
                 </li>
                 <li class="nav-item">
@@ -337,7 +341,7 @@
                         active_class(Route::is('admin/newsletter'))
                     }}" href="{{ route('admin.newsletter.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Newsletter
+                        @lang('labels.backend.newsletter.management')
                     </a>
                 </li>
                 <li class="nav-item">
@@ -345,7 +349,7 @@
                         active_class(Route::is('admin/faqs'))
                     }}" href="{{ route('admin.faqs') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        FAQ
+                        @lang('labels.backend.faq.faq')
                     </a>
                 </li>
                 <li class="nav-item">
@@ -353,7 +357,7 @@
                         active_class(Route::is('admin/refund'))
                     }}" href="{{ route('admin.refund') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Refund Request
+                        @lang('labels.backend.refund.refund')
                     </a>
                 </li>
 
@@ -362,7 +366,7 @@
                         active_class(Route::is('admin/package'))
                     }}" href="{{ route('admin.package.index') }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        Package
+                        @lang('labels.backend.package.package')
                     </a>
                 </li>
 

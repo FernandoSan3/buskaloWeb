@@ -43,13 +43,13 @@
     <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">GET IN TOUCH</a>
   </li> -->
   <li class="nav-item">
-    <a class="nav-link active" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false">Social</a>
+    <a class="nav-link active" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"> @lang('labels.backend.sitesetting.social') </a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#city-attractions" role="tab" aria-controls="city-attractions" aria-selected="false">Other</a>
+    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#city-attractions" role="tab" aria-controls="city-attractions" aria-selected="false"> @lang('labels.backend.sitesetting.other') </a>
   </li>
    <li class="nav-item">
-    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#freecredit" role="tab" aria-controls="city-attractions" aria-selected="false">Free Credits</a>
+    <a class="nav-link" id="city-attractions-tab" data-toggle="tab" href="#freecredit" role="tab" aria-controls="city-attractions" aria-selected="false"> @lang('labels.backend.sitesetting.free_credits')</a>
   </li>
 </ul>
 
@@ -228,14 +228,14 @@
   </div>
 <div class="tab-pane fade" id="city-attractions" role="tabpanel" aria-labelledby="city-attractions-tab">
    <div class="form-group row">
-      <label class="col-md-2 form-control-label">Logo</label>
+      <label class="col-md-2 form-control-label"> @lang('labels.backend.sitesetting.logo') </label>
           <div class="col-md-10">
               <input type="file" name="logo_image" accept="image/jpg, image/jpeg">
           </div><!--col-->
    </div><!--form-group-->
 
     <div class="form-group row">
-      <label class="col-md-2 form-control-label">Terms </label>
+      <label class="col-md-2 form-control-label"> @lang('labels.backend.sitesetting.terms') </label>
           <div class="col-md-10">
               {{ html()->text('terms')
                   ->value($sitesetting->terms)
@@ -247,7 +247,7 @@
     </div><!--form-group-->
 
     <div class="form-group row">
-   <label class="col-md-2 form-control-label">Disclaimer </label>
+   <label class="col-md-2 form-control-label"> @lang('labels.backend.sitesetting.disclaimer') </label>
        <div class="col-md-10">
             {{ html()->text('disclaimer')
                 ->value($sitesetting->disclaimer)
@@ -272,7 +272,7 @@
 </div>
   <div class="tab-pane fade" id="freecredit" role="tabpanel" aria-labelledby="city-attractions-tab">
      <div class="form-group row">
-        <label class="col-md-2 form-control-label">Free Credit</label>
+        <label class="col-md-2 form-control-label">@lang('labels.backend.sitesetting.free_credit')</label>
             <div class="col-md-10">
                 {{ html()->text('free_credit')
                 ->value($sitesetting->free_credit)

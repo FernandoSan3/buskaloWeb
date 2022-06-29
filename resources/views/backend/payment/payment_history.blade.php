@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    @lang('Paymant management')                    
+                @lang('labels.backend.payment_management.payment_management')                   
                 </h4>
             </div><!--col-->
 
@@ -32,13 +32,13 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> Profesional Name </th>
-                            <th> Amount  </th>
-                            <th> Credits  </th>
-                            <th> Transaction Id </th>
-                            <th> Payment Date</th>
-                            <th> Package Name</th>
+                            <th> @lang('labels.backend.payment_management.table.id')               </th>
+                            <th> @lang('labels.backend.payment_management.table.profesional_name') </th>
+                            <th> @lang('labels.backend.payment_management.table.mount')            </th>
+                            <th> @lang('labels.backend.payment_management.table.credits')          </th>
+                            <th> @lang('labels.backend.payment_management.table.transaction_id')   </th>
+                            <th> @lang('labels.backend.payment_management.table.payment_date')     </th>
+                            <th> @lang('labels.backend.payment_management.table.package_name')     </th>
                         </tr>
                         </thead>
                         <tbody>

@@ -40,12 +40,12 @@
                         <tr>
                           <th style="display:none"> @lang('labels.backend.questions.table.id')</th>
                             <th> @lang('labels.backend.questions.table.id')</th>
-                            <th> Category</th>
-                            <th> Service</th>
-                            <th> Sub Service</th>
-                            <th> Child-subservice</th>
-                            <th> Title</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.questions.table.category')</th>
+                            <th> @lang('labels.backend.questions.table.service')</th>
+                            <th> @lang('labels.backend.questions.table.subservice')</th>
+                            <th> @lang('labels.backend.questions.table.childsubservice')</th>
+                            <th> @lang('labels.backend.questions.table.title')</th>
+                            <th> @lang('labels.backend.questions.table.action')</th>
                         </tr>
                         </thead>
                         <tbody>

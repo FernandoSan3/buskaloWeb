@@ -18,8 +18,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                    {{-- @lang('labels.backend.category.management') --}}
-                    Faq Management                 
+                    @lang('labels.backend.faq.management')   
                 </h4>
             </div><!--col-->
 
@@ -35,12 +34,12 @@
                     <table id="example" class="table table-striped table-bordered dt-responsive  question-table">
                         <thead>
                         <tr>
-                            <th> @lang('labels.backend.services.table.id') </th>
-                            <th> @lang('Question Type') </th>
-                            <th> @lang('Question') </th>
-                            <th> @lang('Answer') </th>
-                            <th>Status</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <th> @lang('labels.backend.faq.table.id')            </th>
+                            <th> @lang('labels.backend.faq.table.question_type') </th>
+                            <th> @lang('labels.backend.faq.table.question')      </th>
+                            <th> @lang('labels.backend.faq.table.answer')        </th>
+                            <th> @lang('labels.backend.faq.table.status')        </th>
+                            <th> @lang('labels.backend.faq.table.action')        </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -58,9 +57,9 @@
                                     <td>{{ $faq->answer }}</td>
                                      <td>
                                         @if($faq->status==1)
-                                         Active
+                                         @lang('labels.backend.faq.active')
                                          @else
-                                         Inactive
+                                         @lang('labels.backend.faq.inactive')
                                          @endif
                                      </td>
                                     <td class="que-btn">
