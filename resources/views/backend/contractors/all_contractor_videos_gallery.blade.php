@@ -53,10 +53,21 @@
                             <tr>
                                 <td>{{ $key+1 }}</td>
                                 <td>
+                                    <?php
+                                        if($document['file_type'] == 0){
+                                    ?>
+                                        <a href="{{ $document['file_name'] }}" target="_blank">
+                                            <video style="height: 100px;width: 150px;" src="{{ $document['file_name'] }}" type="video/mp4">
+                                        </a>
+                                    <?php   } else {
+                                    ?>
+                                        <a href="{{ $document['file_name'] }}" target="_blank"> 
+                                            <video style="height: 100px;width: 150px;" src="{{ url('img/frontend/file_icon.png') }}"> 
+                                        </a>
+                                    <?php
+                                       }
+                                    ?>
 
-                                    <video width="200px" height="200px"  controls >
-                                        <source src="{{ $document['file_name'] }}" type="video/mp4">
-                                    </video>
                                 </td>
                                 <td>
                                     <a href="{{route('admin.contractors.delete_gallery_video',$document['id'])}}"><button type="button"  class="notification_b btn btn-danger">Delete</button></a>

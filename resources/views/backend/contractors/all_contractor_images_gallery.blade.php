@@ -66,13 +66,18 @@
                             <tr>
                                 <td>{{ $key+1 }}</td>
                                 <td>
-                                    <div class="click-zoom">
-                                      <label>
-                                        <input type="checkbox">
-                                        <img  style="height: 50px;width: 70px;" src="{{ $document['file_name'] }}">
-                                      </label>
-                                    </div>
-                                    <!-- <img style="height: 50px;width: 70px;" src="{{ $document['file_name'] }}"> -->
+                                    <?php
+                                        if($document['file_type'] == 0){
+                                    ?>
+                                        <a href="{{ $document['file_name'] }}" target="_blank"><img style="height: 50px;width: 70px;" src="{{ $document['file_name'] }}"></a>
+                                    <?php   } else {
+                                    ?>
+                                        <a href="{{ $document['file_name'] }}" target="_blank"> <img style="height: 50px;width: 70px;" src="{{ url('img/frontend/file_icon.png') }}"> </a>
+                                    <?php
+                                       }
+                                    ?>
+
+
                                 </td>
 
                                 <td>
