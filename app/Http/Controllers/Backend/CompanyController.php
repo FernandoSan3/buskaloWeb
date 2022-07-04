@@ -25,14 +25,10 @@ class CompanyController extends Controller
 
     public function index()
     {
-        //die('companyt index');
-        // $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('user_group_id',4)->where('approval_status',1)->get();
-
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
             ->latest('users.created_at')->where('users.deleted_at', NULL)
             ->where('users.approval_status', 1)
-            // ->whereIN('users.user_group_id', [3, 4])
             ->where('user_group_id', 4)
             ->where('users.mobile_number', '!=', NULL)
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
@@ -50,6 +46,30 @@ class CompanyController extends Controller
 
       }
         return view('backend.company.index',compact('users'));
+    }
+    public function index1()
+    {
+        $users = DB::table('users_services_area')
+            ->join('users', 'users_services_area.user_id', '=', 'users.id')
+            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->where('users.approval_status', 1)
+            ->where('user_group_id', 4)
+            ->where('users.mobile_number', '!=', NULL)
+            ->where('users_services_area.whole_country', 1)
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id')
+            ->get();
+
+        foreach ($users as $key => $value) {
+        $value->total_service_requests = DB::table('service_request')
+        ->join('category','service_request.category_id','=','category.id')
+        ->join('services','service_request.service_id','=','services.id')
+        ->join('sub_services','service_request.sub_service_id','=','sub_services.id')
+        ->leftjoin('child_sub_services','service_request.child_sub_service_id','=','child_sub_services.id')
+        ->where('service_request.user_id',$value->id)
+        ->count();
+
+      }
+        return view('backend.company.index1',compact('users'));
     }
 
 
@@ -394,14 +414,80 @@ class CompanyController extends Controller
         return view('backend.company.view_company',compact('company_details'));
     }
 
+    public function ratings_reviews ($user_id)
+    {
+        $userId = $user_id;
+        $ratings_reviews = DB::table('reviews')
+        ->join('users', 'reviews.to_user_id', '=', 'users.id')
+        ->select('reviews.id','reviews.user_id','reviews.review_by','reviews.to_user_id','reviews.request_id','reviews.rating','reviews.price','reviews.puntuality','reviews.service', 'reviews.quality','reviews.amiability','reviews.review','reviews.created_at','users.username')
+        ->where('reviews.user_id',$userId)
+        ->where('reviews.deleted_at', NULL)->get();
+
+        return view('backend.company.ratings_reviews',compact('ratings_reviews'));
+    }
+
+    public function edit_ratings_reviews($user_id)
+    {
+        $userId = $user_id;
+        $ratings_reviews = DB::table('reviews')
+        ->leftjoin('users', 'reviews.to_user_id', '=', 'users.id')
+        ->select('reviews.*','users.username')
+        ->where('reviews.id', $userId)
+        ->where('reviews.deleted_at', NULL)->first();
+
+        return view('backend.company.edit_ratings_reviews', compact('ratings_reviews'));
+    }
+
+    public function update_ratings_reviews(Request $request)
+    {
+        $ratings_reviews_id = $request->ratings_reviews_id;
+
+        $request->validate([
+            'review' => 'required',
+        ]);
+
+        $ratings_reviews = DB::table('reviews')
+        ->leftjoin('users', 'reviews.to_user_id', '=', 'users.id')
+        ->select('reviews.*','users.username')
+        ->where('reviews.id', $ratings_reviews_id)
+        ->where('reviews.deleted_at', NULL)->first();
+
+        $update_arr['review'] = $request->review;
+        $update_arr['rating'] = $request->rating;
+        $update_arr['price'] = $request->price;
+        $update_arr['puntuality'] = $request->puntuality;
+        $update_arr['service'] = $request->service;
+        $update_arr['quality'] = $request->quality;
+        $update_arr['amiability'] = $request->amiability;
+        $update_arr['updated_at'] = Carbon::now();
+        $update_arr['deleted_at'] = null;
+
+        DB::table('reviews')->where('id', $ratings_reviews_id)->update($update_arr);
+
+        return redirect()->route('admin.company.ratings_reviews', ['id' => $ratings_reviews->user_id])->with('success','Rating & Review updated successfully.');
+    }
+
+    public function destroy_ratings_reviews($reviews_id)
+    {
+        $update_arr['deleted_at'] = Carbon::now();
+
+        $ratings_reviews = DB::table('reviews')
+        ->leftjoin('users', 'reviews.to_user_id', '=', 'users.id')
+        ->select('reviews.*','users.username')
+        ->where('reviews.id', $reviews_id)
+        ->where('reviews.deleted_at', NULL)->first();
+
+        DB::table('reviews')->where('id', $reviews_id)->update($update_arr);
+
+        return redirect()->route('admin.company.ratings_reviews', ['id' =>  $ratings_reviews->user_id])->with('success','Rating & Review deleted successfully.');
+    }
+
     public function edit($user_id)
     {
 
         $user_details = DB::table('users')->leftjoin('social_networks','users.id','=','social_networks.user_id')
         ->select('users.*','facebook_url','instagram_url','snap_chat_url','twitter_url','youtube_url')
         ->where('users.id',$user_id)->first();
-
-        //echo "<pre>"; print_r($user_details); die('con');
 
         return view('backend.company.edit',compact('user_details'));
     }

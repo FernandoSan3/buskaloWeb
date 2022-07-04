@@ -32,6 +32,9 @@ return [
             'all_contractor_police_records' => 'Registros policiales',
             'show_services_offered' => 'Servicios',
             'edit_coverage_area' => 'Editar área de cobertura',
+            'ratings_reviews' => 'Calificaciones y reseñas',
+            'ratings_reviews_management' => 'Gestionar calificaciones y reseñas',
+            'edit_ratings_reviews' => 'Editar calificaciones y reseñas',
             'destroy' => 'Eliminar contratista',
             'destroyC' => 'Eliminar empresa',
             'serviceRequests' => 'Solicitud de servicio',
@@ -638,6 +641,7 @@ return [
 
         'contractor' => [
             'management' => 'Contratistas',
+            'management_n' => 'Contratistas Nacionales',
             'update' => 'Actualizar contratistas',
             'edit' => 'Editar contratistas',
             'create' => 'Crear Contratistas',
@@ -884,6 +888,8 @@ return [
         'review' => [
             'review' => 'Revisión',
             'management' => 'Revisión de la administración',
+            'update_ratings_reviews' => 'Calificación y revisión actualizada con éxito.',
+            'delete_ratings_reviews' => 'Calificación y revisión eliminada con éxito.',
 
             'table' => [
                 'id' => 'ID',
@@ -897,6 +903,7 @@ return [
                 'Service' => 'Servicio',
                 'Quality' => 'Calidad',
                 'Amiability' => 'Amabilidad',
+                'Review' => 'Reseña',
                 'Request User' => 'Solicitud de usuario',
                 'Category Name' => 'Nombre de la categoría',
                 'Service Name' =>'Nombre del servicio',
@@ -914,12 +921,13 @@ return [
 
         'company' => [
             'company' => 'Empresas',
+            'company_n' => 'Empresas Nacionales',
             'create' => 'Crear Empresa',
             'update' => 'Actualizar Empresa',
             'edit' => 'Editar Empresa',
             'management' => 'Administración de empresa',
             'view' => 'Ver la empresa',
-
+            'list' => 'Lista de empresas',
 
             'table' => [
                 'id' => 'Id',

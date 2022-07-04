@@ -39,8 +39,8 @@
                         <tr>
                             <th>Id</th>
                             <th>Is Verified</th>
-                            <th>Document</th>
-                            <th>@lang('labels.general.actions')</th>
+                            <!-- <th>Document</th> -->
+                            <!-- <th>@lang('labels.general.actions')</th> -->
                         </tr>
                         </thead>
                         <tbody>
@@ -64,7 +64,7 @@
                                 ?>
 
                                 </td>
-                                <td>
+                                <!-- <td>
                                      <?php
                                         if($document['file_type'] == 0){
                                     ?>
@@ -76,11 +76,11 @@
                                        }
                                     ?>
 
-                                </td>
+                                </td> -->
 
-                                <td>
+                                <!-- <td>
                                     <a href="{{route('admin.contractors.delete_certificate',$document['id'])}}"><button type="button"  class="notification_b btn btn-danger">Delete</button></a>
-                                </td>
+                                </td> -->
 
                             </tr>
 

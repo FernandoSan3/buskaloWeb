@@ -95,7 +95,7 @@
                     <ul class="nav-dropdown-items">
                         
                        
-                    <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/aplicacions'))
                         }}" href="{{ route('admin.aplicacions') }}">
@@ -123,6 +123,15 @@
                     </a>
 
                     <ul class="nav-dropdown-items">
+
+                        <!-- <li class="nav-item">
+                            <a class="nav-link {{
+                            active_class(Route::is('admin/aplicacions1'))
+                        }}" href="{{ route('admin.aplicacions1.index') }}">
+                            @lang('labels.backend.other.new')
+                            </a>
+                        </li> -->
+
                         <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/contractors'))
@@ -130,6 +139,15 @@
                               @lang('labels.backend.contractor.management')
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{
+                            active_class(Route::is('admin/contractors'))
+                        }}" href="{{ route('admin.contractors1.index') }}">
+                              @lang('labels.backend.contractor.management_n')
+                            </a>
+                        </li>
+                         
                         <li class="nav-item">
                             <a class="nav-link {{
                             active_class(Route::is('admin/contractors*'))
@@ -139,7 +157,6 @@
                         </li>
                     </ul>
                 </li>
-
 
 
                 <li class="nav-item nav-dropdown {{
@@ -157,6 +174,13 @@
                             active_class(Route::is('admin/company'))
                         }}" href="{{ route('admin.company.index') }}">
                             @lang('labels.backend.company.company')
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{
+                            active_class(Route::is('admin/company'))
+                        }}" href="{{ route('admin.company1.index') }}">
+                            @lang('labels.backend.company.company_n')
                             </a>
                         </li>
                         <li class="nav-item">

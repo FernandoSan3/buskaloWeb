@@ -32,6 +32,9 @@ return [
             'all_contractor_police_records' => 'All Police Records',
             'show_services_offered' => 'Services',
             'edit_coverage_area' => 'Edit Coverage Area',
+            'ratings_reviews' => 'Ratings & Reviews',
+            'ratings_reviews_management' => 'Ratings & Reviews Management',
+            'edit_ratings_reviews' => 'Edit Ratings & Reviews',
             'destroy' => 'Delete Contractor',
             'destroyC' => 'Delete Company',
             'serviceRequests' => 'Service Request',
@@ -512,6 +515,7 @@ return [
 
         'contractor' => [
             'management' => 'Contractors',
+            'management_n' => 'National Contractors',
             'update' => 'Update Contractor',
             'edit' => 'Edit Contractor',
             'create' => 'Create Contractor',
@@ -758,9 +762,11 @@ return [
         'review' => [
             'review' => 'Review',
             'management' => 'Review Management',
+            'update_ratings_reviews' => 'Rating & Review updated successfully.',
+            'delete_ratings_reviews' => 'Rating & Review deleted successfully.',
 
             'table' => [
-                'id' => 'Id',
+                'id' => 'ID',
                 'Role' => 'Role',
                 'Mobile Number' => 'Mobile Number',
                 'User Name' => 'User Name',
@@ -771,6 +777,7 @@ return [
                 'Service' => 'Service',
                 'Quality' => 'Quality',
                 'Amiability' => 'Amiability',
+                'Review' => 'Review',
                 'Request User' => 'Request User',
                 'Category Name' => 'Category Name',
                 'Service Name' =>'Service Name',
@@ -787,11 +794,13 @@ return [
 
         'company' => [
             'company' => 'Companies',
+            'company_n' => ' National Companies',
             'create' => 'Create Company',
             'update' => 'Update Company',
             'edit' => 'Edit Company',
             'management' => 'Company Management',
             'view' => 'View Company',
+            'list' => 'List Company',
 
             'table' => [
                 'id' => 'Id',

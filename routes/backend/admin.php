@@ -131,7 +131,11 @@ Route::group(['namespace' => 'Contractors'], function ()
     Route::get('contractors/creditpackage/{id}', [ContractorsController::class, 'creditPackage'])->name('contractors.creditpackage');
     Route::post('contractors/creditpackage/store', [ContractorsController::class, 'creditPackageStore'])->name('contractors.creditpackage.store');
 	Route::get('contractors', [ContractorsController::class, 'index'])->name('contractors.index');
+
+	Route::get('contractors1', [ContractorsController::class, 'index1'])->name('contractors1.index');
+
 	Route::get('contractors/create', [ContractorsController::class, 'create'])->name('contractors.create');
+
 	Route::post('contractors', [ContractorsController::class, 'store'])->name('contractors.store');
 
 	Route::get('contractors/create_worker/{id}', [ContractorsController::class, 'createWorker'])->name('contractors.create_worker');
@@ -182,6 +186,14 @@ Route::group(['namespace' => 'Contractors'], function ()
 
 
 	Route::get('contractors/edit_coverage_area/{id}', [ContractorsController::class, 'editCoverageArea'])->name('contractors.edit_coverage_area');
+
+	Route::get('contractors/ratings_reviews/{id}', [ContractorsController::class, 'ratings_reviews'])->name('contractors.ratings_reviews');
+	
+	Route::post('contractors/update_ratings_reviews', [ContractorsController::class, 'update_ratings_reviews'])->name('contractors.update_ratings_reviews');
+	
+	Route::get('contractors/edit_ratings_reviews/{id}', [ContractorsController::class, 'edit_ratings_reviews'])->name('contractors.edit_ratings_reviews');
+
+	Route::get('contractors/destroy_ratings_reviews/{id}', [ContractorsController::class, 'destroy_ratings_reviews'])->name('contractors.destroy_ratings_reviews');
 
 	Route::post('contractors/update_coverage_area', [ContractorsController::class, 'updateCoverageArea'])->name('contractors.update_coverage_area');
 
@@ -235,6 +247,9 @@ Route::group(['namespace' => 'Contractors'], function ()
 
 	Route::get('aplicacions', [ContractorsController::class, 'aplicacions'])->name('aplicacions');
     Route::get('aplicacions1', [ContractorsController::class, 'aplicacions1'])->name('aplicacions1.index');
+
+    Route::get('aplicacions2', [ContractorsController::class, 'aplicacions2'])->name('aplicacions2.index');
+
 	Route::get('aplicacions/accept/{id}', [ContractorsController::class, 'aplicacionsAccept'])->name('aplicacions.accept');
     Route::get('aplicacions/decline/{id}', [ContractorsController::class, 'aplicacionsDecline'])->name('aplicacions.decline');
     Route::get('contractors/payment/{id}', [ContractorsController::class, 'paymentInfo'])->name('contractors.payment');
@@ -438,6 +453,9 @@ Route::group(['namespace' => 'Company'], function ()
     Route::post('company/creditpackage/store', [CompanyController::class, 'creditPackageStore'])->name('company.creditpackage.store');
     
 	Route::get('company', [CompanyController::class, 'index'])->name('company.index');
+	// Route::get('contractors1', [ContractorsController::class, 'index1'])->name('contractors1.index');
+	Route::get('company1', [CompanyController::class, 'index1'])->name('company1.index');
+
 	Route::get('company/create', [CompanyController::class, 'create'])->name('company.create');
 	Route::post('company', [CompanyController::class, 'store'])->name('company.store');
 
@@ -467,9 +485,17 @@ Route::group(['namespace' => 'Company'], function ()
 
 	Route::delete('company/destroy_worker/{id}', [CompanyController::class, 'destroyWorker'])->name('company.destroy_worker');
 
-	 Route::get('company/destroy/{id}', [CompanyController::class, 'destroy'])->name('company.destroy');
+	Route::get('company/destroy/{id}', [CompanyController::class, 'destroy'])->name('company.destroy');
 
 	Route::get('company/edit_coverage_area/{id}', [CompanyController::class, 'editCoverageArea'])->name('company.edit_coverage_area');
+
+	Route::get('company/ratings_reviews/{id}', [CompanyController::class, 'ratings_reviews'])->name('company.ratings_reviews');
+
+	Route::post('company/update_ratings_reviews', [CompanyController::class, 'update_ratings_reviews'])->name('company.update_ratings_reviews');
+	
+	Route::get('company/edit_ratings_reviews/{id}', [CompanyController::class, 'edit_ratings_reviews'])->name('company.edit_ratings_reviews');
+
+	Route::get('company/destroy_ratings_reviews/{id}', [CompanyController::class, 'destroy_ratings_reviews'])->name('company.destroy_ratings_reviews');
 
 	Route::post('company/update_coverage_area', [CompanyController::class, 'updateCoverageArea'])->name('company.update_coverage_area');
 
@@ -585,7 +611,3 @@ Route::group(['namespace' => 'security_policy'], function ()
 	Route::post('security-policy', [SecurityPolicyController::class, 'updatepolicies'])->name('security-policy.updatepolicies');
 
 });
-
-
-
-
