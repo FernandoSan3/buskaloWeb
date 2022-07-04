@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-sm-5">
                 <h4 class="card-title mb-0">
-                     @lang('labels.backend.contractor.management')
+                     @lang('labels.backend.contractor.management_n')
                 </h4>
             </div><!--col-->
 
@@ -37,7 +37,6 @@
                             <th> @lang('labels.backend.access.users.table.email') </th>
                             <th> @lang('labels.backend.access.users.table.mobile') </th>
                             <th> @lang('labels.backend.access.users.table.profession') </th>
-                            <th> @lang('labels.backend.access.users.table.citiename') </th>
                             <th> @lang('labels.general.actions1.actions') </th>                            
                         </tr>
                         </thead>
@@ -51,7 +50,6 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->mobile_number }}</td>
                                 <td>{{ $user->profile_title }}</td>
-                                <td>{{ $user->name }}</td>
 
                                 <td class="btn-td">
                                     <div class="dropdown">
