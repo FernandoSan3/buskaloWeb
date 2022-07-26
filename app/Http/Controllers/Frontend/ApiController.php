@@ -7168,7 +7168,7 @@ class ApiController extends Controller
 
                                          if($userEntity->user_group_id==3)
                                          {
-                                         $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                         $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension', 'is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
 
                                          if(!empty($allPoliceRecImage))
                                          {
@@ -7191,7 +7191,7 @@ class ApiController extends Controller
                                             $users_count_var->police_records['images']=[];
                                          }
 
-                                         $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                         $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension', 'is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
 
                                          if(!empty($allPoliceRecDoc))
                                          {
@@ -10859,11 +10859,11 @@ class ApiController extends Controller
 
                                     if($lang=='en')
                                     {
-                                      $message  = 'Hello '.$contractor_arr->username.', '.$user_arr->username. ' has given you a rating and review for your service';  
+                                      $message  = 'Hello '.$user_arr->username.', '.$contractor_arr->username. ' has given you a rating and review for your service';  
                                     }
                                     if($lang=='es')
                                     {
-                                         $message  = 'Hola '.$contractor_arr->username.', '.$user_arr->username. ' le ha dado una calificación y revisión por su servicio'; 
+                                        $message  = 'Hola '.$user_arr->username.', '.$contractor_arr->username. ' le ha dado una calificación y revisión por su servicio'; 
                                     }
                                     
 
