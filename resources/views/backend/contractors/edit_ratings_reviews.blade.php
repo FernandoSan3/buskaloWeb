@@ -23,51 +23,33 @@
         <div class="row mt-4">
             <div class="col">
 
-                <div class="form-group row">
-                    <label class="col-md-2 form-control-label">@lang('labels.backend.review.table.id')</label>
-
-                    <div class="col-md-10">
-                        {{ html()->text('user_id')
-                                    ->class('form-control')
-                                    ->placeholder('user_id')
-                                    ->value($ratings_reviews->user_id)
-                                    ->required()
-                                    ->autofocus() }}
-                    </div>
+                <div  style="visibility:hidden" >
+                        {{ html()
+                            ->text('user_id')
+                            ->value($ratings_reviews->user_id)
+                            ->required()
+                        }}
                 </div>
 
 
                 <div class="form-group row">
                     <label class="col-md-2 form-control-label">@lang('labels.backend.review.table.User Name')</label>
 
+                    
                     <div class="col-md-10">
                         {{ html()->text('username')
-                                    ->class('form-control')
-                                    ->placeholder('username')
-                                    ->attribute('maxlength', 191)
-                                    ->value($ratings_reviews->username)
-                                    ->required()
-                                    ->autofocus() }}
+                            ->class('form-control')
+                            ->placeholder('username')
+                            ->attribute('maxlength', 191)
+                            ->value($total_service_requests->username)
+                            ->disabled()
+                            ->required()
+                            ->autofocus() }}
                     </div>
                     <!--col-->
                 </div>
                 <!--form-group-->
 
-                <div class="form-group row">
-                    <label class="col-md-2 form-control-label">@lang('labels.backend.review.table.Rating')</label>
-
-                    <div class="col-md-10">
-                        {{ html()->text('rating')
-                                            ->class('form-control')
-                                            ->placeholder('rating')
-                                            ->attribute('maxlength', 3)
-                                            ->value($ratings_reviews->rating)
-                                            ->required()
-                                            ->autofocus() }}
-                    </div>
-                    <!--col-->
-                </div>
-                <!--form-group-->
 
                 <div class="form-group row">
                     <label class="col-md-2 form-control-label">@lang('labels.backend.review.table.Price')</label>

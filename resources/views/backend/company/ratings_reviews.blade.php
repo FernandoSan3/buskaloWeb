@@ -54,7 +54,11 @@
                         @foreach($ratings_reviews as $key => $user)
                             <tr>
                                 <td>{{ $key+1 }}</td>
-                                <td>{{ $user->username }}</td>
+                                <td>
+                                    @foreach ($user->total_service_requests as $userq)
+                                        {{ $userq->username }}
+                                    @endforeach
+                                </td>
                                 <td>{{ $user->rating }}</td>
                                 <td>{{ $user->price }}</td>
                                 <td>{{ $user->puntuality }}</td>

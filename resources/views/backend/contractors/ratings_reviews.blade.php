@@ -49,25 +49,26 @@
                             <th>@lang('labels.backend.review.table.action')</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody> 
                         @foreach($ratings_reviews as $key => $user)
-                            <tr>
-                                <td>{{ $key+1 }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->rating }}</td>
-                                <td>{{ $user->price }}</td>
-                                <td>{{ $user->puntuality }}</td>
-                                <td>{{ $user->service }}</td>
-                                <td>{{ $user->quality }}</td>
-                                <td>{{ $user->amiability }}</td>
-                                <td>{{ $user->review }}</td>
-                                
-                                <td >
-                                    <a href="{{ route('admin.contractors.edit_ratings_reviews',$user->id) }}" class="btn btn-info"><i class="fas fa-edit"></i></a>
-                                    <a href="{{ route('admin.contractors.destroy_ratings_reviews',$user->id) }}" class="btn btn-danger"><i class="fas fa-trash-alt"></i></a>
-                                </td>
-                            </tr>
-
+                                <tr>
+                                    <td>{{ $key+1 }}</td>
+                                    <td>@foreach ($user->total_service_requests as $userq)
+                                        {{ $userq->username }}
+                                    @endforeach</td>
+                                    <td>{{ $user->rating }}</td>
+                                    <td>{{ $user->price }}</td>
+                                    <td>{{ $user->puntuality }}</td>
+                                    <td>{{ $user->service }}</td>
+                                    <td>{{ $user->quality }}</td>
+                                    <td>{{ $user->amiability }}</td>
+                                    <td>{{ $user->review }}</td>
+                                    
+                                    <td >
+                                        <a href="{{ route('admin.contractors.edit_ratings_reviews',$user->id) }}" class="btn btn-info"><i class="fas fa-edit"></i></a>
+                                        <a href="{{ route('admin.contractors.destroy_ratings_reviews',$user->id) }}" class="btn btn-danger"><i class="fas fa-trash-alt"></i></a>
+                                    </td>
+                                </tr>
 
                         @endforeach
                     
