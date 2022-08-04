@@ -420,8 +420,15 @@ class CompanyController extends Controller
         $ratings_reviews = DB::table('reviews')
         ->join('users', 'reviews.to_user_id', '=', 'users.id')
         ->select('reviews.id','reviews.user_id','reviews.review_by','reviews.to_user_id','reviews.request_id','reviews.rating','reviews.price','reviews.puntuality','reviews.service', 'reviews.quality','reviews.amiability','reviews.review','reviews.created_at','users.username')
-        ->where('reviews.user_id',$userId)
+        ->where('reviews.to_user_id',$userId)
         ->where('reviews.deleted_at', NULL)->get();
+
+        foreach ($ratings_reviews as $key => $value) {
+            $value->total_service_requests =DB::table('users')
+            ->select('users.username')
+            ->where('id',$value->user_id)
+            ->get();
+        }
 
         return view('backend.company.ratings_reviews',compact('ratings_reviews'));
     }
@@ -434,8 +441,12 @@ class CompanyController extends Controller
         ->select('reviews.*','users.username')
         ->where('reviews.id', $userId)
         ->where('reviews.deleted_at', NULL)->first();
+        $total_service_requests =DB::table('users')
+            ->select('users.username')
+            ->where('id',$ratings_reviews->user_id)
+            ->first();
 
-        return view('backend.company.edit_ratings_reviews', compact('ratings_reviews'));
+        return view('backend.company.edit_ratings_reviews', compact('ratings_reviews','total_service_requests'));
     }
 
     public function update_ratings_reviews(Request $request)
@@ -453,18 +464,18 @@ class CompanyController extends Controller
         ->where('reviews.deleted_at', NULL)->first();
 
         $update_arr['review'] = $request->review;
-        $update_arr['rating'] = $request->rating;
         $update_arr['price'] = $request->price;
         $update_arr['puntuality'] = $request->puntuality;
         $update_arr['service'] = $request->service;
         $update_arr['quality'] = $request->quality;
         $update_arr['amiability'] = $request->amiability;
+        $update_arr['rating'] = round(($request->price + $request->puntuality + $request->service+ $request->quality + $request->amiability)/5);
         $update_arr['updated_at'] = Carbon::now();
         $update_arr['deleted_at'] = null;
 
         DB::table('reviews')->where('id', $ratings_reviews_id)->update($update_arr);
 
-        return redirect()->route('admin.company.ratings_reviews', ['id' => $ratings_reviews->user_id])->with('success','Rating & Review updated successfully.');
+        return redirect()->route('admin.company.ratings_reviews', ['id' => $ratings_reviews->to_user_id])->with('success','Rating & Review updated successfully.');
     }
 
     public function destroy_ratings_reviews($reviews_id)
