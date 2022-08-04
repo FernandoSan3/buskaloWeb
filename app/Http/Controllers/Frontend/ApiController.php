@@ -142,10 +142,10 @@ class ApiController extends Controller
                         $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
                         if($lang='es')
                         {
-                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' créditos.';
+                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
                         }else
                         {
-                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!';
+                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
                         }
                         
                         //$message=trans('apimessage.Your profile is activated successfully, and you have recived bonus of 20 credits.!');
@@ -169,10 +169,10 @@ class ApiController extends Controller
                         $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
                         if($lang='es')
                         {
-                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' créditos.';
+                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
                         }else
                         {
-                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!';
+                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
                         }
                        // $message=trans('Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!');
                          DB::table('user_devices')->where('user_id',$users_count_var->id)->update(['login_count'=>1]);
@@ -7117,7 +7117,7 @@ class ApiController extends Controller
                                            $certi2=array();$certi3=array();
                                            $policeR2=array(); $policeR3=array();
 
-                                        $allCertificatesImages=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                        $allCertificatesImages=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
                                        
                                          if(!empty($allCertificatesImages))
                                          {
@@ -7129,6 +7129,7 @@ class ApiController extends Controller
                                                 $allImages1['file_name']=url($path.$value->file_name);
                                                 $allImages1['file_extension']=!empty($value->file_extension)?$value->file_extension:'';
                                                 $allImages1['status']=!empty($value->status)?$value->status:0;
+                                                $allImages1['is_verified']=!empty($value->is_verified)?$value->is_verified:0;
                                                 $allImages1['created_at']=$value->created_at;
                                                 array_push($certi2, $allImages1);
                                             }
@@ -7141,7 +7142,7 @@ class ApiController extends Controller
                                           //print_r($allCertificatesImages); die;
 
 
-                                          $DocallCertificates=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                          $DocallCertificates=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
                                         
                                          if(!empty($DocallCertificates))
                                          {
@@ -7168,7 +7169,7 @@ class ApiController extends Controller
 
                                          if($userEntity->user_group_id==3)
                                          {
-                                         $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension', 'is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                         $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
 
                                          if(!empty($allPoliceRecImage))
                                          {
@@ -7181,17 +7182,20 @@ class ApiController extends Controller
                                                 $allVideo1['file_type']=$value->file_type;
                                                 $allVideo1['file_extension']=$value->file_extension;
                                                 $allVideo1['status']=$value->status;
+                                                $allVideo1['is_verified']=$value->is_verified;
                                                 $allVideo1['created_at']=$value->created_at;
                                                 array_push($policeR2, $allVideo1);
                                             }
                                            $users_count_var->police_records['images'] = $policeR2;
+                                           $users_count_var->police_records_verified['verifiedI'] = $value->is_verified;
                                          }
                                          else
                                          {
                                             $users_count_var->police_records['images']=[];
+                                            $users_count_var->police_records_verified['verifiedI'] = 2;
                                          }
 
-                                         $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension', 'is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                         $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
 
                                          if(!empty($allPoliceRecDoc))
                                          {
@@ -7204,14 +7208,17 @@ class ApiController extends Controller
                                                 $all2['file_type']=$valll->file_type;
                                                 $all2['file_extension']=$valll->file_extension;
                                                 $all2['status']=$valll->status;
+                                                $all2['is_verified']=$valll->is_verified;
                                                 $all2['created_at']=$valll->created_at;
                                                 array_push($policeR3, $all2);
                                             }
                                            $users_count_var->police_records['documents'] = $policeR3;
+                                           $users_count_var->police_records_verified['verifiedD'] = $value->is_verified;
                                          }
                                          else
                                          {
                                             $users_count_var->police_records['documents']=[];
+                                            $users_count_var->police_records_verified['verifiedD'] = 2;
                                          }
                                      }
 
@@ -9797,6 +9804,7 @@ class ApiController extends Controller
                         ->select('users_chat.id','users_chat.message','users_chat.created_at','users.id AS from_user_id','users.username AS from_user_name','users_chat.is_read','users_chat.is_starred','users_chat.deleted_by','users_chat.to_userid','users_chat.is_starred_pro')
                         ->where('users_chat.from_userid',$userEntity->id)
                         ->whereRaw("(users_chat.deleted_by IS null )")
+                        ->whereRaw("(users.id IS NOT null )")
                         ->groupBy('users_chat.to_userid')
                         ->orderBy('users_chat.created_at', 'DESC')
                         ->get();
@@ -9809,6 +9817,7 @@ class ApiController extends Controller
                         ->select('users_chat.id','users_chat.message','users_chat.created_at','users.id AS from_user_id','users.username AS from_user_name','users_chat.is_read','users_chat.is_starred','users_chat.deleted_by','users_chat.to_userid','users_chat.is_starred_pro')
                         ->where('users_chat.from_userid',$userEntity->id)
                         ->whereRaw("(users_chat.deleted_by IS null )")
+                        ->whereRaw("(users.id IS NOT null )")
                         ->groupBy('users_chat.to_userid')
                         ->orderBy('users_chat.created_at', 'DESC')
                         ->get();
@@ -9822,6 +9831,7 @@ class ApiController extends Controller
                         ->select('users_chat.id','users_chat.message','users_chat.created_at','users.id AS from_user_id','users.username AS from_user_name','users_chat.is_read','users_chat.is_starred','users_chat.deleted_by','users_chat.to_userid','users_chat.is_starred_pro')
                         ->where('users_chat.to_userid',$userEntity->id)
                         ->whereRaw("(users_chat.deleted_by IS null )")
+                        ->whereRaw("(users.id IS NOT null )")
                         ->groupBy('users_chat.from_userid')
                         ->orderBy('users_chat.created_at', 'DESC')->get();
                        // ->unique('to_userid');
@@ -9844,7 +9854,7 @@ class ApiController extends Controller
                             {
 
                                 $getRecieverprofile = DB::table('users')
-                                ->select('avatar_location')
+                                ->select('avatar_location','username')
                                 ->whereRaw("(active=1)")
                                 ->whereRaw("(id = '".$vall->from_user_id."' AND deleted_at IS null )")
                                 ->first();
@@ -9890,18 +9900,22 @@ class ApiController extends Controller
                                if(!empty($getSenderprofile->avatar_location))
                                 {
                                  $from_usr_profile = url($path.$getSenderprofile->avatar_location);
+                                //  $to_usr_name = !empty($getRecieverprofile->username)?$getRecieverprofile->username:'';
+
                                 }else
                                 {
                                    $from_usr_profile =""; 
+                                //    $to_usr_name ="";
+                                   
                                 }
 
                                 if(!empty($getRecieverprofile->avatar_location))
                                 {
                                  $to_usr_profile = url($path.$getRecieverprofile->avatar_location);
-                                  $to_usr_name = !empty($getSenderprofile->username)?$getSenderprofile->username:'';
+                                 $to_usr_name = !empty($getSenderprofile->username)?$getSenderprofile->username:'';
                                 }else
                                 {
-                                   $to_usr_name ="";
+                                   $to_usr_name = !empty($getSenderprofile->username)?$getSenderprofile->username:'';;
                                    $to_usr_profile ="";
                                   
                                 }
@@ -10859,11 +10873,11 @@ class ApiController extends Controller
 
                                     if($lang=='en')
                                     {
-                                      $message  = 'Hello '.$user_arr->username.', '.$contractor_arr->username. ' has given you a rating and review for your service';  
+                                      $message  = 'Hello '.$contractor_arr->username.', ' .$user_arr->username.' has given you a rating and review for your service';  
                                     }
                                     if($lang=='es')
                                     {
-                                        $message  = 'Hola '.$user_arr->username.', '.$contractor_arr->username. ' le ha dado una calificación y revisión por su servicio'; 
+                                        $message  = 'Hola '.$contractor_arr->username.', ' .$user_arr->username.' le ha dado una calificación y revisión por su servicio'; 
                                     }
                                     
 
