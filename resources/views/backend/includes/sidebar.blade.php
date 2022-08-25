@@ -206,6 +206,15 @@
 
                 <li class="nav-item">
                     <a class="nav-link {{
+                        active_class(Route::is('admin/banner'))
+                    }}" href="{{ route('admin.banner.index') }}">
+                        <i class="nav-icon fa-bars"></i>
+                        @lang('labels.backend.banner.banner')
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{
                         active_class(Route::is('admin/services'))
                     }}" href="{{ route('admin.services.index') }}">
                         <!-- <i class="nav-icon fas fa-tachometer-alt"></i> -->

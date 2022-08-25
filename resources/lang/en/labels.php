@@ -281,6 +281,30 @@ return [
             ],
         ],
 
+        'banner' => [
+            'banner' => 'Banners',
+            'create' => 'Create Banner',
+            'update' => 'Update Banner',
+            'edit' => 'Edit Banner',
+            'management' => 'Banner Management',
+            'old_image' => 'Old Image',
+            'image' => 'Image',
+            'image_view' => 'Image View',
+            'table' => [
+                'id' => 'ID',
+                'select_category' => 'Select Category',
+                'category' => 'Category',
+                'deactivate' => 'Deactivate',
+                'activate' => 'Activate',
+                'image' => 'Image',
+                'status' => 'Status',
+                'action' => 'Actions',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+        ],
 
         'services' => [
             'services' => 'Services',

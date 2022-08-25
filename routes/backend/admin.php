@@ -28,6 +28,7 @@ use App\Http\Controllers\Backend\WorkWithUsController;
 use App\Http\Controllers\Backend\EmailTemplateController;
 use App\Http\Controllers\Backend\PackageController;
 use App\Http\Controllers\Backend\SecurityPolicyController;
+use App\Http\Controllers\Backend\BannerController;
 
 
 
@@ -65,6 +66,16 @@ Route::group(['namespace' => 'Category'], function ()
 
 
 });   
+Route::group(['namespace' => 'Banner'], function (){
+	Route::get('banner',[BannerController::class, 'index'])->name('banner.index');
+	Route::get('banner/create',[BannerController::class, 'create'])->name('banner.create');
+	Route::post('banner',[BannerController::class, 'store'])->name('banner.store');
+
+	Route::get('banner/edit/{id}',[BannerController::class, 'edit'])->name('banner.edit');
+	Route::get('banner/destroy/{id}',[BannerController::class, 'destroy'])->name('banner.destroy');
+	Route::post('banner/update',[BannerController::class, 'update'])->name('banner.update');
+	Route::get('banner/removeImage', [BannerController::class, 'removeImage'])->name('banner.removeimage');
+});
 
 Route::group(['namespace' => 'Services'], function ()
 {

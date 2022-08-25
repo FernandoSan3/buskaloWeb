@@ -10339,6 +10339,10 @@ class ApiController extends Controller
                             ->whereRaw("(from_userid = '".$from_user_id."')")
                             ->whereRaw("(to_userid = '".$userid."' AND deleted_at IS null )")
                             ->get()->toArray();
+                        // $getProUsersChat = DB::table('users_chat')  
+                        //     ->whereRaw("(from_userid = '".$userid."')")
+                        //     ->whereRaw("(to_userid = '".$from_user_id."' AND deleted_at IS null )")
+                        //     ->get()->toArray();
 
                             if(!empty($getUsersChat)) 
                             {
@@ -10389,7 +10393,56 @@ class ApiController extends Controller
                                     $resultArray['status']='1';
                                     $resultArray['message']=trans('apimessage.message_read_success');
                                     echo json_encode($resultArray); exit;    
-                            }else
+                            }else if(!empty($getProUsersChat)){
+
+                                foreach ($getProUsersChat as $key => $valued) 
+                                {
+                                    $HiddenValue = explode(',',$valued->read_by);
+
+                                    if(in_array($userid, $HiddenValue))
+                                    {
+                                            
+                                    }else
+                                    {
+                                        if(!empty($valued->read_by))
+                                        {
+                                            $update_Arr['read_by'] = $valued->read_by.','.$userid;
+                                            $update_Arr['is_read'] = '1';
+                                        }else
+                                        {
+                                           $update_Arr['read_by'] = $userid;
+                                            $update_Arr['is_read'] = '1';
+                                        }
+                                                 
+                                         DB::table('users_chat')->where('id', $valued->id)->update($update_Arr);
+                                    }
+
+                                    if(in_array($from_user_id, $HiddenValue))
+                                    {
+                                            
+                                    }else
+                                    {
+                                        if(!empty($valued->read_by))
+                                        {
+                                            $update_Arr['read_by'] = $valued->read_by.','.$from_user_id;
+                                            $update_Arr['is_readbypro'] ='1';
+                                        }else
+                                        {
+                                           $update_Arr['read_by'] = $from_user_id;
+                                            $update_Arr['is_readbypro'] ='1';
+                                        }
+                                                 
+                                         DB::table('users_chat')->where('id', $valued->id)->update($update_Arr);
+
+                                    }
+                                }
+
+                                    $resultArray['status']='1';
+                                    $resultArray['message']=trans('apimessage.message_read_success');
+                                    echo json_encode($resultArray); exit;
+
+
+                            }else 
                             {
                                 $resultArray['status']='0';
                                 $resultArray['message']=trans('apimessage.message_id_nor_found');
@@ -12121,9 +12174,11 @@ class ApiController extends Controller
                                 if($hireProOrCompany->hire_status==0)
                                 {
                                     $update_Arr['hire_status'] = 1;
+                                    $update_Arr['is_pro_read'] = 1;
                                     $update_Arr['request_status'] = 'buy';
                                     //$update_Arr['job_status'] = 3;
                                     $update_jobArr['request_status'] = 'ignore';
+                                    $update_jobArr['is_pro_read'] = 1;
                                     $update_jobArr['hire_status'] = 2;
                                     $update_jobArr['job_status'] = 4;
                                     $update_jobArr['rejected_by'] = 'user';
