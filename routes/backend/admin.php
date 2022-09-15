@@ -29,8 +29,7 @@ use App\Http\Controllers\Backend\EmailTemplateController;
 use App\Http\Controllers\Backend\PackageController;
 use App\Http\Controllers\Backend\SecurityPolicyController;
 use App\Http\Controllers\Backend\BannerController;
-
-
+use App\Http\Controllers\Backend\ClientController;
 
 // All route names are prefixed with 'admin.'.
 Route::redirect('/', '/admin/dashboard', 301);
@@ -457,6 +456,18 @@ Route::group(['namespace' => 'Childsubservices'], function ()
 
 });
 
+Route::group(['namespace' => 'Client'], function (){
+	Route::get('client', [ClientController::class, 'index'])->name('client.index');
+	Route::get('client/edit/{id}', [ClientController::class, 'edit'])->name('client.edit');
+	Route::get('client/show/{id}', [ClientController::class, 'show'])->name('client.show');
+	Route::get('client/destroy/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
+	Route::post('client/update', [ClientController::class, 'update'])->name('client.update');
+	Route::get('client/deleted', [ClientController::class, 'getDeleted'])->name('client.deleted');
+	Route::get('client/restore/{id}', [ClientController::class, 'restore'])->name('client.restore');
+	Route::get('client/delete/{id}', [ClientController::class, 'delete'])->name('client.delete-permanently');
+
+});
+
 
 Route::group(['namespace' => 'Company'], function ()
 {
@@ -480,8 +491,6 @@ Route::group(['namespace' => 'Company'], function ()
 	Route::get('company/get_districts', [CompanyController::class, 'get_districts'])->name('questions.get_districts');
 
 	Route::get('company/show/{id}', [CompanyController::class, 'show'])->name('company.show');
-
-
 
 	Route::get('company/edit/{id}', [CompanyController::class, 'edit'])->name('company.edit');
 	Route::post('company/update', [CompanyController::class, 'update'])->name('company.update');

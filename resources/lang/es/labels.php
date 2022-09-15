@@ -37,6 +37,7 @@ return [
             'edit_ratings_reviews' => 'Editar calificaciones y reseñas',
             'destroy' => 'Eliminar contratista',
             'destroyC' => 'Eliminar empresa',
+            'destroyCl' => 'Eliminar cliente',
             'serviceRequests' => 'Solicitud de servicio',
             'accept' => 'Aceptar',
             'reject' => 'Rechazar',
@@ -260,6 +261,8 @@ return [
                     'content' => [
                         'overview' => [
                             'avatar' => 'Avatar',
+                            'year_of_constitution' => 'Año de constitución',
+                            'web_address' => 'Dirección web',
                             'confirmed' => 'Confirmado',
                             'created_at' => 'Fecha de Creación ',
                             'deleted_at' => 'Eliminado por',
@@ -971,6 +974,33 @@ return [
                 'total' => 'rol total|roles total',
             ],
             'view' => 'Ver la empresa',
+        ],
+
+        'client' => [
+            'client' => 'Clientes',
+            'create' => 'Crear Cliente',
+            'update' => 'Actualizar Cliente',
+            'edit' => 'Editar Cliente',
+            'management' => 'Administración de clientes',
+            'view' => 'Ver cliente',
+            'list' => 'Lista de clientes',
+            'all' => 'Todos los clientes',
+            'deleted' => 'Clientes eliminados',
+            'restore' => 'Restaurar cliente',
+            'table' => [
+                'id' => 'Id',
+                'sort' => 'Ordenar',
+                'name' => 'Nombre',
+                'last_name' => 'Apellido',
+                'email' => 'Correo electrónico',
+                'contact_number' => 'Número de contacto',
+                'status' => 'Estado',
+                'created_at' => 'Fecha de Creación ',
+                'updated_at' => 'Actualizado en',
+                'deleted_at' => 'Eliminado en',
+                'total' => 'rol total|roles total',
+            ],
+            'view' => 'Ver cliente',
         ],
 
 

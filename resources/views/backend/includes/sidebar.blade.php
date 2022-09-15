@@ -158,7 +158,6 @@
                     </ul>
                 </li>
 
-
                 <li class="nav-item nav-dropdown {{
                     active_class(Route::is('admin/company*'), 'open')
                 }}">
@@ -188,6 +187,25 @@
                             active_class(Route::is('admin/company*'))
                         }}" href="{{ route('admin.company.create') }}">
                             @lang('labels.backend.company.create')
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item nav-dropdown {{
+                    active_class(Route::is('admin/company*'), 'open')
+                }}">
+                    <a class="nav-link nav-dropdown-toggle {{
+                            active_class(Route::is('admin/company*'))
+                        }}" href="#">
+                        <i class="nav-icon fas fa-list"></i> @lang('labels.backend.client.client')
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a class="nav-link {{
+                            active_class(Route::is('admin/client'))
+                        }}" href="{{ route('admin.client.index') }}">
+                            @lang('labels.backend.client.client')
                             </a>
                         </li>
                     </ul>

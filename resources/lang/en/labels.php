@@ -37,6 +37,7 @@ return [
             'edit_ratings_reviews' => 'Edit Ratings & Reviews',
             'destroy' => 'Delete Contractor',
             'destroyC' => 'Delete Company',
+            'destroyCl' => 'Delete Client',
             'serviceRequests' => 'Service Request',
             'accept' => 'Accept',
             'reject' => 'Reject',
@@ -134,6 +135,8 @@ return [
                     'content' => [
                         'overview' => [
                             'avatar' => 'Avatar',
+                            'year_of_constitution' => 'Year Of Constitution',
+                            'web_address' => 'Web Address',
                             'confirmed' => 'Confirmed',
                             'created_at' => 'Created At',
                             'deleted_at' => 'Deleted At',
@@ -844,6 +847,33 @@ return [
                 'total' => 'role total|roles total',
             ],
             'view' => 'View Company',
+        ],
+
+        'client' => [
+            'client' => 'Clients',
+            'create' => 'Create Client',
+            'update' => 'Update Client',
+            'edit' => 'Edit Client',
+            'management' => 'Client Management',
+            'view' => 'View Client',
+            'list' => 'List Client',
+            'all' => 'All Clients',
+            'deleted' => 'Deleted Clients',
+            'restore' => 'Restore Client',
+            'table' => [
+                'id' => 'Id',
+                'sort' => 'Sort',
+                'name' => 'Name',
+                'last_name' => 'Last Name',
+                'email' => 'Email',
+                'mobile_number' => 'Mobile Number',
+                'status' => 'Status',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+                'deleted_at' => 'Deleted At',
+                'total' => 'role total|roles total',
+            ],
+
         ],
 
 
