@@ -45,7 +45,6 @@ class ApiController extends Controller
     public function signIn(Request $request)
     {
         $access_token=123456;
-
         $email = isset($request->email) && !empty($request->email) ? $request->email : '' ;
         $password = isset($request->password) && !empty($request->password) ? $request->password : '';
         $lang = isset($request->lang) && !empty($request->lang) ? $request->lang : 'en';
@@ -54,34 +53,52 @@ class ApiController extends Controller
         $type = isset($request->user_type) && !empty($request->user_type) ? $request->user_type : '' ;
 
         $resultArray = [];
+        $userDeviceCheck = null;
         App::setLocale($lang);
 
         if(!empty($email) && !empty($password) && !empty($device_id) && !empty($device_type))
         {
+            $user= DB::table('users')->where('email',$email)->first();
+            if($user->deleted_at !== null){
 
-            $users_count_var="";
-            if(Auth::attempt(['email' => $email, 'password' => $password, 'user_group_id' =>[2,3,4]]))
-            { 
-                $users_count_var = Auth::user();
+                $dayinactive = 30;
+                $date1 = date_create(date('Y-m-d H:i:s', strtotime(Carbon::now())));
+                $date2 = date_create(date('Y-m-d H:i:s', strtotime($user->deleted_at)));
+                $diff = date_diff($date1,$date2);
+                $days = $diff->format("%a");
+                $days = $dayinactive - $days;
 
-                if(!empty($type))
+                if($days <= 0 ){
+                    $message = 'Su cuenta ha sido eliminada por favor registrese nuevamente';
+                    
+
+                }else {
+                    $message = 'Su cuenta se encuentra inactiva, por '.$days.' días. Por favor, comuníquese con el administrador para activar su cuenta.';
+                   
+                }
+
+            } else {
+
+                $users_count_var="";
+                if(Auth::attempt(['email' => $email, 'password' => $password, 'user_group_id' =>[2,3,4]]))
+                { 
+                    $users_count_var = Auth::user();
+
+                    if(!empty($type))
+                    {
+                        $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','created_at','updated_at','deleted_at','confirmed','confirmation_code','approval_status')->whereRaw("(user_group_id = '".$type."')")->whereRaw("(email = '".$email."')")->first(); 
+                    }else
+                    {
+                        $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','created_at','updated_at','deleted_at','confirmed','confirmation_code','approval_status')->whereRaw("(email = '".$email."')")->first();
+                    }
+                }
+                else
                 {
-
-                    $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','created_at','updated_at','confirmed','confirmation_code','approval_status')->whereRaw("(user_group_id = '".$type."')")->whereRaw("(email = '".$email."')")->first(); 
-
-
-                 }else
-                 {
-                    $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','created_at','updated_at','confirmed','confirmation_code','approval_status')->whereRaw("(email = '".$email."')")->first();
-                 }
-
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.Invalid login credential.');
+                    echo json_encode($resultArray); exit;
+                } 
             }
-            else
-            {
-              $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid login credential.');
-                echo json_encode($resultArray); exit;
-            } 
             if(empty($users_count_var))
             {
                 $resultArray['status']='0';
@@ -128,8 +145,8 @@ class ApiController extends Controller
             }
             else
             {
-                /*-------------------*/
-                 $userDeviceCheck= DB::table('user_devices')->where('user_id',$users_count_var->id)->first();
+                $userDeviceCheck = DB::table('user_devices')->where('user_id',$users_count_var->id)->first();
+
                 if(isset($userDeviceCheck) && !empty($userDeviceCheck))
                 {
                     $userdevice= array('device_id'=>$device_id,'device_type'=>$device_type);
@@ -153,14 +170,14 @@ class ApiController extends Controller
                     }
                     else
                     {
-                       $message=trans('apimessage.Successfully login.'); 
+                        $message=trans('apimessage.Successfully login.');
                     }
                 }else
                 {
                     $userdevice= array('user_id' => $users_count_var->id ,'device_id'=>$device_id,'device_type'=>$device_type);
                     DB::table('user_devices')->insert($userdevice);
                     $users_count_var->device_id =$device_id;
-                     $logincount=isset($userDeviceCheck->login_count)?$userDeviceCheck->login_count:0;
+                     $logincount = isset($this->$userDeviceCheck->login_count)? $this->$userDeviceCheck->login_count : 0;
                       if(($logincount==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
                     {
                         // if(($userDeviceCheck->login_count==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
@@ -182,6 +199,7 @@ class ApiController extends Controller
                         $message=trans('apimessage.Successfully login.');
                     }
                 }
+            
 
                 /*-------------------*/ 
                 $resultArray['status']='1'; 
@@ -196,7 +214,8 @@ class ApiController extends Controller
         else
         {
         $resultArray['status']='0';
-        $resultArray['message']=trans('apimessage.Invalid login credential.');
+        // $resultArray['message']=trans('apimessage.Invalid login credential.');
+        $resultArray['message'] =trans('Su cuenta ha esta confirmada.');
         echo json_encode($resultArray); exit;
         }
         }
@@ -481,188 +500,226 @@ class ApiController extends Controller
 
     public function signUp(Request $request) 
     {
-        $validator = Validator::make($request->all(), [
-                'username' => 'required',
-                'email' => 'required|email',
-                'password' => 'required',
-                'user_type' => 'required',
-                'device_id' => 'required',
-                'device_type' => 'required',
-            ]);
+        $validator = Validator::make($request->all(),
+        [   
+            'username' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'user_type' => 'required',
+            'device_id' => 'required',
+            'device_type' => 'required',
+        ]);
 
-            if($validator->fails())
-            {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid parameters.');
-                echo json_encode($resultArray); exit;;       
-            }
-            $access_token=123456;
-            $type = isset($request->user_type) && !empty($request->user_type) ? $request->user_type : '' ;
+        if($validator->fails())
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameters.');
+            echo json_encode($resultArray); exit;;       
+        }
+        $access_token=123456;
+        $type = isset($request->user_type) && !empty($request->user_type) ? $request->user_type : '' ;
+        $username = isset($request->username) && !empty($request->username) ? $request->username : '' ;
+        $email = isset($request->email) && !empty($request->email) ? $request->email : '' ;
+        $password = isset($request->password) && !empty($request->password) ? $request->password : '';
+        $lang = isset($request->lang) && !empty($request->lang) ? $request->lang : 'en';
 
-            $username = isset($request->username) && !empty($request->username) ? $request->username : '' ;
+        App::setLocale($lang);
 
-            $email = isset($request->email) && !empty($request->email) ? $request->email : '' ;
-
-            $password = isset($request->password) && !empty($request->password) ? $request->password : '';
-
-            $lang = isset($request->lang) && !empty($request->lang) ? $request->lang : 'en';
-
-            App::setLocale($lang);
-
-            $device_id = isset($request->device_id) && !empty($request->device_id) ? $request->device_id : '';
-            $device_type = isset($request->device_type) && !empty($request->device_type) ? $request->device_type : '';
+        $device_id = isset($request->device_id) && !empty($request->device_id) ? $request->device_id : '';
+        $device_type = isset($request->device_type) && !empty($request->device_type) ? $request->device_type : '';
         if(!empty($username) && !empty($email) && !empty($password) &&  !empty($device_id) && !empty($device_type) && !empty($type))
         {
-            $adminaprovel = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='1')")->first();
-            if(!empty($adminaprovel))
-            {
-                if($adminaprovel->user_group_id==3||$adminaprovel->user_group_id==4)
-                {
-                    //$check_auth = $this->checkToken($access_token,$adminaprovel->id);
-                    $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminaprovel->id."')")->first();
-                    $resultArray['status']='1';        
-                    $resultArray['message']=trans('apimessage.Email Already Exist.');
-                    $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
-                    $resultdata= $this->intToString($users_count_var );
-                    $resultArray['userData']=$resultdata;
-                    echo json_encode($resultArray); exit;
-                }
-            }
-            $adminnotapprovel = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='0')")->first();
-            if(!empty($adminnotapprovel))
-            {
-                if( $adminnotapprovel->user_group_id==3||$adminnotapprovel->user_group_id==4)
-                {
-                   // $check_auth = $this->checkToken($access_token,$adminnotapprovel->id);
-                    $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminnotapprovel->id."')")->first();
-                    $resultArray['status']='1';        
-                    $resultArray['message']=trans('apimessage.Email Already Exist.');
-                    $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
-                    $resultdata= $this->intToString($users_count_var );
-                    $resultArray['userData']=$resultdata;
-                    echo json_encode($resultArray); exit;
-                }
-            }
-            $adminaprovelreject = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='2')")->first();
-            if(!empty($adminaprovelreject))
-            {
-                if($adminaprovelreject->user_group_id==3||$adminaprovelreject->user_group_id==4)
-                {
-                    DB::table('users')->where('id',$adminaprovelreject->id)->update(['approval_status'=>0]);
-                    //$check_auth = $this->checkToken($access_token,$adminaprovelreject->id);
-                    $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminaprovelreject->id."')")->first();
-                    $resultArray['status']='1';        
-                    $resultArray['message']='update information';
-                    $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
-                    $resultdata= $this->intToString($users_count_var );
-                    $resultArray['userData']=$resultdata;
-                    echo json_encode($resultArray); exit;
-                }
-            }
+            $user= DB::table('users')->where('email',$email)->first();
+            if($user->deleted_at !== null){
+                // update account
+                
+                $dayinactive = 30;
+                $date1 = date_create(date('Y-m-d H:i:s', strtotime(Carbon::now())));
+                $date2 = date_create(date('Y-m-d H:i:s', strtotime($user->deleted_at)));
+                $diff = date_diff($date1,$date2);
+                $days = $diff->format("%a");
+                $days = $dayinactive - $days;
 
-            $emailexist = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null )")->first();
-       
-            if($emailexist)
-            {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Email Already Exist.');
-                echo json_encode($resultArray); exit;
-            }
-            $registerArr['uuid'] = Uuid::uuid4()->toString();
-            $registerArr['username'] = $username;
-            $registerArr['email'] = $email;
-            $registerArr['active'] = 1;
-            $registerArr['confirmed'] = 0;
-            $registerArr['is_verified'] = 1;
-            $registerArr['password'] = Hash::make($password);
-            $registerArr['user_group_id'] = $type;
-            $registerArr['confirmation_code'] = md5(uniqid(mt_rand(), 1));
-            $registerArr['created_at'] = Carbon::now()->toDateTimeString();
-            $registerArr['updated_at'] = Carbon::now()->toDateTimeString();
-            $registerArr['remember_token'] = Hash::make('secret');
-            $msg='';
-            if($userId = DB::table('users')->insertGetId($registerArr)) 
-            {
+                if($days <= 0 ){
 
-                $msg = trans('apimessage.Your account has been created successfully.');
-                $userdevice['user_id'] = $userId;
-                $userdevice['device_id'] = $device_id;
-                $userdevice['device_type'] = $device_type;
-                DB::table('user_devices')->insert($userdevice);
-
-                $socialNetw['user_id'] = $userId;
-                $socialNetw['created_at'] = Carbon::now()->toDateTimeString();
-                DB::table('social_networks')->insert($socialNetw);
-
-                    if($type==3 || $type==4)
+                    $userupdate = array(
+                    'user_group_id'=>$type,
+                    'username'=>$username,
+                    'email'=>$email,
+                    'password'=>Hash::make($password),
+                    'updated_at'=>date('Y-m-d H:i:s'),
+                    'deleted_at'=>null,
+                    );
+                    DB::table('users')->where('id',$user->id)->update($userupdate);
+                    $checkdeviceId=DB::table('user_devices')->where('user_id',$user->id)->first();
+                    if(empty($checkdeviceId))
                     {
-                        $freecredit=DB::table('site_settings')->where('id',1)->first();
-                        $addCredits['user_id'] = $userId;
-                        $addCredits['transaction_date'] = Carbon::now()->toDateTimeString();
-                        $addCredits['debit'] = isset($freecredit->free_credit)?$freecredit->free_credit:'20';
-                        $addCredits['credit'] = '0';
-                        $addCredits['current_balance'] = isset($freecredit->free_credit)?$freecredit->free_credit:'20';
-                        $addCredits['updated_at'] = Carbon::now()->toDateTimeString();
-                        $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
-                         DB::table('users')->where('id',$userId)->update(['pro_credit'=>$useradd]);
-
-                        $addCreditsToContractor = DB::table('bonus')->insert($addCredits);
+                        DB::table('user_devices')->insert(['user_id'=>$user->id,'device_type'=>$device_type,'device_id'=>$device_id]);
                     }
-                    //  if($type==2)
-                    // {
-                        $objDemo = new \stdClass();
-                        if($lang=='en')
-                        {
-                            $objDemo->message = 'Click here to verify your account.';
-                        }
-                        else
-                        {
-                            $objDemo->message = 'Pulse aquí para verificar su cuenta.';
-                        }
-                        $objDemo->link = url('/account/confirm/'.$registerArr['confirmation_code']);
-                        $objDemo->sender = 'Buskalo';
-                        $objDemo->receiver = $email;
-                        $objDemo->level = '';
-                        $objDemo->username = $username;
-                        $objDemo->logo=url('img/logo/logo-svg.png');
-                        $objDemo->footer_logo=url('img/logo/footer-logo.png');
-                        $objDemo->user_icon=url('img/logo/logo.jpg');
-                        
-                        Mail::to($email)->send(new NewUserVerify($objDemo));
+                    else
+                    {
+                        DB::table('user_devices')->where('user_id',$user->id)->update(['device_type'=>$device_type,'device_id'=>$device_id]);
+                    }
 
-                        $msg=trans('exceptions.frontend.auth.confirmation.created_confirm');
-                   // }
-                   // $check_auth = $this->checkToken($access_token,$userId);
-                if(1!=1)
-                {
-                    //echo json_encode($check_auth); exit;
+                }else {
+                    $message = 'Su cuenta se encuentra inactiva, por '.$days.' días. Por favor, comuníquese con el administrador para activar su cuenta.';
+                    $resultArray['status']='1';   
+                    $resultArray['message']=$message;
+                    echo json_encode($resultArray); exit;
                 }
+
+            } else {
+                // create account
+                $adminaprovel = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='1')")->first();
+                if(!empty($adminaprovel))
+                {   
+                    if($adminaprovel->user_group_id==3||$adminaprovel->user_group_id==4)
+                    {
+                        $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminaprovel->id."')")->first();
+                        $resultArray['status']='1';        
+                        $resultArray['message']=trans('apimessage.Email Already Exist.');
+                        $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
+                        $resultdata= $this->intToString($users_count_var );
+                        $resultArray['userData']=$resultdata;
+                        echo json_encode($resultArray); exit;
+                    }
+                }
+                $adminnotapprovel = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='0')")->first();
+                if(!empty($adminnotapprovel))
+                {
+                    if( $adminnotapprovel->user_group_id==3||$adminnotapprovel->user_group_id==4)
+                    {
+                        // $check_auth = $this->checkToken($access_token,$adminnotapprovel->id);
+                        $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminnotapprovel->id."')")->first();
+                        $resultArray['status']='1';        
+                        $resultArray['message']=trans('apimessage.Email Already Exist.');
+                        $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
+                        $resultdata= $this->intToString($users_count_var );
+                        $resultArray['userData']=$resultdata;
+                        echo json_encode($resultArray); exit;
+                    }
+                }
+                $adminaprovelreject = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null AND approval_status='2')")->first();
+                if(!empty($adminaprovelreject))
+                {
+                    if($adminaprovelreject->user_group_id==3||$adminaprovelreject->user_group_id==4)
+                    {
+                        DB::table('users')->where('id',$adminaprovelreject->id)->update(['approval_status'=>0]);
+                        //$check_auth = $this->checkToken($access_token,$adminaprovelreject->id);
+                        $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at','approval_status')->whereRaw("(id = '".$adminaprovelreject->id."')")->first();
+                        $resultArray['status']='1';        
+                        $resultArray['message']='update information';
+                        $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
+                        $resultdata= $this->intToString($users_count_var );
+                        $resultArray['userData']=$resultdata;
+                        echo json_encode($resultArray); exit;
+                    }
+                }
+
+                $emailexist = DB::table('users')->whereRaw("(email = '".$email."' AND deleted_at IS null )")->first();
+            
+                if($emailexist)
+                {
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.Email Already Exist.');
+                    echo json_encode($resultArray); exit;
+                }
+                $registerArr['uuid'] = Uuid::uuid4()->toString();
+                $registerArr['username'] = $username;
+                $registerArr['email'] = $email;
+                $registerArr['active'] = 1;
+                $registerArr['confirmed'] = 0;
+                $registerArr['is_verified'] = 1;
+                $registerArr['password'] = Hash::make($password);
+                $registerArr['user_group_id'] = $type;
+                $registerArr['confirmation_code'] = md5(uniqid(mt_rand(), 1));
+                $registerArr['created_at'] = Carbon::now()->toDateTimeString();
+                $registerArr['updated_at'] = Carbon::now()->toDateTimeString();
+                $registerArr['remember_token'] = Hash::make('secret');
+                $msg='';
+                if($userId = DB::table('users')->insertGetId($registerArr)) 
+                {
+
+                    $msg = trans('apimessage.Your account has been created successfully.');
+                    $userdevice['user_id'] = $userId;
+                    $userdevice['device_id'] = $device_id;
+                    $userdevice['device_type'] = $device_type;
+                    DB::table('user_devices')->insert($userdevice);
+
+                    $socialNetw['user_id'] = $userId;
+                    $socialNetw['created_at'] = Carbon::now()->toDateTimeString();
+                    DB::table('social_networks')->insert($socialNetw);
+
+                        if($type==3 || $type==4)
+                        {
+                            $freecredit=DB::table('site_settings')->where('id',1)->first();
+                            $addCredits['user_id'] = $userId;
+                            $addCredits['transaction_date'] = Carbon::now()->toDateTimeString();
+                            $addCredits['debit'] = isset($freecredit->free_credit)?$freecredit->free_credit:'20';
+                            $addCredits['credit'] = '0';
+                            $addCredits['current_balance'] = isset($freecredit->free_credit)?$freecredit->free_credit:'20';
+                            $addCredits['updated_at'] = Carbon::now()->toDateTimeString();
+                            $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
+                                DB::table('users')->where('id',$userId)->update(['pro_credit'=>$useradd]);
+
+                            $addCreditsToContractor = DB::table('bonus')->insert($addCredits);
+                        }
+                        //  if($type==2)
+                        // {
+                            $objDemo = new \stdClass();
+                            if($lang=='en')
+                            {
+                                $objDemo->message = 'Click here to verify your account.';
+                            }
+                            else
+                            {
+                                $objDemo->message = 'Pulse aquí para verificar su cuenta.';
+                            }
+                            $objDemo->link = url('/account/confirm/'.$registerArr['confirmation_code']);
+                            $objDemo->sender = 'Buskalo';
+                            $objDemo->receiver = $email;
+                            $objDemo->level = '';
+                            $objDemo->username = $username;
+                            $objDemo->logo=url('img/logo/logo-svg.png');
+                            $objDemo->footer_logo=url('img/logo/footer-logo.png');
+                            $objDemo->user_icon=url('img/logo/logo.jpg');
+                            
+                            Mail::to($email)->send(new NewUserVerify($objDemo));
+
+                            $msg=trans('exceptions.frontend.auth.confirmation.created_confirm');
+                        // }
+                        // $check_auth = $this->checkToken($access_token,$userId);
+                    if(1!=1)
+                    {
+                        //echo json_encode($check_auth); exit;
+                    }
+                    else
+                    {
+                            $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at')->whereRaw("(id = '".$userId."')")->first();
+                        
+                            $settingEntity = DB::table('settings')->whereRaw("(user_id = '".$userId."')")->first();
+                            if($settingEntity)
+                            {
+                            $users_count_var->lang = $settingEntity->app_language;
+                            }else
+                            {
+                            $users_count_var->lang = '0';
+                            }
+                        $resultArray['status']='1';   
+                        // $resultArray['userData'] = $users_count_var;     
+                        $resultArray['message']=$msg;
+                        $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
+                            $resultdata= $this->intToString($users_count_var );
+                            $resultArray['userData']=$resultdata;
+                        echo json_encode($resultArray); exit;
+                    } 
+                }   
                 else
                 {
-                      $users_count_var = DB::table('users')->select('id','user_group_id','username','email','active','user_group_id','created_at','updated_at')->whereRaw("(id = '".$userId."')")->first();
-                  
-                      $settingEntity = DB::table('settings')->whereRaw("(user_id = '".$userId."')")->first();
-                      if($settingEntity)
-                      {
-                        $users_count_var->lang = $settingEntity->app_language;
-                      }else
-                      {
-                        $users_count_var->lang = '0';
-                      }
-                    $resultArray['status']='1';   
-                   // $resultArray['userData'] = $users_count_var;     
-                    $resultArray['message']=$msg;
-                    $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
-                     $resultdata= $this->intToString($users_count_var );
-                      $resultArray['userData']=$resultdata;
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.Sorry some problem occurs please try again.');
                     echo json_encode($resultArray); exit;
-                } 
-            }   
-            else
-            {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Sorry some problem occurs please try again.');
-                echo json_encode($resultArray); exit;
+                }
             }
         }
         else
@@ -2234,12 +2291,12 @@ class ApiController extends Controller
                         echo json_encode($resultArray); exit;      
                     } 
 
-                             $userEntity = DB::table('users')
-                            ->whereRaw("(active=1)")
-                            //->whereRaw("(mobile_number = '".$mobile_number."' AND deleted_at IS null )")
-                            ->whereRaw("(email = '".$email."')")
-                            ->first(); 
-                            $userid="";
+                        $userEntity = DB::table('users')
+                        ->whereRaw("(active=1)")
+                        //->whereRaw("(mobile_number = '".$mobile_number."' AND deleted_at IS null )")
+                        ->whereRaw("(email = '".$email."')")
+                        ->first(); 
+                        $userid="";
                            
                             if(!empty($service_id) && !empty($sub_service_id) )
                             {  
@@ -2286,15 +2343,7 @@ class ApiController extends Controller
                                     $resultArray['message']=trans('Su número de móvil ingresado ya se ha utilizado. por favor ingrese un nuevo número de teléfono celular.');
                                         echo json_encode($resultArray);exit;
                                 }
-                                // $emailCheck=DB::table('users')->where('email',$email)->first();
-                                
-                                // if(!empty($emailCheck))
-                                // {
-                                //     $resultArray['status']='0';
-                                //     $resultArray['message']=trans('apimessage.your_email_account');
-                                //         echo json_encode($resultArray);exit;
-                                // }
-                                 $userId = DB::table('users')->insertGetId($registerArr);
+                                $userId = DB::table('users')->insertGetId($registerArr);
                                 if(!empty($userId)) 
                                 {
                                     //Start Send Mail to new User
@@ -2309,14 +2358,15 @@ class ApiController extends Controller
                                         $objDemo->message = 'Gracias por su solicitud de servicio en buskalo, creamos su cuenta con contraseña predeterminada por favor inicie sesión con esta contraseña.';
                                     }
                                     
+                                    
                                     $objDemo->sender = 'Buskalo';
                                     $objDemo->receiver = $email;
                                     $objDemo->username = $username;
                                     $objDemo->logo=url('img/logo/logo-svg.png');
                                     $objDemo->footer_logo=url('img/logo/footer-logo.png');
-                                    if(isset($userEntity->avatar_location) && !empty($userEntity->avatar_location))
+                                    if(isset($this->$userEntity->avatar_location) && !empty($this->$userEntity->avatar_location))
                                     {
-                                        $objDemo->user_icon=url('img/user/profile/'.$userEntity->avatar_location);
+                                        $objDemo->user_icon=url('img/user/profile/'.$this->$userEntity->avatar_location);
                                     }
                                     else
                                     {
@@ -7615,30 +7665,22 @@ class ApiController extends Controller
 
     public function buyOpportunity(Request $request)
     {
-
-
         $access_token=123456;
         $allData=array();
-        $userid = isset($request->userid) && !empty($request->userid) ? $request->userid : '' ;
+        $userid = !empty($request->userid) ? $request->userid : '' ;
         $session_key = !empty($request->session_key) ? $request->session_key : '' ;
         $user_group_id = !empty($request->user_group_id) ? $request->user_group_id : '' ;
         $opportunity_id = !empty($request->opportunity_id) ? $request->opportunity_id : '' ;
         $service_request = !empty($request->service_request) ? $request->service_request : '' ;
-       // $tranx_id = !empty($request->tranx_id) ? $request->tranx_id : '' ;
-        //$tranx_status = !empty($request->tranx_status) ? $request->tranx_status : '' ;
-       // $currency = !empty($request->currency) ? $request->currency : '' ;
-       // $amount = !empty($request->amount) ? $request->amount : '' ;
         $hire_amount = !empty($request->hire_amount) ? $request->hire_amount : '' ;
         $lang = !empty($request->lang) ? $request->lang : 'en' ;
         App::setLocale($lang);
 
          $validator = Validator::make($request->all(), [
                 'userid' => 'required',
-               // 'session_key' => 'required',
                 'user_group_id' => 'required',
                 'opportunity_id' => 'required',
-                //'tranx_status' => 'required',
-                //'amount' => 'required',
+                'service_request' => 'required',
                 'hire_amount' => 'required',
             ]);
 
@@ -7649,18 +7691,9 @@ class ApiController extends Controller
                 echo json_encode($resultArray); exit;      
             } 
 
-
             if(!empty($userid) && !empty($opportunity_id)) 
             {
-
-               // $check_auth = $this->checkToken($access_token, $userid, $session_key, $lang );
-                if(1!=1)
-                {   
-                    $check_auth='';
-                    //echo json_encode($check_auth); exit;
-                }
-                else
-                {
+                
                      $userEntity = DB::table('users')
                     ->whereRaw("(active=1)")
                     ->whereRaw("(id = '".$userid."' AND deleted_at IS null )")
@@ -7702,23 +7735,20 @@ class ApiController extends Controller
                                             ->whereRaw("(service_request_id = '".$service_request."' AND request_status = '".'buy'."')")->count();
                                         if($chkThreeUserLimit < 3)
                                         {
-                                            if($userEntity->pro_credit>=$request->hire_amount)
+                                            $leftcredit = ($userEntity->pro_credit - $request->hire_amount);
+
+                                            if ($leftcredit >= 0) 
                                             {
-                                                $leftcredit= $userEntity->pro_credit-$request->hire_amount;
-
-                                                 DB::table('users')
-                                                    ->where('id',$userid)
-                                                    ->update(['pro_credit'=>$leftcredit]);
-
+                                                $updateArrPro['pro_credit'] = $leftcredit;
+                                                DB::table('users')->where('id', $userid)->update($updateArrPro);
+                                            
                                                 $admincrdit= DB::table('users')
                                                     ->where('id',1)->first();
 
                                                  DB::table('users')
                                                     ->where('id',1)
                                                     ->update(['pro_credit'=>$admincrdit->pro_credit+$request->hire_amount]);
-                                            }
-                                            else
-                                            {
+                                            } else {
                                                 $resultArray['status']='0';
                                                 $resultArray['message']=trans('apimessage.hire_amount');
                                                 echo json_encode($resultArray); exit;
@@ -7888,7 +7918,7 @@ class ApiController extends Controller
                         $resultArray['message']=trans('apimessage.Invalid user.');
                         echo json_encode($resultArray); exit;
                     }
-                }
+                
             }
             else 
             {
@@ -10893,7 +10923,7 @@ class ApiController extends Controller
                 {
                     $contractor_arr = DB::table('users')
                         ->select('users.*')
-                        //->whereRaw("(users.user_group_id=3)")
+                        // ->whereRaw("(users.user_group_id=3)")
                         ->whereRaw("(users.id = '".$to_user_id."' AND deleted_at IS null )")
                         ->first();   
                     if(!empty($contractor_arr))
@@ -10936,6 +10966,46 @@ class ApiController extends Controller
 
                                     $resultArray['status']='1';
                                     $resultArray['message']=trans($message);
+
+                                    $userToken = DB::table('users')
+                                    ->leftjoin('user_devices','user_devices.user_id','=','users.id')
+                                    ->where('users.id',$to_user_id)
+                                    ->select('user_devices.*', 'users.email','users.username','users.mobile_number','users.user_group_id')
+                                    ->first();
+                                    // print_r($userToken);exit;
+                                    $device_id=isset($userToken->device_id)?$userToken->device_id:'';
+                                    $device_type=$userToken->device_type;
+                                    $title='Mensaje nuevo';
+                                    $messagechat='Tienes un mensaje nuevo en el Chat de Búskalo.';
+                                    $userid= $userid;
+                                    $prouserId=0; 
+                                    $serviceId= 0;
+                                    $senderId=$userid;
+                                    $reciverId=$to_user_id;
+                                    $notify_type='qualification';
+                                    $senderName=isset($contractor_arr->username)?$contractor_arr->username:$contractor_arr->first_name;
+                                    
+
+                                    $insert['from_userid'] = $userid;    
+                                    $insert['to_userid'] = $to_user_id;
+                                    $insert['message'] = $message;
+                                    $insert['is_read'] = 0;
+                                    $insert['is_starred'] = 0;
+                                    $insert['created_at'] = Carbon::now();  
+                                    $lastId=DB::table('users_chat')->insertGetId($insert);  
+                                    $resultArray['status']='1';
+                                    $resultArray['message']=trans('apimessage.qualification_send_success');
+                                    echo json_encode($resultArray);
+                                    // if($userToken->device_type=='android')
+                                    // {
+                                        $this->postpushnotification($device_id,$title,$messagechat,$userid,$prouserId,$serviceId,$senderId,$reciverId,$senderName,$notify_type);
+                                    // }
+                                    // if($userToken->device_type=='ios')
+                                    // {
+                                    //     $this->iospush($device_id,$title,$messagechat,$userid,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type );
+                                    // }
+
+                                    exit;      
                                     return json_encode($resultArray);
                                 }
                                 else
@@ -12196,21 +12266,21 @@ class ApiController extends Controller
                                         ->where('user_devices.user_id',$pro_user_id)
                                         ->first();
 
-                                        // $device_id=$userDeviceHire->device_id;
-                                        // $device_type=$userDeviceHire->device_type;
-                                        // $title='¡Felicidades te tenemos noticias!';
-                                        // $message='Al usuario le encantó tu perfil y contrató tu.';
-                                        // $userId=$pro_user_id;
-                                        // $prouserId=$user_id;
-                                        // $serviceId=$request_id;
-                                        // $senderid=0;
-                                        // $reciverid=0;
-                                        // $chattype=0;
-                                        // $notify_type='hire_pro';
-                                        // $senderName=isset($userEntity->username)?$userEntity->username:'';
+                                        $device_id=$userDeviceHire->device_id;
+                                        $device_type=$userDeviceHire->device_type;
+                                        $title='¡Felicidades te tenemos noticias!';
+                                        $message='Al usuario le encantó tu perfil y te contrató.';
+                                        $userId=$pro_user_id;
+                                        $prouserId=$user_id;
+                                        $serviceId=$request_id;
+                                        $senderid=0;
+                                        $reciverid=0;
+                                        $chattype=0;
+                                        $notify_type='hire_pro';
+                                        $senderName=isset($userEntity->username)?$userEntity->username:'';
                                         // if($userDeviceHire->device_type=='android')
                                         // {
-                                        //     $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
+                                            $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
                                         // }
                                         // if($userDeviceHire->device_type=='ios')
                                         // {
@@ -12453,7 +12523,6 @@ class ApiController extends Controller
             'Authorization: key=' . $API_ACCESS_KEY,
             'Content-Type: application/json'
             );
-
             $ch = curl_init();
             curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
             curl_setopt( $ch,CURLOPT_POST, true );
@@ -13059,7 +13128,7 @@ class ApiController extends Controller
                                         $submsg='To make your payment click here';
                                     }else
                                     {
-                                        $msg='Gracias por preferir Buskalo, el profesional ' .$profesionName->username.' te ha enviado una solicitud de pago con el siguiente detalle:';
+                                        $msg='Gracias por preferir Buskalo, el profesional ' .$profesionName->username.' te ha enviado una solicitud de pago con El servicioiguiente detalle:';
                                         $submsg='Para realizar su pago haca clic aqui';
                                     }
 
@@ -13513,6 +13582,40 @@ class ApiController extends Controller
         echo "SENT|NA";
         else
         echo "FAILED|$status";
+    }
+
+    public function deleteAccount(Request $request){
+        $id = $request->id;
+        $lang = !empty($request->lang) ? $request->lang : 'en' ;
+
+        App::setLocale($lang);
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if($validator->fails()){
+            $resultArray['status'] = 0;
+            $resultArray['message']=trans('apimessage.Invalid parameters.');
+            return response()->json($resultArray); exit;
+        }
+
+        $userCheck=DB::table('users')->where('id',$id)->first();
+
+        if(!empty($userCheck))
+        {
+            $update_Arr['deleted_at']= Carbon::now();
+            DB::table('users')->where('id',$userCheck->id)->update($update_Arr);
+            $resultArray['status']='1';
+            $resultArray['message']=trans('Su cuenta ha sido eliminada con éxito. Esperamos verte pronto.');
+            echo json_encode($resultArray); exit; 
+
+        } else
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.data_not_found');
+            echo json_encode($resultArray); exit; 
+        }
+
     }
 
 

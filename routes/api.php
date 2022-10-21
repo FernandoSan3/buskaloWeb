@@ -95,3 +95,5 @@ Route::post('sendVerifyApprovelRequest','Frontend\ApiController@sendVerifyApprov
 Route::post('refundRequest','Frontend\ApiController@refundRequest');
 Route::post('refundFaq','Frontend\ApiController@refundFaq');
 Route::post('requestProfileUpdate','Frontend\ApiController@requestProfileUpdate');
+
+Route::post('deleteAccount','Frontend\ApiController@deleteAccount');
