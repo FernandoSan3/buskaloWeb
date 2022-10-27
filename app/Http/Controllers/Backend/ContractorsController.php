@@ -26,22 +26,15 @@ class ContractorsController extends Controller
 
     public function index()
     {
-
-        // $users = DB::table('users')
-        //     ->latest()
-        //     ->where('deleted_at', NULL)
-        //     ->where('user_group_id', 3)
-        //     ->where('approval_status', 1)
-        //     ->get();
-
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
-            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
             ->where('users.approval_status', 1)
             ->where('user_group_id', 3)
             ->where('users.mobile_number', '!=', NULL)
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users.pro_credit', 'users_services_area.city_id', 'cities.name')
             ->get();
         //echo "<pre>";print_r($users); die;
         foreach ($users as $key => $value) {
@@ -62,12 +55,13 @@ class ContractorsController extends Controller
     {
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
-            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
             ->where('users.approval_status', 1)
             ->where('user_group_id', 3)
             ->where('users.mobile_number', '!=', NULL)
             ->where('users_services_area.whole_country', 1)
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id' )
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id','users.pro_credit' )
             ->get();
         foreach ($users as $key => $value) {
             $value->total_service_requests = DB::table('service_request')
@@ -1859,16 +1853,13 @@ class ContractorsController extends Controller
 
     public function aplicacions1()
     {
-
-        // $users = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
-
-        // $first = DB::table('users')->latest()->where('deleted_at',NULL)->where('approval_status',0)->whereIN('user_group_id',[3,4])->where('mobile_number','!=', NULL)->get();
-
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
-            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
             ->where('users.approval_status', 0)
-            ->whereIN('users.user_group_id', [3, 4])->where('users.mobile_number', '!=', NULL)
+            ->whereIN('users.user_group_id', [3, 4])
+            ->where('users.mobile_number', '!=', NULL)
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
             ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
             ->get();
@@ -1898,7 +1889,6 @@ class ContractorsController extends Controller
             })
             ->where('approval_status', 0)
             ->whereIN('user_group_id', [3, 4])
-            ->where('mobile_number', '!=', NULL)
             ->get();
 
         foreach ($users as $key => $value) {

@@ -50,6 +50,7 @@
                             <th> @lang('labels.backend.access.users.table.mobile') </th>
                             <th> @lang('labels.backend.access.users.table.profession') </th>
                             <th> @lang('labels.backend.access.users.table.citiename') </th>
+                            <th> @lang('labels.backend.access.users.table.coins') </th>
                             <th> @lang('labels.general.actions1.actions') </th>  
                             </tr>
                         </thead>
@@ -62,6 +63,7 @@
                                 <td>{{ $user->mobile_number }}</td>
                                 <td>{{ $user->profile_title }}</td>
                                 <td>{{ $user->name }}</td>
+                                <td>{{ $user->pro_credit }}</td>
 
                                 <td class="btn-td">
                                     <div class="dropdown">

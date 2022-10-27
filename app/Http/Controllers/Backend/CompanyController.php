@@ -27,12 +27,13 @@ class CompanyController extends Controller
     {
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
-            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
             ->where('users.approval_status', 1)
             ->where('user_group_id', 4)
             ->where('users.mobile_number', '!=', NULL)
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users.pro_credit', 'users_services_area.city_id', 'cities.name')
             ->get();
 
         foreach ($users as $key => $value) {
@@ -51,12 +52,13 @@ class CompanyController extends Controller
     {
         $users = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
-            ->latest('users.created_at')->where('users.deleted_at', NULL)
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
             ->where('users.approval_status', 1)
             ->where('user_group_id', 4)
             ->where('users.mobile_number', '!=', NULL)
             ->where('users_services_area.whole_country', 1)
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users.pro_credit')
             ->get();
 
         foreach ($users as $key => $value) {

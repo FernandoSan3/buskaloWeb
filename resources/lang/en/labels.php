@@ -124,6 +124,7 @@ return [
                     'profession' => 'Profession',
                     'citiename' => 'City', 
                     'action' => 'Actions',
+                    'coins' => 'Coins',
                 ],  
 
                 'tabs' => [
