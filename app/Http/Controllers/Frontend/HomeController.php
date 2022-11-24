@@ -672,55 +672,57 @@ class HomeController extends Controller
         $userData=array();
         $userId=!empty($request->user_id) ? $request->user_id : '' ;
 
-        $mobile_number = !empty($request->mobile_number) ? $request->mobile_number: '' ;
         $checkapprovl=DB::table('users')->where('id', $userId)->first();
         if($checkapprovl->approval_status==2)
         {
             DB::table('users')->where('id', $userId)->update(['approval_status'=>0]);
         }
-        $mobileexist = DB::table('users')->whereRaw("(mobile_number = '".$mobile_number."' AND deleted_at IS null )")->where('id', '!=' , $userId)->first();
-
-        // if(!empty($mobileexist))
-        // {
-        //     return redirect()->back()->withFlashDanger('El campo número de teléfono ya esa en uso');
-        // }
-            //Multiple
+       
+        //Multiple
         $images_gallery=!empty($request->images_gallery) ? $request->images_gallery : '' ;
         $videos_gallery=!empty($request->videos_gallery) ? $request->videos_gallery : '' ;
 
+        // GENERAL INFORMATION FOR COMPANY PROFILE TABLE
+        $ruc_no= !empty($request->ruc_no) ? $request->ruc_no : '' ;
+        $year_of_constitution = !empty($request->year_of_constitution) ? $request->year_of_constitution : '' ;
+        $username = !empty($request->username) ? $request->username: '' ;
+        $profileTitle = !empty($request->profile_title) ? $request->profile_title: '' ;
+        $legal_representative = !empty($request->legal_representative) ? $request->legal_representative : '' ;
+        $identity_no = !empty($request->identity_no) ? $request->identity_no: '' ;
+        $website_address = !empty($request->website_address) ? $request->website_address: '' ;
+        $address = !empty($request->address) ? $request->address : '' ;
+        $office_address = !empty($request->office_address) ? $request->office_address: '' ;
+        $mobile_number = !empty($request->mobile_number) ? $request->mobile_number: '' ;
+        $landline_number = !empty($request->landline_number) ? $request->landline_number: '' ;
+        $office_number = !empty($request->office_number) ? $request->office_number: '' ;
+
+        // SOCIAL NETWORKS FOR COMPANY PROFILE TABLE
         $facebook_url=!empty($request->facebook_url) ? $request->facebook_url : '' ;
         $instagram_url=!empty($request->instagram_url) ? $request->instagram_url : '' ;
         $linkedin_url=!empty($request->linkedin_url) ? $request->linkedin_url : '' ;
         $twitter_url=!empty($request->twitter_url) ? $request->twitter_url : '' ;
         $other_url=!empty($request->other) ? $request->other : '' ;
-
-        //$username = !empty($request->username) ? $request->username : '' ;
-        $ruc_no= !empty($request->ruc_no) ? $request->ruc_no : '' ;
-        $year_of_constitution = !empty($request->year_of_constitution) ? $request->year_of_constitution : '' ;
-        $legal_representative = !empty($request->legal_representative) ? $request->legal_representative : '' ;
-        $address = !empty($request->address) ? $request->address : '' ;
-        $website_address = !empty($request->website_address) ? $request->website_address: '' ;
-        $landline_number = !empty($request->landline_number) ? $request->landline_number: '' ;
-        $office_number = !empty($request->office_number) ? $request->office_number: '' ;
-        $identity_no = !empty($request->identity_no) ? $request->identity_no: '' ;
-        $username = !empty($request->username) ? $request->username: '' ;
-        $profileTitle = !empty($request->profile_title) ? $request->profile_title: '' ;
-        $office_address = !empty($request->office_address) ? $request->office_address: '' ;
+        
+        // PROFILE DESCRIPTION FOR COMPANY PROFILE TABLE
+        $profile_description=!empty($request->profile_description) ? $request->profile_description : '' ;
 
  
-        // $validator = Validator::make($request->all(), [
-        //  'username' => 'required',
-        //  'address' => 'required',
-        //  'ruc_no' => 'required',
-        //  'legal_representative' => 'required',
-        //  'mobile_number' => 'required',
-        //  'user_id' => 'required',
-        // ]);
+        $validator = Validator::make($request->all(), [
+            'ruc_no' => 'required',
+            'year_of_constitution' => 'required',
+            'username' => 'required',
+            'profile_title' => 'required',
+            'legal_representative' => 'required',
+            'identity_no' => 'required',
+            'address' => 'required',
+            'mobile_number' => 'required',
+            'user_id' => 'required',
+        ]);
 
-        // if($validator->fails())
-        // {
-        //     return redirect()->route('frontend.index')->withFlashDanger(__('Invalid Parameters'));exit;    
-        // }
+        if($validator->fails())
+        {
+            return redirect()->route('frontend.index')->withFlashDanger(__('Invalid Parameters'));exit;    
+        }
        
         // $profile = NULL;
         // $profile = !empty($request->avtar_name) ? $request->avtar_name : '' ;
@@ -992,9 +994,9 @@ class HomeController extends Controller
         //End Service Offered
 
         // profile description
-        if(isset($request->profile_description) && !empty($request->profile_description)) 
+        if(isset($profile_description) && !empty($profile_description)) 
         {
-            $pro_desc_arr['profile_description'] = $request->profile_description;
+            $pro_desc_arr['profile_description'] = $profile_description;
             $pro_desc_arr['updated_at'] = Carbon::now();
             DB::table('users')->where('id',$userId)->update($pro_desc_arr);                    
         }
@@ -4030,7 +4032,7 @@ class HomeController extends Controller
 
                     $logo =  url('img/logo/logo-svg.png');
                     $services=isset($servicename->es_name)?$servicename->es_name:'';
-                   $usermail=array('email'=>$request->email,'username'=>$request->username, 'avatar_location'=>$userIcon,'logo'=>$logo,'servicess'=>$services);
+                    $usermail=array('email'=>$request->email,'username'=>$request->username, 'avatar_location'=>$userIcon,'logo'=>$logo,'servicess'=>$services);
 
                     Mail::send('frontend.mail.requestsuccess', ['user' => $usermail], function ($m) use ($usermail) {
                     $m->from(env('MAIL_FROM'));
@@ -4562,7 +4564,7 @@ class HomeController extends Controller
               $data = array(
                 'username'=>$userdata->username,
                 'receiver'=>$userdata->email,
-                'message'=>'Tu compra de recarga de créditos ha sido exitosa.',
+                'message'=>'Tu compra de recarga de monedas ha sido exitosa.',
                 'total'=>$creditPak->price,
                 'credit'=>$creditPak->credit,
                 'packagename'=>$creditPak->es_name,

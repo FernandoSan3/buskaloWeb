@@ -1863,6 +1863,21 @@ class ContractorsController extends Controller
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
             ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
             ->get();
+        $usersAll = DB::table('users_services_area')
+            ->join('users', 'users_services_area.user_id', '=', 'users.id')
+            ->latest('users.created_at')
+            ->where('users.deleted_at', NULL)
+            ->where('users.approval_status', 0)
+            ->whereIN('users.user_group_id', [3, 4])
+            ->where('users.mobile_number', '!=', NULL)
+            ->where('users_services_area.whole_country', 1)
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users_services_area.whole_country')
+            ->get();
+        $usersAll->map(function ($item, $key) {
+            $item->name = 'Todo el país';
+            return $item;
+        });
+        $users = $users->merge($usersAll);
 
         foreach ($users as $key => $value) {
             $value->total_service_requests = DB::table('service_request')
@@ -1885,7 +1900,7 @@ class ContractorsController extends Controller
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('users_services_area')
-                    ->whereRaw('users_services_area.user_id = users.id AND users_services_area.city_id IS NOT NULL');
+                    ->whereRaw('users_services_area.user_id = users.id AND users_services_area.city_id IS NOT NULL AND users_services_area.whole_country = 0');
             })
             ->where('approval_status', 0)
             ->whereIN('user_group_id', [3, 4])
