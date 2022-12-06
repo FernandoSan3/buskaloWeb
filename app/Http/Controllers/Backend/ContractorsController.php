@@ -1853,7 +1853,7 @@ class ContractorsController extends Controller
 
     public function aplicacions1()
     {
-        $users = DB::table('users_services_area')
+        $usersa = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
             ->latest('users.created_at')
             ->where('users.deleted_at', NULL)
@@ -1861,7 +1861,7 @@ class ContractorsController extends Controller
             ->whereIN('users.user_group_id', [3, 4])
             ->where('users.mobile_number', '!=', NULL)
             ->join('cities', 'users_services_area.city_id', '=', 'cities.id')
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id',  'users_services_area.city_id', 'cities.name')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users.created_at','users_services_area.city_id', 'cities.name')
             ->get();
         $usersAll = DB::table('users_services_area')
             ->join('users', 'users_services_area.user_id', '=', 'users.id')
@@ -1871,13 +1871,20 @@ class ContractorsController extends Controller
             ->whereIN('users.user_group_id', [3, 4])
             ->where('users.mobile_number', '!=', NULL)
             ->where('users_services_area.whole_country', 1)
-            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users_services_area.whole_country')
+            ->select('users.id', 'users.username', 'users.email', 'users.profile_title', 'users.mobile_number', 'users.user_group_id', 'users.created_at')
             ->get();
         $usersAll->map(function ($item, $key) {
+            $item->city_id = -1;
             $item->name = 'Todo el país';
             return $item;
         });
-        $users = $users->merge($usersAll);
+        $usersa = $usersa->merge($usersAll);
+        // data users order by created_at
+        $users = $usersa->sortByDesc('created_at');
+
+        
+        
+        // $users = $users->sortBy('created_at');
 
         foreach ($users as $key => $value) {
             $value->total_service_requests = DB::table('service_request')
