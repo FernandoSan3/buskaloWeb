@@ -53,7 +53,7 @@ return [
                     'requested_opportunity' => 'La oportunidad solicitada ya está asignada a otros profesionales.',
                     'opportunity_already_accepted' => 'Oportunidad ya aceptada.!',
                     'taken_by_another' => 'Esta oportunidad ya la han aprovechado otros tres profesionales o la empresa.!',
-                    'credits_not_sufficient' => 'Los créditos no son suficientes para comprar esta oportunidad, compre créditos',
+                    'credits_not_sufficient' => 'Las monedas no son suficientes para comprar esta oportunidad, compre monedas',
                     'dont_have_this_opportunity' => "No tienes esta oportunidad Actualiza tu perfil de los servicios ofrecidos para obtener nuevas Oportunidades..",
                     'requested_opportunity_id_not_found' => 'No se encontró el ID de oportunidad solicitado.!'
                 ],
@@ -135,7 +135,7 @@ return [
                     'opportunity_already_accepted' => 'Oportunidad ya aceptada.!',
                     'successful_purchase_opportunity' => 'Has adquirido la información con éxito',
                     'taken_by_another' => 'Esta oportunidad ya ha sido aprovechada por otros tres profesionales o una empresa',
-                    'credits_not_sufficient' => 'Los créditos no son suficientes para comprar esta oportunidad, compre créditos',
+                    'credits_not_sufficient' => 'Las monedas no son suficientes para comprar esta oportunidad, compre monedas',
                     'dont_have_this_opportunity' => 'No tiene esta oportunidad Actualice su perfil de los servicios ofrecidos para obtener nuevas oportunidades',
                     'requested_opportunity_id_not_found' => 'No se encontró el ID de oportunidad solicitado.',
                     'requested_opportunity' => 'La oportunidad solicitada ya está asignada a otros profesionales',

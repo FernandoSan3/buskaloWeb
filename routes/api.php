@@ -97,3 +97,5 @@ Route::post('refundFaq','Frontend\ApiController@refundFaq');
 Route::post('requestProfileUpdate','Frontend\ApiController@requestProfileUpdate');
 
 Route::post('deleteAccount','Frontend\ApiController@deleteAccount');
+
+Route::get('notification/{id}', 'Frontend\ApiController@getNotificaton');

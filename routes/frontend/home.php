@@ -191,11 +191,11 @@ Route::post('service/payment/web',[HomeController::class,'servicePaymentStoreWeb
 
         Route::get('projects', [SendRequestsController::class, 'projects'])->name('projects');
 
-         Route::get('usr/chats', 'ChatsController@index')->name('usr.chats');
+        Route::get('usr/chats', 'ChatsController@index')->name('usr.chats');
 
-         Route::get('usr/load-latest-messages', 'MessagesController@getLoadLatestMessages')->name('usr.load-latest-messages');
+        Route::get('usr/load-latest-messages', 'MessagesController@getLoadLatestMessages')->name('usr.load-latest-messages');
 
-         Route::post('/senduserchat', 'MessagesController@postSendMessage')->name('senduserchat');
+        Route::post('/senduserchat', 'MessagesController@postSendMessage')->name('senduserchat');
         Route::post('/send', 'MessagesController@postSendMessage');
 
         Route::get('usr/fetch-old-messages', 'MessagesController@getOldMessages')->name('usr.fetch-old-messages');

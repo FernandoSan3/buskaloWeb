@@ -1763,7 +1763,7 @@ our range of collaborators',
 
                'registry_constractor' => 'Application for admission as an independent professional',
                'registry_company' => 'Application for admission as Business',
-                'registry_user' => 'User login request',
+               'registry_user' => 'Application for admission as User',
                'username' => "Username",
                'mobile_phone_number' => "Mobile phone number",
                'email' => "Email",

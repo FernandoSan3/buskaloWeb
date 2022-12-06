@@ -1876,7 +1876,7 @@ return [
            'check_in' => "ENVIAR",
            'terms_and_conditions' => "Al registrarse acepta nuestros términos y condiciones",
            'registry_company'=>'Solicitud de ingreso como Empresa',
-           'registry_user'=>'',
+           'registry_user'=>'Solicitud de ingreso como Usuario',
            'registry_constractor' => 'Solicitud de ingreso como Profesional Independiente.',
 
         ],

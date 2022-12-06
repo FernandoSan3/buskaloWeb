@@ -185,6 +185,7 @@ return array(
     'App\\Mail\\WelcomeNewUser' => $baseDir . '/app/Mail/WelcomeNewUser.php',
     'App\\Mail\\forgotPasswordMail' => $baseDir . '/app/Mail/forgotPasswordMail.php',
     'App\\Mail\\newsletterMail' => $baseDir . '/app/Mail/newsletterMail.php',
+    'App\\Mail\\NewOpportunity' => $baseDir . '/app/Mail/NewOpportunity.php',
     'App\\Message' => $baseDir . '/app/Message.php',
     'App\\Models\\Areatype' => $baseDir . '/app/Models/Areatype.php',
     'App\\Models\\Auth\\BaseUser' => $baseDir . '/app/Models/Auth/BaseUser.php',

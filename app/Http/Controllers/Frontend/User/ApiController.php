@@ -137,10 +137,10 @@ class ApiController extends Controller
                         $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
                         if($lang='es')
                         {
-                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' créditos.';
+                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
                         }else
                         {
-                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!';
+                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
                         }
                         
                         //$message=trans('apimessage.Your profile is activated successfully, and you have recived bonus of 20 credits.!');

@@ -939,6 +939,7 @@ class ComposerStaticInitb4d607a26812c47f1b23ab0539757778
         'App\\Mail\\WelcomeNewUser' => __DIR__ . '/../..' . '/app/Mail/WelcomeNewUser.php',
         'App\\Mail\\forgotPasswordMail' => __DIR__ . '/../..' . '/app/Mail/forgotPasswordMail.php',
         'App\\Mail\\newsletterMail' => __DIR__ . '/../..' . '/app/Mail/newsletterMail.php',
+        'App\\Mail\\NewOpportunity' => __DIR__ . '/../..' . '/app/Mail/NewOpportunity.php',
         'App\\Message' => __DIR__ . '/../..' . '/app/Message.php',
         'App\\Models\\Areatype' => __DIR__ . '/../..' . '/app/Models/Areatype.php',
         'App\\Models\\Auth\\BaseUser' => __DIR__ . '/../..' . '/app/Models/Auth/BaseUser.php',

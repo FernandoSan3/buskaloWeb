@@ -24,6 +24,7 @@ use App\Mail\WelcomeNewUser;
 use App\Mail\NewUserVerify;
 use App\Mail\ServiceRequestOtp;
 use App\Mail\forgotPasswordMail;
+use App\Mail\NewOpportunity;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -128,102 +129,102 @@ class ApiController extends Controller
                 echo json_encode($resultArray); exit;
             }
            
-        if(isset($users_count_var) && $users_count_var->confirmed==1 && !empty($users_count_var))
-        {
-            $settingEntity = DB::table('settings')->select('app_language')->whereRaw("(user_id = '".$users_count_var->id."')")->first();  
-              if($settingEntity)
-              {
-                $users_count_var->lang =$settingEntity->app_language;
-              }else
-              {
-                $users_count_var->lang = 0;
-              }
-            //$check_auth = $this->checkToken($access_token,$users_count_var->id);
-            if(1!=1)
+            if(isset($users_count_var) && $users_count_var->confirmed==1 && !empty($users_count_var))
             {
-              //echo json_encode($check_auth); exit;
+                $settingEntity = DB::table('settings')->select('app_language')->whereRaw("(user_id = '".$users_count_var->id."')")->first();  
+                    if($settingEntity)
+                    {
+                    $users_count_var->lang =$settingEntity->app_language;
+                    }else
+                    {
+                    $users_count_var->lang = 0;
+                    }
+                //$check_auth = $this->checkToken($access_token,$users_count_var->id);
+                if(1!=1)
+                {
+                    //echo json_encode($check_auth); exit;
+                }
+                else
+                {
+                    $userDeviceCheck = DB::table('user_devices')->where('user_id',$users_count_var->id)->first();
+
+                    if(isset($userDeviceCheck) && !empty($userDeviceCheck))
+                    {
+                        $userdevice= array('device_id'=>$device_id,'device_type'=>$device_type);
+                        DB::table('user_devices')->where('user_id',$users_count_var->id)->update($userdevice);
+                        $users_count_var->device_id =$device_id;
+                        $logincount=isset($userDeviceCheck->login_count)?$userDeviceCheck->login_count:0;
+                        if(($logincount==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
+                        {
+                            $freecredit=DB::table('site_settings')->where('id',1)->first();
+                            $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
+                            if($lang='es')
+                            {
+                                $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
+                            }else
+                            {
+                                $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
+                            }
+                            
+                            //$message=trans('apimessage.Your profile is activated successfully, and you have recived bonus of 20 credits.!');
+                            DB::table('user_devices')->where('user_id',$users_count_var->id)->update(['login_count'=>'1']);
+                        }
+                        else
+                        {
+                            $message=trans('apimessage.Successfully login.');
+                        }
+                    }else
+                    {
+                        $userdevice= array('user_id' => $users_count_var->id ,'device_id'=>$device_id,'device_type'=>$device_type);
+                        DB::table('user_devices')->insert($userdevice);
+                        $users_count_var->device_id =$device_id;
+                            $logincount = isset($this->$userDeviceCheck->login_count)? $this->$userDeviceCheck->login_count : 0;
+                            if(($logincount==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
+                        {
+                            // if(($userDeviceCheck->login_count==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
+                            //  {
+                            $freecredit=DB::table('site_settings')->where('id',1)->first();
+                            $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
+                            if($lang='es')
+                            {
+                                $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
+                            }else
+                            {
+                                $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
+                            }
+                            // $message=trans('Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!');
+                                DB::table('user_devices')->where('user_id',$users_count_var->id)->update(['login_count'=>1]);
+                        }
+                        else
+                        {
+                            $message=trans('apimessage.Successfully login.');
+                        }
+                    }
+                
+
+                    /*-------------------*/ 
+                    $resultArray['status']='1'; 
+                    //$resultArray['userdata'] = $users_count_var;     
+                    $resultArray['message']=$message;
+                    $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
+                    $resultdata= $this->intToString($users_count_var );
+                    $resultArray['userData']=$resultdata;
+                    echo json_encode($resultArray); exit;
+                }
             }
             else
             {
-                $userDeviceCheck = DB::table('user_devices')->where('user_id',$users_count_var->id)->first();
-
-                if(isset($userDeviceCheck) && !empty($userDeviceCheck))
-                {
-                    $userdevice= array('device_id'=>$device_id,'device_type'=>$device_type);
-                    DB::table('user_devices')->where('user_id',$users_count_var->id)->update($userdevice);
-                    $users_count_var->device_id =$device_id;
-                    $logincount=isset($userDeviceCheck->login_count)?$userDeviceCheck->login_count:0;
-                    if(($logincount==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
-                    {
-                        $freecredit=DB::table('site_settings')->where('id',1)->first();
-                        $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
-                        if($lang='es')
-                        {
-                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
-                        }else
-                        {
-                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
-                        }
-                        
-                        //$message=trans('apimessage.Your profile is activated successfully, and you have recived bonus of 20 credits.!');
-                        DB::table('user_devices')->where('user_id',$users_count_var->id)->update(['login_count'=>'1']);
-                    }
-                    else
-                    {
-                        $message=trans('apimessage.Successfully login.');
-                    }
-                }else
-                {
-                    $userdevice= array('user_id' => $users_count_var->id ,'device_id'=>$device_id,'device_type'=>$device_type);
-                    DB::table('user_devices')->insert($userdevice);
-                    $users_count_var->device_id =$device_id;
-                     $logincount = isset($this->$userDeviceCheck->login_count)? $this->$userDeviceCheck->login_count : 0;
-                      if(($logincount==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
-                    {
-                        // if(($userDeviceCheck->login_count==0) && ($users_count_var->user_group_id==3 || $users_count_var->user_group_id==4))
-                        //  {
-                        $freecredit=DB::table('site_settings')->where('id',1)->first();
-                        $useradd=isset($freecredit->free_credit)?$freecredit->free_credit:'20';
-                        if($lang='es')
-                        {
-                            $message='Su perfil se activó con éxito y ha recibido una bonificación de'. $useradd.' monedas.';
-                        }else
-                        {
-                            $message='Your profile is activated successfully, and you have recived bonus of'. $useradd.' coins.!';
-                        }
-                       // $message=trans('Your profile is activated successfully, and you have recived bonus of'. $useradd.' credits.!');
-                         DB::table('user_devices')->where('user_id',$users_count_var->id)->update(['login_count'=>1]);
-                    }
-                    else
-                    {
-                        $message=trans('apimessage.Successfully login.');
-                    }
-                }
-            
-
-                /*-------------------*/ 
-                $resultArray['status']='1'; 
-                //$resultArray['userdata'] = $users_count_var;     
-                $resultArray['message']=$message;
-                $resultArray['session_key']='';//$check_auth['Data']['randnumber'];
-                $resultdata= $this->intToString($users_count_var );
-                $resultArray['userData']=$resultdata;
-                echo json_encode($resultArray); exit;
+            $resultArray['status']='0';
+            // $resultArray['message']=trans('apimessage.Invalid login credential.');
+            $resultArray['message'] =trans('Su cuenta ha esta confirmada.');
+            echo json_encode($resultArray); exit;
             }
         }
         else
         {
-        $resultArray['status']='0';
-        // $resultArray['message']=trans('apimessage.Invalid login credential.');
-        $resultArray['message'] =trans('Su cuenta ha esta confirmada.');
-        echo json_encode($resultArray); exit;
-        }
-        }
-        else
-        {
-        $resultArray['status']='0';
-        $resultArray['message']=trans('apimessage.Invalid parameters send.');
-        echo json_encode($resultArray); exit;
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameters send.');
+            echo json_encode($resultArray); exit;
         }
     }
 
@@ -2756,27 +2757,131 @@ class ApiController extends Controller
         {
             $request_id = isset($request->request_id) && !empty($request->request_id) ? $request->request_id : '' ;
             $lang = !empty($request->lang) ? $request->lang : 'en' ;
-                 App::setLocale($lang);
+            App::setLocale($lang);
 
             $getAllContCompny= DB::table('users')
-                        ->select('users.username','user_devices.device_id','user_devices.device_type')
-                        ->leftjoin('user_devices', 'users.id', '=', 'user_devices.user_id')
-                        ->leftjoin('assign_service_request','assign_service_request.user_id','=','users.id')
-                        ->where('assign_service_request.service_request_id',$request_id)->get();
-                foreach ($getAllContCompny as $key => $getuser)
-                {
+            ->select('users.username','users.email','users.avatar_location','users.user_group_id','user_devices.device_id','user_devices.device_type', 'assign_service_request.service_request_id','cities.name')
+            ->join('user_devices', 'users.id', '=', 'user_devices.user_id')
+            ->join('assign_service_request','assign_service_request.user_id','=','users.id')
+            ->join('service_request','service_request.id','=','assign_service_request.service_request_id')
+            ->join('cities','cities.id','=','service_request.city_id')
+            ->where('assign_service_request.service_request_id',$request_id)->get();
+            
+            $servicesRequestedQues = DB::table('service_request_questions')
+            ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
+            ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+            ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
+            ->whereRaw("(service_request_questions.service_request_id = '".$request_id."')")->get()->toArray(); 
+            $options=array();
+            $objDemo = new \stdClass();
+            $objQuestion= new \stdClass();
 
+            foreach ($servicesRequestedQues as $key => $que) 
+            {
+                $question=$que->es_title;
+                $data2['question'] = isset($question) && !empty($question) ? $question : '';
+                $option=$que->es_option;
+                $data2['option'] = $option;
+                array_push($options, $data2);
+            }
+            // Remove two last elements
+            array_pop($options);
+            array_pop($options);
+
+            foreach ($getAllContCompny as $key => $getuser)
+            {
+
+                $title='¡Nueva Oportunidad!';
+                if($lang=='en')
+                {
+                    // $message='Great News: You have a new job opportunity for'.$serviceName.', check the details in your professional profile. At Buskalo we make your life easier.';
+                    $message='Someone is looking for your services, enter OPPORTUNIDADES and get their information now!.';
+                }
+                else
+                {
+                    $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
+                }
+                
+                $userId=0;
+                $prouserId=0;
+                $serviceId=0;
+                $senderId=0;
+                $reciverId=0;
+                $chatType=0;
+                $senderName=$getuser->username;
+                $notify_type='new_opportunity';
+                $device_id=isset($getuser->device_id)?$getuser->device_id:'';
+                $email = isset($getuser->email)?$getuser->email:'';
+                $avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
+                $objDemo->avatar_location=$avatar_location;
+                $objDemo->user_group_id = isset($getuser->user_group_id)?$getuser->user_group_id:'';
+                $objDemo->city_name = isset($getuser->name)?$getuser->name:'';
+                $objDemo->email = $email;
+                $objDemo->username = $senderName;
+                $objQuestion = $options;
+                //if(!empty($getuser->device_type) && $getuser->device_type=='android')
+                // {
+                    $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
+                    Mail::to($email)->send(new NewOpportunity($objDemo, $objQuestion));
+
+                // }
+                // if(!empty($getuser->device_type) && $getuser->device_type=='ios')
+                // {
+                //     $this->iospush($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
+                // }
+                echo 'send all notification';
+            }
+        } 
+
+        // GET ALL NOTIFICATION
+        
+        public function getNotificaton( $id){
+            $request_id = $id;
+
+            $getAllContCompny= DB::table('users')
+            ->select('users.username','users.email','users.avatar_location','users.user_group_id','user_devices.device_id','user_devices.device_type', 'assign_service_request.service_request_id','cities.name')
+            ->join('user_devices', 'users.id', '=', 'user_devices.user_id')
+            ->join('assign_service_request','assign_service_request.user_id','=','users.id')
+            ->join('service_request','service_request.id','=','assign_service_request.service_request_id')
+            ->join('cities','cities.id','=','service_request.city_id')
+            ->where('assign_service_request.service_request_id',$request_id)->get();
+
+            $servicesRequestedQues = DB::table('service_request_questions')
+            ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
+            ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+            ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
+            ->whereRaw("(service_request_questions.service_request_id = '".$request_id."')")->get()->toArray(); 
+            $options=array();
+            $objDemo = new \stdClass();
+            $objQuestion= new \stdClass();
+            foreach ($servicesRequestedQues as $key => $que) 
+            {
+                $question=$que->es_title;
+                $data2['question'] = isset($question) && !empty($question) ? $question : '';
+                $option=$que->es_option;
+                $data2['option'] = $option;
+                array_push($options, $data2);
+            }
+            // Remove two last elements
+            array_pop($options);
+            array_pop($options);
+
+            
+
+            foreach ($getAllContCompny as $key => $getuser)
+                {
+                    //Start Send OTP ON Mail to User
                     $title='¡Nueva Oportunidad!';
-                    if($lang=='en')
-                    {
-                       // $message='Great News: You have a new job opportunity for'.$serviceName.', check the details in your professional profile. At Buskalo we make your life easier.';
-                        $message='Someone is looking for your services, enter OPPORTUNIDADES and get their information now!.';
-                    }
-                    else
-                    {
-                        $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
-                    }
+                    $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
                     
+                    $objDemo->message = $message;
+                    $objDemo->footer_logo = url('img/logo/footer-logo.png');
+                    $objDemo->avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
+                    $objDemo->logo = url('img/logo/logo-svg.png');
+                    $objDemo->sender = 'Buskalo';
+                    
+                    $objDemo->user_icon = url('img/logo/logo.jpg');           
+
                     $userId=0;
                     $prouserId=0;
                     $serviceId=0;
@@ -2786,22 +2891,26 @@ class ApiController extends Controller
                     $senderName=$getuser->username;
                     $notify_type='new_opportunity';
                     $device_id=isset($getuser->device_id)?$getuser->device_id:'';
-                    //if(!empty($getuser->device_type) && $getuser->device_type=='android')
-                    // {
-                        $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
-                    // }
-                    // if(!empty($getuser->device_type) && $getuser->device_type=='ios')
-                    // {
-                    //     $this->iospush($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
-                    // }
-                    echo 'send all notification';
+                    $email = isset($getuser->email)?$getuser->email:'';
+                    $avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
+                    $objDemo->avatar_location=$avatar_location;
+                    $objDemo->user_group_id = isset($getuser->user_group_id)?$getuser->user_group_id:'';
+                    $objDemo->city_name = isset($getuser->name)?$getuser->name:'';
+                    $objDemo->email = $email;
+                    $objDemo->username = $senderName;
+                    $objQuestion = $options;
+                    
+                        Mail::to($email)->send(new NewOpportunity($objDemo, $objQuestion));
                 }
-        } 
+                
+            $resultArray['status']='1';
+            $resultArray['message']= $id;
+            $resultArray['data']=$getAllContCompny;
+            $resultArray['objDemo']=$objDemo;
+            $resultArray['objQuestion']=$objQuestion;
 
-
-
-
-
+            echo json_encode($resultArray); exit;
+        }
           /*
           * ************ SEND REQUEST BY USER *********************
           *
@@ -3038,7 +3147,7 @@ class ApiController extends Controller
 
                                 $servicesRequestedQues = DB::table('service_request_questions')
                                 ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
-                                 ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+                                ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
                                 ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
                                 ->whereRaw("(service_request_questions.service_request_id = '".$vall->id."')")->get()->toArray(); 
 

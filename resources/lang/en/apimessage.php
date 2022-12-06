@@ -97,6 +97,7 @@ return [
     'starred_message_list_found'=>'Starred Message List Found Successfully.!',
     'count_found_success'=>'Count Found Successfully.!',
     'message_send_success'=>'Message Send Successfully.!',
+    'qualification_send_success'=>'Qualification Send Successfully.!',
     'request_not_found'=>'Request not found.',
     'request_list_not_found'=>'Request List Not Found.!',
     'request_list_found_successfully'=>'Request List Found Successfully.!',

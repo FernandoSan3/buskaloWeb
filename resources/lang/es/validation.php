@@ -29,7 +29,7 @@ return [
         'array' => 'La lista :attribute debe contener entre :min y :max elementos.',
     ],
     'boolean' => 'El campo :attribute debe ser booleano.',
-    'confirmed' => 'La contraseña y confirmación no coinciden',
+    'confirmed' => 'La contraseña y confirmación no coinciden.',
     'date' => 'El campo :attribute no es una fecha válida.',
     'date_equals' => 'The :attribute must be a date equal to :date.',
     'date_format' => 'La fecha :attribute debe coincidir con el formato :format.',
@@ -85,10 +85,7 @@ return [
     'min' => [
         'numeric' => 'El número :attribute debe ser mayor o igual que :min.',
         'file' => 'El fichero del campo :attribute debe tener un tamaño menor o igual de :min kilobytes.',
-        //'string' => 'El texto :attribute debe tener, al menos, :min caracteres.',
-        
-         'string' => 'La contraseña tiene que constar de al menos, :min caracteres.',
-
+        'string' => 'La contraseña tiene que constar de al menos, :min caracteres.',
         'array' => 'La lista :attribute debe contener, al menos, :min elementos.',
     ],
     'not_in' => 'El campo :attribute seleccionado no es válido.',

@@ -17,6 +17,7 @@ return [
     'Invalid mail'=>'Correo inválido.',
     'service list fount successfully.!'=> 'lista de servicios de búsqueda con éxito.',
     'Invalid login credential.'=> 'Credencial de inicio de sesión no válida.',
+    'Invalid account.'=> 'Cuenta no válida.',
     'Your account is not approved please contact to ADMIN'=> 'Su cuenta no está aprobada, póngase en contacto con ADMIN',
     'A verification email was sent to the email address you provided when creating your account. Please click the verification link from that email before you can log in.' => 'Se envió un correo electrónico de verificación a la dirección de correo electrónico que proporcionó al crear su cuenta. Haga clic en el enlace de verificación de ese correo electrónico antes de poder iniciar sesión.',
     'Successfully login.'=> 'Se ha conectado con éxito.',
@@ -24,7 +25,7 @@ return [
     'You are not authorize to access this module.'=> 'No tiene autorización para acceder a este módulo.',
     'Invalid token!'=> 'Simbolo no valido!',
     'Invalid session.'=> 'Sesión inválida.',
-    'hire_amount'=>'Los créditos no son suficientes para comprar esta oportunidad, compre créditos.',
+    'hire_amount'=>'Las monedas no son suficientes para comprar esta oportunidad, compre monedas.',
 
     'Invalid mobile number format.'=>'Formato de número de móvil no válido',
     'Mobile Number Already Exist.'=>'El número de móvil ya existe.',
@@ -33,7 +34,7 @@ return [
     'Sorry some problem occurs please try again.'=>'Lo sentimos, se produce algún problema. Inténtalo de nuevo.',
     'Invalid parameters.'=>'Parámetros inválidos.',
     'Your account is not verified please verify your account using otp code.'=>'Su cuenta no está verificada, verifique su cuenta usando el código otp.',
-    'Your profile is activated successfully, and you have recived bonus of 20 credits.!'=>'Su perfil se activó con éxito y ha recibido una bonificación de 20 créditos.',
+    'Your profile is activated successfully, and you have recived bonus of 20 credits.!'=>'Su perfil se activó con éxito y ha recibido una bonificación de 20 monedas.',
     'Account alreday verified!.'=>'Cuenta ya verificada !.',
     'Do not match new password and confirm password.'=>'No coincida con la nueva contraseña y confirme la contraseña.',
     'Password must be greater than 6 characters'=>'La contraseña debe tener más de 6 caracteres.',
@@ -99,6 +100,7 @@ return [
     'starred_message_list_found'=>'La lista de mensajes destacados se ha encontrado correctamente.!',
     'count_found_success'=>'Recuento encontrado con éxito.!',
     'message_send_success'=>'Mensaje enviado exitosamente.!',
+    'qualification_send_success'=>'Calificación enviada con éxito.!',
     'request_not_found'=>'Solicitud no encontrada.',
     'request_list_not_found'=>'Lista de solicitudes no encontrada.!',
     'request_list_found_successfully'=>'Lista de solicitudes encontrada correctamente.!',
@@ -126,9 +128,4 @@ return [
     'invalid_service_request'=>'Solicitud de servicio no válida',
     'service_request_successfully'=>'Su solicitud de servicio fue aceptada con éxito.',
 
-
 ];
-
-
-
-
