@@ -69,26 +69,8 @@
 
             <div class="collapse navbar-collapse navbar-right" id="navbarSupportedContent">
               <ul class="navbar-nav mr-auto">
-               <!--   <li class="nav-item">
-                  <a class="nav-link" href="{{url('home_page')}}">@lang('labels.frontend.company.profile.categories')</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{route('frontend.service_online')}}">@lang('labels.frontend.company.profile.online_services')</a>
-                </li> -->
-               <!--   @if(config('locale.status') && count(config('locale.languages')) > 1)
-                  <li class="nav-item dropdown">
-                      <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownLanguageLink" data-toggle="dropdown"
-                         aria-haspopup="true" aria-expanded="false">{{ strtoupper(app()->getLocale()) }}</a>
-                  </li>
-               @endif -->
                 @include('includes.partials.lang')
               </ul>
-
-             <!--  <ul class="navbar-nav right-nav  ml-auto">
-                 <li class="nav-item">
-                    <a href="{{ url('/') }}"><img src="{{ url('img/frontend/user-professional.png') }}" style="width: 143px;"></a>
-                  </li>
-              </ul> -->
             </div>
           </nav>
         </div>
@@ -125,14 +107,14 @@
          <!-- <h4>A un paso de conseguirlo todo</h4> -->
         </div>
         <div class="meta-list reg-option">
-         <!--  <p>Empieza tu registro como:</p> -->
          <p>@lang('labels.frontend.index.you_want_to_apply_as')</p>
+         <!--  <p>Empieza tu registro como:</p> -->
           <label class="cust-radio">@lang('labels.frontend.index.business')
             <input type="radio" checked="checked" name="user_group_id" value="4">            
             <span class="checkmark"></span>
           </label>
-
-          <label class="cust-radio"><!-- Profesional Independiente -->@lang('labels.frontend.index.professional_independent')
+          <!-- Profesional Independiente -->
+          <label class="cust-radio">@lang('labels.frontend.index.professional_independent')
             <input type="radio" name="user_group_id" value="3">
             <span class="checkmark"></span>
           </label>
@@ -143,7 +125,7 @@
           {{-- <button class="btn login-btn" type="submit">Siguiente</button> --}}
           <button class="btn login-btn" type="submit" id="nextScreen1">@lang('labels.frontend.index.continue')</button>
 
-       <!--    <center><p style="font-size: 16px;">Todo lo que registras acepta nuestros terminos condiciones</p></center> -->
+          <!-- <center><p style="font-size: 16px;">Todo lo que registras acepta nuestros terminos condiciones</p></center> -->
         </div>
 
         </form>
@@ -178,5 +160,3 @@
   
   </script>
 </html>
-
-
