@@ -181,6 +181,7 @@ class RegisterController extends Controller
                 $updateOtp['active'] = 1;
                 $updateOtp['is_verified'] =0;
                 $updateOtp['confirmed'] = 0;
+                $updateOtp['pro_credit'] = 10;
                 $updateOtp['updated_at'] = Carbon::now()->toDateTimeString();
                 if(DB::table('users')->where('id',$user->id)->update($updateOtp))
                 {
