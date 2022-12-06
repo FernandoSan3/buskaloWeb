@@ -84,8 +84,8 @@
                                    <h5>$<?php echo $value['price'] ?></h5>
                                  </div>
                                  <h6><?php echo $value['es_name'] ?></h6>
-                                     <p>Paquete de<br>Créditos <br><strong>$<?php echo  $value['price'] ?></strong></p>
-                                     <p>Cantidad de<br><strong><?php echo  $value['credit'] ?></strong> Créditos </p>
+                                     <p>Paquete de<br>Monedas <br><strong>$<?php echo  $value['price'] ?></strong></p>
+                                     <p>Cantidad de<br><strong><?php echo  $value['credit'] ?></strong> Monedas </p>
                                      <p>Descuento<br><strong><?php echo  $value['discount'] ?></strong></p>
                                   <a href="{{ url('payment/'.$value['id'].'/'.$value['es_name'].'/'.$userdata->id)}}" class="btn user_login gr-btn">
                                     <div class="cart-icon box-cart">

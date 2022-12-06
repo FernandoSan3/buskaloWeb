@@ -72,7 +72,7 @@ class SubscriptionController extends Controller
           $data = array(
             'username'=>$userdata->username,
             'receiver'=>$userdata->email,
-            'message'=>'Tu compra de recarga de créditos ha sido exitosa.',
+            'message'=>'Tu compra de recarga de monedas ha sido exitosa.',
             'total'=>$creditPak->price,
             'credit'=>$creditPak->credit,
             'packagename'=>$creditPak->es_name,

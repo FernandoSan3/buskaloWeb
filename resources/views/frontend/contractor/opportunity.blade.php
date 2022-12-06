@@ -70,7 +70,7 @@ li.nav-item .active {
                                         <div class="media-body">
                                         <h6 class="">{{ $opprtunity['service_name'] }}</h6>
                                         <span> {{ date('g:ia \o\n l jS F Y', strtotime($opprtunity['created_at'])) }}</span>
-                                        <p><span>Créditos: {{ number_format($opprtunity['credit'],2)}} </span></p>
+                                        <p><span>Monedas: {{ number_format($opprtunity['credit'],2)}} </span></p>
                                         </div>
                                         </div>
                                         </div>
@@ -101,7 +101,7 @@ li.nav-item .active {
                                         <div class="media-body">
                                         <h6 class="">{{ $opprtunity['service_name'] }}</h6>
                                         <span> {{ date('g:ia \o\n l jS F Y', strtotime($opprtunity['created_at'])) }}</span>
-                                        <p><span>Créditos: {{ number_format($opprtunity['credit'],2)}} </span></p>
+                                        <p><span>Monedas: {{ number_format($opprtunity['credit'],2)}} </span></p>
                                         </div>
                                         </div>
                                         </div>

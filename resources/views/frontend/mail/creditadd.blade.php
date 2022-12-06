@@ -56,7 +56,7 @@
                         <th>{{isset($data['packagename'])?$data['packagename']:''}}</th>
                     </tr>
                     <tr>
-                        <th>Créditos:</th>
+                        <th>Monedas:</th>
                         <th>{{isset($data['credit'])?$data['credit']:''}}</th>
                     </tr>
                     <tr>
