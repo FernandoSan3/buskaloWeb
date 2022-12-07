@@ -7764,9 +7764,7 @@ class ApiController extends Controller
                             }
                             else
                             {
-                                // $chkThreeUserLimit = DB::table('assign_service_request')
-                                // ->whereRaw("(service_request_id = '".$service_request."' AND request_status = '".'buy'."')")->count();
-                                $maxcount=DB::table('assign_service_request')->where('service_request_id = ',$service_request)->where('request_status','buy')->count();
+                                $maxcount=DB::table('assign_service_request')->where('service_request_id',$chkUserRecivedOpprtOrNot->service_request_id)->where('request_status','buy')->count();
 
                                 if($maxcount < 3)
                                 {
