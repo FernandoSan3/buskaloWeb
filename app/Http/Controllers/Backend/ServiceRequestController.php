@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
@@ -7,10 +8,14 @@ use App\Models\Services;
 use App\Models\Subservices;
 use App\Models\Questions;
 use App\Models\QuestionOptions;
+use App\Mail\NewOpportunity;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+
 use DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 
 class ServiceRequestController extends Controller
 {
@@ -212,8 +217,9 @@ class ServiceRequestController extends Controller
                         $service_credit=($service_credit*75)/100;
                     }
       // }
-       
+        $lang = ($service_requests->en_subservice_name == '.')?'es':'en';
         $serviceName=  $this->sendApportunityNotification($request_id,$service_credit);
+        $sendNotificaction= $this->serviceVerifyNotification($request_id, $lang);
        return redirect()->route('admin.service_request.index')->with('success','Request forward successfully.');
     }
 
@@ -475,4 +481,126 @@ class ServiceRequestController extends Controller
 
         return view('backend.service_requests.showservice_status',compact('service_requests'));
     }
+
+    public function serviceVerifyNotification($request_id, $lang)
+    {
+        $request_id = isset($request_id) && !empty($request_id) ? $request_id : '' ;
+        $lang =  !empty($lang) ? $lang : 'en' ;
+        App::setLocale($lang);
+
+        $getAllContCompny= DB::table('users')
+        ->select('users.username','users.email','users.avatar_location','users.user_group_id','user_devices.device_id','user_devices.device_type', 'assign_service_request.service_request_id','cities.name')
+        ->join('user_devices', 'users.id', '=', 'user_devices.user_id')
+        ->join('assign_service_request','assign_service_request.user_id','=','users.id')
+        ->join('service_request','service_request.id','=','assign_service_request.service_request_id')
+        ->join('cities','cities.id','=','service_request.city_id')
+        ->where('assign_service_request.service_request_id',$request_id)->get();
+        
+        $servicesRequestedQues = DB::table('service_request_questions')
+        ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
+        ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+        ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
+        ->whereRaw("(service_request_questions.service_request_id = '".$request_id."')")->get()->toArray(); 
+        $options=array();
+        $objDemo = new \stdClass();
+        $objQuestion= new \stdClass();
+
+        foreach ($servicesRequestedQues as $key => $que) 
+        {
+            $question=$que->es_title;
+            $data2['question'] = isset($question) && !empty($question) ? $question : '';
+            $option=$que->es_option;
+            $data2['option'] = $option;
+            array_push($options, $data2);
+        }
+        // Remove two last elements
+        array_pop($options);
+        array_pop($options);
+
+        foreach ($getAllContCompny as $key => $getuser)
+        {
+
+            $title='¡Nueva Oportunidad!';
+            if($lang=='en')
+            {
+                // $message='Great News: You have a new job opportunity for'.$serviceName.', check the details in your professional profile. At Buskalo we make your life easier.';
+                $message='Someone is looking for your services, enter OPPORTUNIDADES and get their information now!.';
+            }
+            else
+            {
+                $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
+            }
+            
+            $userId=0;
+            $prouserId=0;
+            $serviceId=0;
+            $senderId=0;
+            $reciverId=0;
+            $chatType=0;
+            $senderName=$getuser->username;
+            $notify_type='new_opportunity';
+            $device_id=isset($getuser->device_id)?$getuser->device_id:'';
+            $email = isset($getuser->email)?$getuser->email:'';
+            $avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
+            $objDemo->avatar_location=$avatar_location;
+            $objDemo->user_group_id = isset($getuser->user_group_id)?$getuser->user_group_id:'';
+            $objDemo->city_name = isset($getuser->name)?$getuser->name:'';
+            $objDemo->email = $email;
+            $objDemo->username = $senderName;
+            $objQuestion = $options;
+            
+            $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
+            Mail::to($email)->send(new NewOpportunity($objDemo, $objQuestion));
+
+            echo 'send all notification';
+        }
+    }
+    function postpushnotification($device_id,$title,$message,$userId=null,$prouserId=null,$serviceId=null,$senderid=null,$reciverid=null,$chattype=null,$senderName=null,$notify_type=null,$urlToken=null)
+    {
+        if(!empty($device_id))
+        {
+          $fields = array(
+             'to' => $device_id,
+              'data' =>array('title' => $title, 'message' => $message,'urlToken' => $urlToken,'userId'=>$userId,'prouserId'=>$prouserId,'serviceId'=>$serviceId, 'senderId'=>$senderid,'reciverId'=>$reciverid,'chatType'=>$chattype,'sendername'=>$senderName,'notify_type'=>$notify_type,'sound'=>'default'),
+            'notification'=>array('title'=>$title,'body'=>$message,'sound'=>'default')
+            );
+
+            $response = $this->sendPushNotification($fields);
+            return true;
+        }
+
+    }
+
+    function sendPushNotification($fields = array(), $usertype=Null)
+    {
+        
+        //echo '<pre>';print_r($fields); //exit;
+        $API_ACCESS_KEY = 'AAAAY4m_HMI:APA91bFYmFGdtenBYXUG3JSgVpnpHeX0M-c2Mx27rqFOOAN1_B3VnIhIi_xzc2jTAHTjaITaHp0YlinWa6Vzb_TE7shnxErycGn9tyFYXpbPR4bOmrKoqggpVB4-sVSYO1X8FHEbn-24';
+
+        $headers = array
+        (
+        'Authorization: key=' . $API_ACCESS_KEY,
+        'Content-Type: application/json'
+        );
+
+        $ch = curl_init();
+        curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+        curl_setopt( $ch,CURLOPT_POST, true );
+        curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+        // Execute post
+        $result = curl_exec($ch);
+        //print_r($result);//die;
+        sleep(5);
+        if ($result === FALSE) {
+            die('Curl failed: ' . curl_error($ch));
+        }
+        // Close connection
+        curl_close($ch);
+        return $result;    
+    }
+
 }
