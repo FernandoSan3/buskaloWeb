@@ -2833,89 +2833,29 @@ class ApiController extends Controller
             }
         } 
 
-        // GET ALL NOTIFICATION
+    // GET ALL NOTIFICATION
         
-        public function getNotificaton( $id){
-            $request_id = $id;
+    public function getNotificaton( $id){
+        $service_request = $id;
+        $olddate=date('Y-m-d H:i:s', strtotime('-8 days'));
 
-            $getAllContCompny= DB::table('users')
-            ->select('users.username','users.email','users.avatar_location','users.user_group_id','user_devices.device_id','user_devices.device_type', 'assign_service_request.service_request_id','cities.name')
-            ->join('user_devices', 'users.id', '=', 'user_devices.user_id')
-            ->join('assign_service_request','assign_service_request.user_id','=','users.id')
-            ->join('service_request','service_request.id','=','assign_service_request.service_request_id')
-            ->join('cities','cities.id','=','service_request.city_id')
-            ->where('assign_service_request.service_request_id',$request_id)->get();
-
-            $servicesRequestedQues = DB::table('service_request_questions')
-            ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
-            ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
-            ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
-            ->whereRaw("(service_request_questions.service_request_id = '".$request_id."')")->get()->toArray(); 
-            $options=array();
-            $objDemo = new \stdClass();
-            $objQuestion= new \stdClass();
-            foreach ($servicesRequestedQues as $key => $que) 
-            {
-                $question=$que->es_title;
-                $data2['question'] = isset($question) && !empty($question) ? $question : '';
-                $option=$que->es_option;
-                $data2['option'] = $option;
-                array_push($options, $data2);
-            }
-            // Remove two last elements
-            array_pop($options);
-            array_pop($options);
-
-            
-
-            foreach ($getAllContCompny as $key => $getuser)
-                {
-                    //Start Send OTP ON Mail to User
-                    $title='¡Nueva Oportunidad!';
-                    $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
-                    
-                    $objDemo->message = $message;
-                    $objDemo->footer_logo = url('img/logo/footer-logo.png');
-                    $objDemo->avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
-                    $objDemo->logo = url('img/logo/logo-svg.png');
-                    $objDemo->sender = 'Buskalo';
-                    
-                    $objDemo->user_icon = url('img/logo/logo.jpg');           
-
-                    $userId=0;
-                    $prouserId=0;
-                    $serviceId=0;
-                    $senderId=0;
-                    $reciverId=0;
-                    $chatType=0;
-                    $senderName=$getuser->username;
-                    $notify_type='new_opportunity';
-                    $device_id=isset($getuser->device_id)?$getuser->device_id:'';
-                    $email = isset($getuser->email)?$getuser->email:'';
-                    $avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
-                    $objDemo->avatar_location=$avatar_location;
-                    $objDemo->user_group_id = isset($getuser->user_group_id)?$getuser->user_group_id:'';
-                    $objDemo->city_name = isset($getuser->name)?$getuser->name:'';
-                    $objDemo->email = $email;
-                    $objDemo->username = $senderName;
-                    $objQuestion = $options;
-                    
-                        Mail::to($email)->send(new NewOpportunity($objDemo, $objQuestion));
-                }
-                
-            $resultArray['status']='1';
-            $resultArray['message']= $id;
-            $resultArray['data']=$getAllContCompny;
-            $resultArray['objDemo']=$objDemo;
-            $resultArray['objQuestion']=$objQuestion;
-
-            echo json_encode($resultArray); exit;
+        $maxcount=DB::table('assign_service_request')->where('service_request_id',$service_request)->where('request_status','buy')->count();
+        if($maxcount > 3)
+        {
+            $ent = 'es menor';
+        }else
+        {
+            $ent = 'es mayor';
         }
-          /*
-          * ************ SEND REQUEST BY USER *********************
-          *
-          * SEND REQUEST BY USER API END HERE
-          */
+            
+        $resultArray['status']='1';
+        $resultArray['message']= $id;
+        $resultArray['ent']= $ent;
+        $resultArray['dolddateata']=$olddate;
+        $resultArray['data']=$maxcount;
+
+        echo json_encode($resultArray); exit;
+    }
 
 
          //Send Req. to all contractor amnd Company
@@ -7487,221 +7427,208 @@ class ApiController extends Controller
              }
 
 
- /* ------------------------------------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------------------------------------ */
+
+    /* GET NEW OPPORTUNITIES API START */
 
     public function getNewOpportunities(Request $request)
     {
-
-        $access_token=123456;
         $allData=array();
         $userid = isset($request->userid) && !empty($request->userid) ? $request->userid : '' ;
-        $session_key = !empty($request->session_key) ? $request->session_key : '' ;
         $lang = !empty($request->lang) ? $request->lang : 'en' ;
         App::setLocale($lang);
 
         $olddate=date('Y-m-d H:i:s', strtotime('-8 days'));
-         $validator = Validator::make($request->all(), [
-                'userid' => 'required',
-                //'session_key' => 'required',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'userid' => 'required',
+        ]);
+        
+        if($validator->fails())
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameters.');
+            echo json_encode($resultArray); exit;      
+        } 
 
-            if($validator->fails())
+        if(!empty($userid)) 
+        {
+            $userEntity = DB::table('users')
+            ->whereRaw("(active=1)")
+            ->whereRaw("(id = '".$userid."' AND deleted_at IS null )")
+            ->first();
+
+            if(!empty($userEntity))
             {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid parameters.');
-                echo json_encode($resultArray); exit;      
-            } 
 
-            if(!empty($userid)) 
+                $servicesOffered=DB::table('services_offered')->select('service_id')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
+
+                if(!empty($servicesOffered))
                 {
-
-                    //$check_auth = $this->checkToken($access_token, $userid, $session_key, $lang );
-                    if(1!=1)
+                    $contractorServices=array();
+                    foreach ($servicesOffered as $val) 
                     {
-                        //echo json_encode($check_auth); exit;
+                        $contractorServices[]=$val->service_id;
                     }
-                    else
-                    {
-                        $userEntity = DB::table('users')
-                        ->whereRaw("(active=1)")
-                        ->whereRaw("(id = '".$userid."' AND deleted_at IS null )")
-                        ->first();
 
-                        if(!empty($userEntity))
+                    $allOpprtunities = DB::table('assign_service_request')
+                    ->join('service_request', 'assign_service_request.service_request_id', '=', 'service_request.id')
+                    ->leftjoin('services', 'service_request.service_id', '=', 'services.id')
+                    ->leftjoin('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
+                    ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
+                    ->leftjoin('category', 'service_request.category_id', '=', 'category.id')
+                    ->leftjoin('cities', 'cities.id', '=', 'service_request.city_id')
+                    ->select('assign_service_request.id','assign_service_request.request_not_now','assign_service_request.is_read','assign_service_request.service_request_id','assign_service_request.user_id','assign_service_request.request_status','service_request.service_id','service_request.location','service_request.username','service_request.status','service_request.email_verify','service_request.created_at','services.en_name', 'services.es_name', 'services.image', 'assign_service_request.assign_date', 'assign_service_request.credit','child_sub_services.en_name as childen','child_sub_services.es_name as childes','sub_services.en_name as suben','sub_services.es_name as subes','category.en_name as caten','category.es_name as cates','.assign_service_request.is_read','cities.name','assign_service_request.updated_at')
+                    ->whereRaw("(assign_service_request.user_id = '".$userid."' AND assign_service_request.deleted_at IS null AND assign_service_request.request_status IS null AND service_request.deleted_at IS null)")
+                    ->where('service_request.status','0')
+                    ->where('assign_service_request.created_at', '>',$olddate)
+                    ->orderBy('assign_service_request.created_at','DESC')
+                    ->groupBy('assign_service_request.service_request_id')->get();
+
+                    if(!empty($allOpprtunities))
+                    {
+                        $data1=array();
+                        foreach ($allOpprtunities as $key => $vall) 
                         {
 
-                        $servicesOffered=DB::table('services_offered')->select('service_id')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
-
-                            if(!empty($servicesOffered))
-                            {
-                                $contractorServices=array();
-                                foreach ($servicesOffered as $val) 
-                                {
-                                  $contractorServices[]=$val->service_id;
-                                }
-
-                                    $allOpprtunities = DB::table('assign_service_request')
-                                    ->join('service_request', 'assign_service_request.service_request_id', '=', 'service_request.id')
-                                    ->leftjoin('services', 'service_request.service_id', '=', 'services.id')
-                                    ->leftjoin('sub_services', 'service_request.sub_service_id', '=', 'sub_services.id')
-                                    ->leftjoin('child_sub_services', 'service_request.child_sub_service_id', '=', 'child_sub_services.id')
-                                    ->leftjoin('category', 'service_request.category_id', '=', 'category.id')
-                                    ->leftjoin('cities', 'cities.id', '=', 'service_request.city_id')
-                                    ->select('assign_service_request.id','assign_service_request.request_not_now','assign_service_request.is_read','assign_service_request.service_request_id','assign_service_request.user_id','assign_service_request.request_status','service_request.service_id','service_request.location','service_request.username','service_request.status','service_request.email_verify','service_request.created_at','services.en_name', 'services.es_name', 'services.image', 'assign_service_request.assign_date', 'assign_service_request.credit','child_sub_services.en_name as childen','child_sub_services.es_name as childes','sub_services.en_name as suben','sub_services.es_name as subes','category.en_name as caten','category.es_name as cates','.assign_service_request.is_read','cities.name','assign_service_request.updated_at')
-                                    ->whereRaw("(assign_service_request.user_id = '".$userid."' AND assign_service_request.deleted_at IS null AND assign_service_request.request_status IS null AND service_request.deleted_at IS null)")
-                                    ->where('service_request.status','0')
-                                    ->where('assign_service_request.created_at', '>',$olddate)
-                                    ->orderBy('assign_service_request.created_at','DESC')
-                                    ->groupBy('assign_service_request.service_request_id')->get();
-								
-                               if(!empty($allOpprtunities))
-                               {
-
-                                $data1=array();
-                                foreach ($allOpprtunities as $key => $vall) 
-                                {
-
-                                    $maxcount=DB::table('assign_service_request')->where('service_request_id',$vall->service_request_id)->where('request_status','buy')->count();
-                                  $hirereqst=DB::table('assign_service_request')->where('service_request_id',$vall->service_request_id)->where('request_status','buy')->where('hire_status',1)->where('user_id',$vall->user_id)->first();
-								  
-                                    if(empty($hirereqst))
-                                    {
-                                        if($maxcount<3)
-                                        {
-                                            $data1['id'] = $vall->id;
-                                            $data1['user_id'] = $vall->user_id;
-                                            $data1['is_read'] = $vall->is_read;
-                                            $data1['request_not_now'] = $vall->request_not_now;
-                                            $data1['service_request_id'] = $vall->service_request_id;
-                                            $data1['request_status'] = isset($vall->request_status) && !empty($vall->request_status) ? $vall->request_status : '';
-                                            $data1['service_id'] = $vall->service_id;
-                                            if($lang=='es')
-                                            {
-                                                $catname=$vall->cates;
-                                                $service_name=$vall->es_name;
-                                                $sub_service_name=isset($vall->subes)?$vall->subes:'';
-                                                $child_service_name=isset($vall->childes)?$vall->childes:'';
-                                            }
-                                            else
-                                            {   
-                                                $catname=$vall->caten;
-                                                $service_name=$vall->en_name;
-                                                $sub_service_name=isset($vall->suben)?$vall->suben:'';
-                                                $child_service_name=isset($vall->childen)?$vall->childen:'';
-                                            }
-                                            $data1['city_name'] = isset($vall->name)?$vall->name:'';
-                                            $data1['category_name'] = $catname;
-                                            $data1['service_name'] = $service_name;
-                                            $data1['sub_service_name'] = $sub_service_name;
-                                            $data1['child_service_name'] = $child_service_name;
-                                            $data1['service_image'] = url('/img/'.$vall->image);
-                                            $data1['location'] = $vall->location;
-                                            $data1['username'] = $vall->username;
-                                            $data1['approval_status'] = $userEntity->approval_status;
-                                            $data1['status'] = $vall->status;
-                                            $data1['email_verify'] = $vall->email_verify;
-                                            $data1['accept_date'] = date('d-m-Y', strtotime($vall->assign_date));
-                                            $data1['accept_time'] = date('H:i', strtotime($vall->assign_date));
-                                            $data1['credit'] = $vall->credit;
-                                            $data1['created_at'] = $vall->created_at;
-                                            $data1['updated_at'] = isset($vall->updated_at)?$vall->updated_at:'';
-                                            $data1['is_read'] =$vall->is_read;
-
-                                            
-                                            $servicesRequestedQues = DB::table('service_request_questions')
-                                            ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
-                                             ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
-                                            ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','service_request_questions.date_time','service_request_questions.fileName','service_request_questions.quantity','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option','questions.question_type')
-                                            ->whereRaw("(service_request_questions.service_request_id = '".$vall->service_request_id."')")->get()->toArray(); 
-
-                                            $options=array();
-
-                                            foreach ($servicesRequestedQues as $key => $que) 
-                                            {
-                                               $data2['id'] = $que->id;
-                                               $data2['service_request_id'] = $que->service_request_id;
-                                               $data2['question_id'] = $que->question_id;
-
-                                                if($lang=='es')
-                                                    {$question=$que->es_title;}
-                                                else{$question=$que->en_title;}
-
-                                               $data2['question'] = $question;
-
-                                               $data2['option_id'] = isset($que->option_id)?$que->option_id:'';
-                                               $data2['question_type'] = $que->question_type;
-                                               $data2['date_time'] = isset($que->date_time)?$que->date_time:'';
-                                               $data2['file_name'] = isset($que->fileName)? url('img/services/'.$que->fileName):'';
-                                               $data2['quantity'] = isset($que->quantity)?$que->quantity:'';
-
-                                                if($lang=='es')
-                                                    {$option=$que->es_option;}
-                                                else{$option=$que->en_option;}
-
-                                               $data2['option'] = $option;
-
-                                                array_push($options, $data2);
-                                            }
-
-                                            $data1['question_options']=$options ;
-                                            array_push($allData, $data1);
-                                        }
-                                    }
-                                }
-
-
-                                if(!empty($data1))
-                                {
-                                    $resultArray['status']='1';   
-                                    $resultArray['message']=trans('Lista de oportunidades encontrada correctamente.!');
-                                    $resultdata= $this->intToString($allData);
-                                    $resultArray['data'] =$resultdata; 
-                                    echo json_encode($resultArray); exit;   
-                                }
-                                else
-                                {
-                                    $resultArray['status']='0';   
-                                    $resultArray['message']=trans('Lista de oportunidades no encontrada.!');
-                                    echo json_encode($resultArray); exit;   
-                                }
-                                
-                                    
-                               }
-                               else
-                               {
-                                $resultArray['status']='0';
-                                $resultArray['message']=trans('Oportunidades no encontradas.');
-                                echo json_encode($resultArray); exit;
-                               }
-
-                            }
-                            else
-                            {
-                                $resultArray['status']='0';
-                                $resultArray['message']=trans('Actualice su perfil para los servicios que ofrece.');
-                                echo json_encode($resultArray); exit;  
-                            }
+                            // $maxcount=DB::table('assign_service_request')->where('service_request_id',$vall->service_request_id)->where('request_status','buy')->count();
+                            $hirereqst=DB::table('assign_service_request')->where('service_request_id',$vall->service_request_id)->where('request_status','buy')->where('hire_status',1)->where('user_id',$vall->user_id)->first();
                             
+                            if(empty($hirereqst))
+                            {
+                                // if($maxcount<3)
+                                // {
+                                    $data1['id'] = $vall->id;
+                                    $data1['user_id'] = $vall->user_id;
+                                    $data1['is_read'] = $vall->is_read;
+                                    $data1['request_not_now'] = $vall->request_not_now;
+                                    $data1['service_request_id'] = $vall->service_request_id;
+                                    $data1['request_status'] = isset($vall->request_status) && !empty($vall->request_status) ? $vall->request_status : '';
+                                    $data1['service_id'] = $vall->service_id;
+                                    if($lang=='es')
+                                    {
+                                        $catname=$vall->cates;
+                                        $service_name=$vall->es_name;
+                                        $sub_service_name=isset($vall->subes)?$vall->subes:'';
+                                        $child_service_name=isset($vall->childes)?$vall->childes:'';
+                                    }
+                                    else
+                                    {   
+                                        $catname=$vall->caten;
+                                        $service_name=$vall->en_name;
+                                        $sub_service_name=isset($vall->suben)?$vall->suben:'';
+                                        $child_service_name=isset($vall->childen)?$vall->childen:'';
+                                    }
+                                    $data1['city_name'] = isset($vall->name)?$vall->name:'';
+                                    $data1['category_name'] = $catname;
+                                    $data1['service_name'] = $service_name;
+                                    $data1['sub_service_name'] = $sub_service_name;
+                                    $data1['child_service_name'] = $child_service_name;
+                                    $data1['service_image'] = url('/img/'.$vall->image);
+                                    $data1['location'] = $vall->location;
+                                    $data1['username'] = $vall->username;
+                                    $data1['approval_status'] = $userEntity->approval_status;
+                                    $data1['status'] = $vall->status;
+                                    $data1['email_verify'] = $vall->email_verify;
+                                    $data1['accept_date'] = date('d-m-Y', strtotime($vall->assign_date));
+                                    $data1['accept_time'] = date('H:i', strtotime($vall->assign_date));
+                                    $data1['credit'] = $vall->credit;
+                                    $data1['created_at'] = $vall->created_at;
+                                    $data1['updated_at'] = isset($vall->updated_at)?$vall->updated_at:'';
+                                    $data1['is_read'] =$vall->is_read;
+
+                                    $servicesRequestedQues = DB::table('service_request_questions')
+                                    ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
+                                    ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+                                    ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','service_request_questions.date_time','service_request_questions.fileName','service_request_questions.quantity','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option','questions.question_type')
+                                    ->whereRaw("(service_request_questions.service_request_id = '".$vall->service_request_id."')")
+                                    ->get()->toArray();
+                                
+                                    $options=array();
+
+                                    foreach ($servicesRequestedQues as $key => $que) 
+                                    {
+                                        $data2['id'] = $que->id;
+                                        $data2['service_request_id'] = $que->service_request_id;
+                                        $data2['question_id'] = $que->question_id;
+
+                                        if($lang=='es')
+                                            {$question=$que->es_title;}
+                                        else{$question=$que->en_title;}
+
+                                        $data2['question'] = $question;
+
+                                        $data2['option_id'] = isset($que->option_id)?$que->option_id:'';
+                                        $data2['question_type'] = $que->question_type;
+                                        $data2['date_time'] = isset($que->date_time)?$que->date_time:'';
+                                        $data2['file_name'] = isset($que->fileName)? url('img/services/'.$que->fileName):'';
+                                        $data2['quantity'] = isset($que->quantity)?$que->quantity:'';
+
+                                        if($lang=='es')
+                                            {$option=$que->es_option;}
+                                        else{$option=$que->en_option;}
+
+                                        $data2['option'] = $option;
+
+                                        array_push($options, $data2);
+                                    }
+
+                                    $data1['question_options']=$options ;
+                                    array_push($allData, $data1);
+                                // }
+                            }
+                        }
+
+                        if(!empty($data1))
+                        {
+                            $resultArray['status']='1';   
+                            $resultArray['message']=trans('Lista de oportunidades encontrada correctamente.!');
+                            $resultdata= $this->intToString($allData);
+                            $resultArray['data'] =$resultdata; 
+                            echo json_encode($resultArray); exit;   
                         }
                         else
                         {
-                            $resultArray['status']='0';
-                            $resultArray['message']=trans('apimessage.Invalid user.');
-                            echo json_encode($resultArray); exit;  
+                            $resultArray['status']='0';   
+                            $resultArray['message']=trans('Lista de oportunidades no encontrada.!');
+                            echo json_encode($resultArray); exit;   
                         }
-
+                    
                     }
-                } 
-                else 
+                    else
+                    {
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('Oportunidades no encontradas.');
+                    echo json_encode($resultArray); exit;
+                    }
+
+                }
+                else
                 {
                     $resultArray['status']='0';
-                    $resultArray['message']=trans('apimessage.Invalid parameter.');
-                    echo json_encode($resultArray); exit;
+                    $resultArray['message']=trans('Actualice su perfil para los servicios que ofrece.');
+                    echo json_encode($resultArray); exit;  
                 }
+                            
+            }
+            else
+            {
+                $resultArray['status']='0';
+                $resultArray['message']=trans('apimessage.Invalid user.');
+                echo json_encode($resultArray); exit;  
+            }
+                    
+        }
+        else 
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameter.');
+            echo json_encode($resultArray); exit;
+        }
 
     }
 
-       
+    /* GET NEW OPPORTUNITIES API END */
+
 /* ------------------------------------------------------------------------------------------------ */
                 
                 
@@ -7769,8 +7696,7 @@ class ApiController extends Controller
 
 
 
-        /* --------------------Opportunity Buy Api Start-------------------- */
-
+    /* --------------------Opportunity Buy Api Start-------------------- */
 
     public function buyOpportunity(Request $request)
     {
@@ -7785,262 +7711,250 @@ class ApiController extends Controller
         $lang = !empty($request->lang) ? $request->lang : 'en' ;
         App::setLocale($lang);
 
-         $validator = Validator::make($request->all(), [
-                'userid' => 'required',
-                'user_group_id' => 'required',
-                'opportunity_id' => 'required',
-                'service_request' => 'required',
-                'hire_amount' => 'required',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'userid' => 'required',
+            'user_group_id' => 'required',
+            'opportunity_id' => 'required',
+            'service_request' => 'required',
+            'hire_amount' => 'required',
+        ]);
 
-            if($validator->fails())
-            {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid parameters.');
-                echo json_encode($resultArray); exit;      
-            } 
+        if($validator->fails())
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameters.');
+            echo json_encode($resultArray); exit;      
+        } 
 
-            if(!empty($userid) && !empty($opportunity_id)) 
+        if(!empty($userid) && !empty($opportunity_id)) 
+        {
+            $userEntity = DB::table('users')
+            ->whereRaw("(active=1)")
+            ->whereRaw("(id = '".$userid."' AND deleted_at IS null )")
+            ->first();
+            
+            if(!empty($userEntity))
             {
-                
-                     $userEntity = DB::table('users')
-                    ->whereRaw("(active=1)")
-                    ->whereRaw("(id = '".$userid."' AND deleted_at IS null )")
-                    ->first();
-                    if(!empty($userEntity))
+                $opportunity = DB::table('assign_service_request')
+                ->whereRaw("(id = '".$opportunity_id."' AND deleted_at IS null )")
+                ->first();
+
+                if($opportunity)
+                {
+                    if($opportunity->hire_status!='0')
                     {
-                        $opportunity = DB::table('assign_service_request')
-                        ->whereRaw("(id = '".$opportunity_id."' AND deleted_at IS null )")
-                        ->first();
-                        if($opportunity)
-                        {
-
-                            if($opportunity->hire_status!='0')
-                            {
-
-                                $resultArray['status']='0';
-                                $resultArray['message']=trans('Requested opportunity is already Assigned another professionals.');
-                                echo json_encode($resultArray); exit;
-
-                            }else
-                            {
-
-                                $chkUserRecivedOpprtOrNot = DB::table('assign_service_request')
-                                ->whereRaw("(id = '".$opportunity_id."' AND deleted_at IS null AND user_id = '".$userid."')")
-                                ->first();
-
-                                if(!empty($chkUserRecivedOpprtOrNot))
-                                {  
-
-                                    if($chkUserRecivedOpprtOrNot->request_status=='buy')
-                                    {
-                                     $resultArray['status']='0';
-                                     $resultArray['message']=trans('apimessage.opportunity_already_accepted');
-                                      echo json_encode($resultArray); exit;
-                                    }
-                                    else
-                                    {
-                                        $chkThreeUserLimit = DB::table('assign_service_request')
-                                            ->whereRaw("(service_request_id = '".$service_request."' AND request_status = '".'buy'."')")->count();
-                                        if($chkThreeUserLimit < 3)
-                                        {
-                                            $leftcredit = ($userEntity->pro_credit - $request->hire_amount);
-
-                                            if ($leftcredit >= 0) 
-                                            {
-                                                $updateArrPro['pro_credit'] = $leftcredit;
-                                                DB::table('users')->where('id', $userid)->update($updateArrPro);
-                                            
-                                                $admincrdit= DB::table('users')
-                                                    ->where('id',1)->first();
-
-                                                 DB::table('users')
-                                                    ->where('id',1)
-                                                    ->update(['pro_credit'=>$admincrdit->pro_credit+$request->hire_amount]);
-                                            } else {
-                                                $resultArray['status']='0';
-                                                $resultArray['message']=trans('apimessage.hire_amount');
-                                                echo json_encode($resultArray); exit;
-                                            }
-
-                                            $update_Arr['request_status'] ='buy'; 
-                                            $update_Arr['amount'] = $hire_amount;
-                                            $update_Arr['assign_date'] = Carbon::now();
-                                            $update_Arr['updated_at'] = Carbon::now();  
-                                            
-                                            DB::table('assign_service_request')
-                                            ->where('id',$opportunity_id)
-                                            ->where('user_id',$userid)
-                                            ->update($update_Arr);
-
-                                            $serviceId=DB::table('service_request')->where('id',$chkUserRecivedOpprtOrNot->service_request_id)->first();
-                                            if(!empty($serviceId))
-                                            {   
-
-                                                $userToken = DB::table('users')
-                                                ->leftjoin('user_devices','user_devices.user_id','=','users.id')
-                                                ->where('users.id',$serviceId->user_id)
-                                                ->select('user_devices.*', 'users.*')
-                                                ->first();
-                                                $email=$userToken->email;
-                                                $userToken->logo= url('img/logo/logo-svg.png');
-                                                $userToken->footer_logo=url('img/logo/footer-logo.png');
-                                                if(isset($userEntity->avatar_location) && !empty($userEntity->avatar_location))
-                                                {
-                                                    if($userEntity->user_group_id==3)
-                                                    {
-                                                        $userToken->user_icon=url('img/contractor/profile/'.$userEntity->avatar_location);
-                                                    }
-                                                    if($userEntity->user_group_id==4)
-                                                    {
-                                                        $userToken->user_icon=url('img/company/profile/'.$userEntity->avatar_location);
-                                                    }
-                                                    
-                                                }
-                                                else
-                                                {
-                                                    $userToken->user_icon=url('img/logo/logo.jpg');
-                                                }
-                                                
-                                                if($lang=='en')
-                                                {
-                                                    $userToken->message='Your service has been buyed by';
-                                                    $userEntity->message='You are successfully bought this service request';
-                                                }
-                                                else
-                                                {
-                                                    $userToken->message='Este profesional cumple con tus requisitos y está dispuesto a ayudarte con lo que necesitas';//'Tu servicio ha sido comprado por';
-                                                    $userEntity->message='Aquí está la información de una persona que puede llegar a ser tu mejor cliente';
-                                                }
-                                                //Pro buy mail send
-
-                                                $usermail=$userEntity->email;
-                                                $userEntity->clientName=$userToken->username;
-                                                $userEntity->addressdata=$userToken->address;
-                                                $userEntity->mobile_numberdata=$userToken->mobile_number;
-                                                $userEntity->useremail=$userToken->email;
-                                                $userEntity->logo= url('img/logo/logo-svg.png');
-                                                $userEntity->footer_logo=url('img/logo/footer-logo.png');
-                                                if($userEntity->user_group_id==3)
-                                                {
-                                                    $userEntity->link=url('dashboard');
-                                                }else
-                                                {
-                                                   $userEntity->link=url('dashboard'); 
-                                                }
-                                                
-                                                if(isset($userToken->avatar_location) && !empty($userToken->avatar_location))
-                                                {
-                                                    $userEntity->user_icon=url('img/user/profile/'.$userToken->avatar_location);
-                                                }
-                                                else
-                                                {
-                                                    $userEntity->user_icon=url('img/logo/logo.jpg');
-                                                }
-
-                                                Mail::send('frontend.mail.pro_service_buy', ['userToken'=>$userEntity], function($message) use($usermail) {
-                                                $message->to($usermail)->subject('Un nuevo cliente esperando por tí ');
-                                                $message->from(env('MAIL_FROM'));
-                                                    });
-
-                                                //Pro mail end
-
-
-                                                //user Mail send
-                                                $userToken->clientName=$userEntity->username;
-                                                $userToken->addressdata=$userEntity->address;
-                                                $userToken->mobile_numberdata=$userEntity->mobile_number;
-                                                $userToken->link=url('/company_profile/my-profile');
-                                                    Mail::send('frontend.mail.service_buy', ['userToken'=>$userToken], function($message) use($email) {
-                                                    $message->to($email)->subject
-                                                            ('Tenemos a alguien que quiere ayudarte ');
-                                                    $message->from(env('MAIL_FROM'));
-                                                    });
-                                                    //End mail
-                                                    $device_id=$userToken->device_id;
-                                                    $device_type=$userToken->device_type;
-                                                    //$title='Service buy';
-                                                    $title='¡Tenemos a un profesional dispuesto a ayudarte!';
-                                                    $message='Ingresa a la App y en la sección de PROYECTOS revisa su perfil completo y le puedes contactar directamente.';
-                                                    $userid= 0;
-                                                    $prouserId=0; 
-                                                    $serviceId=$service_request;
-                                                    $notify_type='service_buy';
-                                                    $senderId=0;
-                                                    $reciverId=0;
-                                                    $chatType=0;
-                                                    $senderName=$userEntity->username;
-                                                    // if($userToken->device_type=='android')
-                                                    // {
-                                                        $this->postpushnotification($device_id,$title,$message,$userid,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
-                                                    // }
-                                                    // if($userToken->device_type=='ios')
-                                                    // {
-                                                    //     $this->iospush($device_id,$title,$message,$userid,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
-                                                    // }
-                                            }else
-                                            {
-                                                $resultArray['status']='0';
-                                                $resultArray['message']=trans('Service Id not found.');
-                                                echo json_encode($resultArray); exit;
-
-                                            }
-
-                                            // $update_Arr['request_status'] ='buy'; 
-                                            // $update_Arr['amount'] = $hire_amount;
-                                            // $update_Arr['updated_at'] = Carbon::now();  
-                                            
-                                            // DB::table('assign_service_request')
-                                            // ->whereRaw("(id = '".$opportunity_id."' AND user_id = '".$userid."')")->update($update_Arr);
-
-
-
-                                            $resultArray['status']='1';
-                                            $resultArray['message']=trans('apimessage.opportunity_success');
-                                            echo json_encode($resultArray); exit;
-                                        }
-                                        else
-                                        {
-                                            $resultArray['status']='0';
-                                            $resultArray['message']=trans('apimessage.This Opportunity Already Taken By Another Three professionals OR Company');
-                                            echo json_encode($resultArray); exit; 
-                                        }
-                                    }   
-                                }
-                               else
-                               {
-                                    $resultArray['status']='0';
-                                    $resultArray['message']=trans("You don't have this opportunity.Please update your profile offerd services to get new Opportunities.");
-                                    echo json_encode($resultArray); exit;  
-                               }
-                            }
-                        }else
-                        {
-                            $resultArray['status']='0';
-                            $resultArray['message']=trans('apimessage.opportunity_id_not_found');
-                            echo json_encode($resultArray); exit;
-                        }
+                        $resultArray['status']='0';
+                        $resultArray['message']=trans('Requested opportunity is already Assigned another professionals.');
+                        echo json_encode($resultArray); exit;
                     }
                     else
                     {
-                        $resultArray['status']='0';
-                        $resultArray['message']=trans('apimessage.Invalid user.');
-                        echo json_encode($resultArray); exit;
+                        $chkUserRecivedOpprtOrNot = DB::table('assign_service_request')
+                        ->whereRaw("(id = '".$opportunity_id."' AND deleted_at IS null AND user_id = '".$userid."')")
+                        ->first();
+
+                        if(!empty($chkUserRecivedOpprtOrNot))
+                        {  
+
+                            if($chkUserRecivedOpprtOrNot->request_status=='buy')
+                            {
+                                $resultArray['status']='0';
+                                $resultArray['message']=trans('apimessage.opportunity_already_accepted');
+                                echo json_encode($resultArray); exit;
+                            }
+                            else
+                            {
+                                // $chkThreeUserLimit = DB::table('assign_service_request')
+                                // ->whereRaw("(service_request_id = '".$service_request."' AND request_status = '".'buy'."')")->count();
+                                $maxcount=DB::table('assign_service_request')->where('service_request_id = ',$service_request)->where('request_status','buy')->count();
+
+                                if($maxcount < 3)
+                                {
+                                    $leftcredit = ($userEntity->pro_credit - $request->hire_amount);
+
+                                    if ($leftcredit >= 0) 
+                                    {
+                                        // Reduce user credit
+                                        $updateArrPro['pro_credit'] = $leftcredit;
+                                        DB::table('users')->where('id', $userid)->update($updateArrPro);
+                                    
+                                        // Add admin credit
+                                        $admincrdit= DB::table('users')
+                                        ->where('id',1)->first();
+
+                                        DB::table('users')
+                                        ->where('id',1)
+                                        ->update(['pro_credit'=>$admincrdit->pro_credit+$request->hire_amount]);
+                                    } 
+                                    else 
+                                    {
+                                        $resultArray['status']='0';
+                                        $resultArray['message']=trans('apimessage.hire_amount');
+                                        echo json_encode($resultArray); exit;
+                                    }
+
+                                    $update_Arr['request_status'] ='buy'; 
+                                    $update_Arr['amount'] = $hire_amount;
+                                    $update_Arr['assign_date'] = Carbon::now();
+                                    $update_Arr['updated_at'] = Carbon::now();  
+                                    
+                                    DB::table('assign_service_request')
+                                    ->where('id',$opportunity_id)
+                                    ->where('user_id',$userid)
+                                    ->update($update_Arr);
+
+                                    $serviceId=DB::table('service_request')->where('id',$chkUserRecivedOpprtOrNot->service_request_id)->first();
+                                    if(!empty($serviceId))
+                                    {   
+                                        $userToken = DB::table('users')
+                                        ->leftjoin('user_devices','user_devices.user_id','=','users.id')
+                                        ->where('users.id',$serviceId->user_id)
+                                        ->select('user_devices.*', 'users.*')
+                                        ->first();
+                                        $email=$userToken->email;
+                                        $userToken->logo= url('img/logo/logo-svg.png');
+                                        $userToken->footer_logo=url('img/logo/footer-logo.png');
+                                        if(isset($userEntity->avatar_location) && !empty($userEntity->avatar_location))
+                                        {
+                                            if($userEntity->user_group_id==3)
+                                            {
+                                                $userToken->user_icon=url('img/contractor/profile/'.$userEntity->avatar_location);
+                                            }
+                                            if($userEntity->user_group_id==4)
+                                            {
+                                                $userToken->user_icon=url('img/company/profile/'.$userEntity->avatar_location);
+                                            }
+                                            
+                                        }
+                                        else
+                                        {
+                                            $userToken->user_icon=url('img/logo/logo.jpg');
+                                        }
+                                        
+                                        if($lang=='en')
+                                        {
+                                            $userToken->message='Your service has been buyed by';
+                                            $userEntity->message='You are successfully bought this service request';
+                                        }
+                                        else
+                                        {
+                                            $userToken->message='Este profesional cumple con tus requisitos y está dispuesto a ayudarte con lo que necesitas';//'Tu servicio ha sido comprado por';
+                                            $userEntity->message='Aquí está la información de una persona que puede llegar a ser tu mejor cliente';
+                                        }
+                                        //Pro buy mail send
+
+                                        $usermail=$userEntity->email;
+                                        $userEntity->clientName=$userToken->username;
+                                        $userEntity->addressdata=$userToken->address;
+                                        $userEntity->mobile_numberdata=$userToken->mobile_number;
+                                        $userEntity->useremail=$userToken->email;
+                                        $userEntity->logo= url('img/logo/logo-svg.png');
+                                        $userEntity->footer_logo=url('img/logo/footer-logo.png');
+                                        if($userEntity->user_group_id==3)
+                                        {
+                                            $userEntity->link=url('dashboard');
+                                        }else
+                                        {
+                                            $userEntity->link=url('dashboard'); 
+                                        }
+                                        
+                                        if(isset($userToken->avatar_location) && !empty($userToken->avatar_location))
+                                        {
+                                            $userEntity->user_icon=url('img/user/profile/'.$userToken->avatar_location);
+                                        }
+                                        else
+                                        {
+                                            $userEntity->user_icon=url('img/logo/logo.jpg');
+                                        }
+
+                                        Mail::send('frontend.mail.pro_service_buy', ['userToken'=>$userEntity], function($message) use($usermail) {
+                                        $message->to($usermail)->subject('Un nuevo cliente esperando por tí ');
+                                        $message->from(env('MAIL_FROM'));
+                                            });
+
+                                        //Pro mail end
+
+                                        //user Mail send
+                                        $userToken->clientName=$userEntity->username;
+                                        $userToken->addressdata=$userEntity->address;
+                                        $userToken->mobile_numberdata=$userEntity->mobile_number;
+                                        $userToken->link=url('/company_profile/my-profile');
+                                            Mail::send('frontend.mail.service_buy', ['userToken'=>$userToken], function($message) use($email) {
+                                            $message->to($email)->subject
+                                                    ('Tenemos a alguien que quiere ayudarte ');
+                                            $message->from(env('MAIL_FROM'));
+                                            });
+                                            //End mail
+                                            $device_id=$userToken->device_id;
+                                            $device_type=$userToken->device_type;
+                                            //$title='Service buy';
+                                            $title='¡Tenemos a un profesional dispuesto a ayudarte!';
+                                            $message='Ingresa a la App y en la sección de PROYECTOS revisa su perfil completo y le puedes contactar directamente.';
+                                            $userid= 0;
+                                            $prouserId=0; 
+                                            $serviceId=$service_request;
+                                            $notify_type='service_buy';
+                                            $senderId=0;
+                                            $reciverId=0;
+                                            $chatType=0;
+                                            $senderName=$userEntity->username;
+                                            
+                                            $this->postpushnotification($device_id,$title,$message,$userid,$prouserId,$serviceId,$senderId,$reciverId,$chatType,$senderName,$notify_type);
+                                            
+                                        // USER MAIL END
+                                    }else
+                                    {
+                                        $resultArray['status']='0';
+                                        $resultArray['message']=trans('Service Id not found.');
+                                        echo json_encode($resultArray); exit;
+
+                                    }
+ 
+                                    $resultArray['status']='1';
+                                    $resultArray['message']=trans('apimessage.opportunity_success');
+                                    echo json_encode($resultArray); exit;
+                                }
+                                else
+                                {
+                                    $resultArray['status']='0';
+                                    $resultArray['message']=trans('apimessage.This Opportunity Already Taken By Another Three professionals OR Company');
+                                    echo json_encode($resultArray); exit; 
+                                }
+                            }   
+                        }
+                        else
+                        {
+                            $resultArray['status']='0';
+                            $resultArray['message']=trans("You don't have this opportunity.Please update your profile offerd services to get new Opportunities.");
+                            echo json_encode($resultArray); exit;  
+                        }
                     }
-                
+                }
+                else
+                {
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.opportunity_id_not_found');
+                    echo json_encode($resultArray); exit;
+                }
             }
-            else 
+            else
             {
                 $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid parameter.');
+                $resultArray['message']=trans('apimessage.Invalid user.');
                 echo json_encode($resultArray); exit;
             }
+        } 
+        else 
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameter.');
+            echo json_encode($resultArray); exit;
+        }
     }
 
-        /* --------------------Opportunity Buy Api END-------------------- */
+    /* --------------------Opportunity Buy Api END-------------------- */
 
-         /* --------------------Opportunity IGNORE Api Start-------------------- */
-
+    /* --------------------Opportunity IGNORE Api Start-------------------- */
 
     public function ignoreOpportunity(Request $request)
     {
