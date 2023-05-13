@@ -267,7 +267,14 @@ class ApiController extends Controller
 					}
 					else
 					{
-						DB::table('user_devices')->where('user_id',$adminaprovel->id)->update(['device_type'=>$request->deviceType,'device_id'=>$request->deviceID]);
+                        DB::table('user_devices')->where('user_id',$adminaprovel->id)->update(['device_type'=>$request->deviceType,'device_id'=>$request->deviceID]);
+                        // if ($checkdeviceId->device_id != $request->deviceID) {
+                        //     DB::table('user_devices')->insert(['user_id'=>$adminaprovel->id,'device_type'=>$request->deviceType,'device_id'=>$request->deviceID]);
+                        // } else if ($checkdeviceId->device_type == $request->deviceType){
+                        //     DB::table('user_devices')->insert(['user_id'=>$adminaprovel->id,'device_type'=>$request->deviceType,'device_id'=>$request->deviceID]);
+                        // } else {
+						//     DB::table('user_devices')->where('user_id',$adminaprovel->id)->update(['device_type'=>$request->deviceType,'device_id'=>$request->deviceID]);
+                        // }
 					}
                     $resultArray['status']=1;        
                     $resultArray['type']='pending';        
@@ -2272,6 +2279,8 @@ class ApiController extends Controller
                 $deviceId = !empty($request->device_id) ? $request->device_id : '' ;
                 $deviceType = !empty($request->device_type) ? $request->device_type : '' ;
 
+                $otpcodeAux = 0;
+
                 $variable_fields_data = json_decode($ques_options);
                 $queOptionData = json_decode(json_encode($variable_fields_data), true);
                     App::setLocale($lang);
@@ -2381,6 +2390,7 @@ class ApiController extends Controller
 
                             $digits = 4;
                             $otpcode= rand(pow(10, $digits-1), pow(10, $digits)-1);
+                            $otpcodeAux = $otpcode;
 
                             if(empty($category_id) && !empty($service_id))
                             {
@@ -2625,6 +2635,7 @@ class ApiController extends Controller
                 $resultArray['status']='1';  
 
                  $resultArray['message']=trans('apimessage.your_email_account');
+                 $resultArray['opt']=$otpcodeAux;
                  $resultArray['request_id']=$serviceRequestId;
                  $resultArray['service_amount']=strval($service_credit);
                  $resultArray['register_status']=$registerData;
@@ -2835,26 +2846,53 @@ class ApiController extends Controller
 
     // GET ALL NOTIFICATION
         
-    public function getNotificaton( $id){
-        $service_request = $id;
-        $olddate=date('Y-m-d H:i:s', strtotime('-8 days'));
+    public function getNotificaton($id,$email,$deviceId,$device_type){
+        // $email = $id;
+        $getuser= DB::table('users')->where('email',$email)->first();
+        $request_id = 532;
+        $servicesRequestedQues = DB::table('service_request_questions')
+        ->leftjoin('questions', 'service_request_questions.question_id', '=', 'questions.id')
+        ->leftjoin('question_options', 'service_request_questions.option_id', '=', 'question_options.id')
+        ->select('service_request_questions.id','service_request_questions.service_request_id','service_request_questions.question_id','service_request_questions.option_id','questions.en_title','questions.es_title','question_options.en_option','question_options.es_option')
+        ->whereRaw("(service_request_questions.service_request_id = '".$request_id."')")->get()->toArray(); 
+        $options=array();
+        $objDemo = new \stdClass();
+        $objQuestion= new \stdClass();
 
-        $maxcount=DB::table('assign_service_request')->where('service_request_id',$service_request)->where('request_status','buy')->count();
-        if($maxcount > 3)
+        foreach ($servicesRequestedQues as $key => $que) 
         {
-            $ent = 'es menor';
-        }else
-        {
-            $ent = 'es mayor';
+            $question=$que->es_title;
+            $data2['question'] = isset($question) && !empty($question) ? $question : '';
+            $option=$que->es_option;
+            $data2['option'] = $option;
+            array_push($options, $data2);
         }
-            
-        $resultArray['status']='1';
-        $resultArray['message']= $id;
-        $resultArray['ent']= $ent;
-        $resultArray['dolddateata']=$olddate;
-        $resultArray['data']=$maxcount;
+        // Remove two last elements
+        array_pop($options);
+        array_pop($options);
+        $title='¡Nueva Oportunidad!';
+        $message='Alguién está buscando de tus servicios, ingresa a OPORTUNIDADES y obtén su información ahora!';
+        $objDemo = new \stdClass();
+        $userId=0;
+        $prouserId=0;
+        $serviceId=0;
+        $senderId=0;
+        $reciverId=0;
+        $chatType=0;
+        $senderName=$getuser->username;
+        $notify_type='new_opportunity';
+        $device_id=isset($getuser->device_id)?$getuser->device_id:'';
+        $email = isset($getuser->email)?$getuser->email:'';
+        $avatar_location = isset($getuser->avatar_location)?$getuser->avatar_location:'';
+        $objDemo->avatar_location=$avatar_location;
+        $objDemo->user_group_id = isset($getuser->user_group_id)?$getuser->user_group_id:'';
+        $objDemo->city_name = isset($getuser->name)?$getuser->name:'';
+        $objDemo->email = $email;
+        $objDemo->username = $senderName;
+        $objQuestion = $options;
+        Mail::to($email)->send(new NewOpportunity($objDemo, $objQuestion));
 
-        echo json_encode($resultArray); exit;
+        echo 'send all notification';
     }
 
 
@@ -6600,10 +6638,10 @@ class ApiController extends Controller
         App::setLocale($lang);
 
 
-          $validator = Validator::make($request->all(), [
-                    'userid' => 'required',
-                    ///'session_key' => 'required',
-                ]);
+        $validator = Validator::make($request->all(), [
+
+            'userid' => 'required',
+        ]);
 
         if($validator->fails())
         {
@@ -6631,7 +6669,7 @@ class ApiController extends Controller
 
                 if(!empty($userEntity))
                 {
-                    //Normal user 
+                    // START Normal user 
                     if($userEntity->user_group_id==2)
                     {
                         $users_count_var=DB::table('users')
@@ -6639,35 +6677,20 @@ class ApiController extends Controller
                         ->select('users.id','users.identity_no','users.user_group_id','users.email','users.username','users.dob','users.address','users.address_lat','users.address_long','users.office_address','users.office_address_lat','users.office_address_long','users.other_address','users.other_address_lat','users.other_address_long','users.mobile_number','users.landline_number','users.office_number','users.is_verified','users.active','avatar_location','users.created_at','users.updated_at','users.approval_status')->where('users.id',$userEntity->id)->first();
 
                         $users_count_var->identity_no = isset($users_count_var->identity_no) && !empty($users_count_var->identity_no) ? $users_count_var->identity_no : '';
-
                         $users_count_var->email = isset($users_count_var->email) && !empty($users_count_var->email) ? $users_count_var->email : '';
-
                         $users_count_var->username = isset($users_count_var->username) && !empty($users_count_var->username) ? $users_count_var->username : '';
-
                         $users_count_var->dob = isset($users_count_var->dob) && !empty($users_count_var->dob) ? $users_count_var->dob : '';
-
-                         $users_count_var->address = isset($users_count_var->address) && !empty($users_count_var->address) ? $users_count_var->address : '';
-
-                         $users_count_var->address_lat = isset($users_count_var->address_lat) && !empty($users_count_var->address_lat) ? $users_count_var->address_lat : '0';
-
-                         $users_count_var->address_long = isset($users_count_var->address_long) && !empty($users_count_var->address_long) ? $users_count_var->address_long : '0';
-
-                         $users_count_var->office_address = isset($users_count_var->office_address) && !empty($users_count_var->office_address) ? $users_count_var->office_address : '';
-
-                         $users_count_var->office_address_lat = isset($users_count_var->office_address_lat) && !empty($users_count_var->office_address_lat) ? $users_count_var->office_address_lat : '0';
-
-                         $users_count_var->office_address_long = isset($users_count_var->office_address_long) && !empty($users_count_var->office_address_long) ? $users_count_var->office_address_long : '0';
-
-                         $users_count_var->other_address = isset($users_count_var->other_address) && !empty($users_count_var->other_address) ? $users_count_var->other_address : '';
-
-                         $users_count_var->other_address_lat = isset($users_count_var->other_address_lat) && !empty($users_count_var->other_address_lat) ? $users_count_var->other_address_lat : '0';
-
-                         $users_count_var->other_address_long = isset($users_count_var->other_address_long) && !empty($users_count_var->other_address_long) ? $users_count_var->other_address_long : '0';
-
+                        $users_count_var->address = isset($users_count_var->address) && !empty($users_count_var->address) ? $users_count_var->address : '';
+                        $users_count_var->address_lat = isset($users_count_var->address_lat) && !empty($users_count_var->address_lat) ? $users_count_var->address_lat : '0';
+                        $users_count_var->address_long = isset($users_count_var->address_long) && !empty($users_count_var->address_long) ? $users_count_var->address_long : '0';
+                        $users_count_var->office_address = isset($users_count_var->office_address) && !empty($users_count_var->office_address) ? $users_count_var->office_address : '';
+                        $users_count_var->office_address_lat = isset($users_count_var->office_address_lat) && !empty($users_count_var->office_address_lat) ? $users_count_var->office_address_lat : '0';
+                        $users_count_var->office_address_long = isset($users_count_var->office_address_long) && !empty($users_count_var->office_address_long) ? $users_count_var->office_address_long : '0';
+                        $users_count_var->other_address = isset($users_count_var->other_address) && !empty($users_count_var->other_address) ? $users_count_var->other_address : '';
+                        $users_count_var->other_address_lat = isset($users_count_var->other_address_lat) && !empty($users_count_var->other_address_lat) ? $users_count_var->other_address_lat : '0';
+                        $users_count_var->other_address_long = isset($users_count_var->other_address_long) && !empty($users_count_var->other_address_long) ? $users_count_var->other_address_long : '0';
                         $users_count_var->mobile_number = isset($users_count_var->mobile_number) && !empty($users_count_var->mobile_number) ? $users_count_var->mobile_number : '';
-
                         $users_count_var->landline_number = isset($users_count_var->landline_number) && !empty($users_count_var->landline_number) ? $users_count_var->landline_number : '';
-
                         $users_count_var->office_number = isset($users_count_var->office_number) && !empty($users_count_var->office_number) ? $users_count_var->office_number : '';
 
 
@@ -6691,8 +6714,8 @@ class ApiController extends Controller
                         }
                         if(!empty($users_count_var->avatar_location))
                         {
-                         $path='/img/user/profile/';
-                         $users_count_var->avatar_location = url($path.$users_count_var->avatar_location);
+                            $path='/img/user/profile/';
+                            $users_count_var->avatar_location = url($path.$users_count_var->avatar_location);
                         }
                         else
                         {
@@ -6708,12 +6731,11 @@ class ApiController extends Controller
                         $resultArray['session_key']='';//$session_key;
                         echo json_encode($resultArray); exit;
                     }
-                    //End Normal user
+                    // END Normal user
 
                     //************************************************//
 
-                    //start Contractor & Company
-
+                    // START Contractor & Company
                     else if($userEntity->user_group_id==3 || $userEntity->user_group_id==4)
                     {
                         if($userEntity->user_group_id==3)
@@ -6750,17 +6772,14 @@ class ApiController extends Controller
                         if($userEntity->user_group_id==4)
                         {
                             $packageId= DB::table('payment_history')
-                                ->leftjoin('package','package.id','=','payment_history.package_id')
-                                ->where('user_id',$userid)
-                                ->orderBy('payment_history.id','DESC')->first();
+                            ->leftjoin('package','package.id','=','payment_history.package_id')
+                            ->where('user_id',$userid)
+                            ->orderBy('payment_history.id','DESC')->first();
                             $users_count_var->subscription_id=isset($packageId->package_id)?$packageId->package_id:0;
-                           $users_count_var->ruc_no = isset($users_count_var->ruc_no) && !empty($users_count_var->ruc_no) ? $users_count_var->ruc_no : '';
+                            $users_count_var->ruc_no = isset($users_count_var->ruc_no) && !empty($users_count_var->ruc_no) ? $users_count_var->ruc_no : '';
                             $users_count_var->legal_representative = isset($users_count_var->legal_representative) && !empty($users_count_var->legal_representative) ? $users_count_var->legal_representative : '';
-
-                             $users_count_var->website_address = isset($users_count_var->website_address) && !empty($users_count_var->website_address) ? $users_count_var->website_address : '';
-
-                              $users_count_var->year_of_constitution = isset($users_count_var->year_of_constitution) && !empty($users_count_var->year_of_constitution) ? $users_count_var->year_of_constitution : '';
-
+                            $users_count_var->website_address = isset($users_count_var->website_address) && !empty($users_count_var->website_address) ? $users_count_var->website_address : '';
+                            $users_count_var->year_of_constitution = isset($users_count_var->year_of_constitution) && !empty($users_count_var->year_of_constitution) ? $users_count_var->year_of_constitution : '';
                            if(!empty($users_count_var->username) && !empty($users_count_var->ruc_no) && !empty($users_count_var->legal_representative) && !empty($users_count_var->mobile_number))
                             {
                                 $users_count_var->is_profile_complete = true;
@@ -6769,19 +6788,19 @@ class ApiController extends Controller
                                  $users_count_var->is_profile_complete = false;
                             }
 
-                             $getAllReview = DB::table('reviews')
-                                 ->select(DB::raw('sum(rating) as total_rating'), DB::raw('COUNT(id) as total_rating_count'))
-                                 ->groupBy('to_user_id')
-                                 ->whereRaw("(reviews.to_user_id = '".$userid."' AND reviews.deleted_at IS null )")
-                                ->get()->toArray();
+                            $getAllReview = DB::table('reviews')
+                            ->select(DB::raw('sum(rating) as total_rating'), DB::raw('COUNT(id) as total_rating_count'))
+                            ->groupBy('to_user_id')
+                            ->whereRaw("(reviews.to_user_id = '".$userid."' AND reviews.deleted_at IS null )")
+                            ->get()->toArray();
 
                             
                             if(!empty($getAllReview))
                             {
                                 foreach ($getAllReview as $review) 
                                 {
-                                     $total=!empty($review->total_rating)?$review->total_rating:0;
-                                     $total_rating_count=!empty($review->total_rating_count)?$review->total_rating_count:0;
+                                    $total=!empty($review->total_rating)?$review->total_rating:0;
+                                    $total_rating_count=!empty($review->total_rating_count)?$review->total_rating_count:0;
 
                                 }
                             }
@@ -6794,95 +6813,89 @@ class ApiController extends Controller
                             }
                         
                             $getAllReview1 = DB::table('users')
-                             ->leftjoin('reviews', 'users.id', '=', 'reviews.user_id')
-                             ->select('users.id','users.user_group_id','users.avatar_location','users.username', 'reviews.rating', 'reviews.review')
-                             ->whereRaw("(reviews.to_user_id = '".$userid."')")
-                             ->where('user_group_id', 2)
-                             ->limit(3)
-                             ->orderBy('reviews.id', 'desc')
-                             ->get()->toArray();
+                            ->leftjoin('reviews', 'users.id', '=', 'reviews.user_id')
+                            ->select('users.id','users.user_group_id','users.avatar_location','users.username', 'reviews.rating', 'reviews.review')
+                            ->whereRaw("(reviews.to_user_id = '".$userid."')")
+                            ->where('user_group_id', 2)
+                            ->limit(3)
+                            ->orderBy('reviews.id', 'desc')
+                            ->get()->toArray();
 
-                               $options=array();
-                                $reviewData = array();
-                                $reviewData2 = array();
+                            $options=array();
+                            $reviewData = array();
+                            $reviewData2 = array();
                                
-                                foreach ($getAllReview1 as $key => $qualification) 
-                                {                      
-                                    $user_id=$qualification->id;
-                                    $reviewData['user_id'] = $qualification->id;
-                                    $reviewData['user_group_id']=$qualification->user_group_id;
-                                    if(!empty( $qualification->username))
-                                    {
-                                        $reviewData['username']=$qualification->username;
-                                    }
-                                    if($qualification->user_group_id==2)
-                                    {
-                                        $userprofilePath ='/img/user/profile/';
-                                           
-                                    }
-                                    if(!empty($profilePath.$qualification->avatar_location)) 
-                                    {
-                                            
-                                        $reviewData['profile']= isset($qualification->avatar_location) && !empty($qualification->avatar_location) ? url($userprofilePath.$qualification->avatar_location) : '';
-                                    } 
-                                    if(!empty($qualification->review)){
-                                       $reviewData['review']=$qualification->review;  
-                                    }
-
-                                    if(!empty($qualification->rating))
-                                    {
-                                        $reviewData['rating']=$qualification->rating;
-                                    }
-                                       
-                                        $reviewData2[] = $reviewData;
-                                }
-                                   
-                                if(!empty($reviewData2))
+                            foreach ($getAllReview1 as $key => $qualification) 
+                            {                      
+                                $user_id=$qualification->id;
+                                $reviewData['user_id'] = $qualification->id;
+                                $reviewData['user_group_id']=$qualification->user_group_id;
+                                if(!empty( $qualification->username))
                                 {
-                                    $data1['sub_services']=$options;
-                                    $users_count_var->review_list = $reviewData2;
+                                    $reviewData['username']=$qualification->username;
                                 }
+                                if($qualification->user_group_id==2)
+                                {
+                                    $userprofilePath ='/img/user/profile/';
+                                        
+                                }
+                                if(!empty($profilePath.$qualification->avatar_location)) 
+                                {
+                                        
+                                    $reviewData['profile']= isset($qualification->avatar_location) && !empty($qualification->avatar_location) ? url($userprofilePath.$qualification->avatar_location) : '';
+                                } 
+                                if(!empty($qualification->review)){
+                                    $reviewData['review']=$qualification->review;  
+                                }
+
+                                if(!empty($qualification->rating))
+                                {
+                                    $reviewData['rating']=$qualification->rating;
+                                }
+                                $reviewData2[] = $reviewData;
+                            }
+                                
+                            if(!empty($reviewData2))
+                            {
+                                $data1['sub_services']=$options;
+                                $users_count_var->review_list = $reviewData2;
+                            }
                         }
                         else if($userEntity->user_group_id==3)
                         {
-                           $packageId= DB::table('payment_history')
-                                ->leftjoin('package','package.id','=','payment_history.package_id')
-                                ->where('user_id',$userid)
-                                ->orderBy('payment_history.id','DESC')->first();
+                            $packageId= DB::table('payment_history')
+                            ->leftjoin('package','package.id','=','payment_history.package_id')
+                            ->where('user_id',$userid)
+                            ->orderBy('payment_history.id','DESC')->first();
+
                             $users_count_var->subscription_id=isset($packageId->package_id)?$packageId->package_id:0;
+                            $users_count_var->identity_no = isset($users_count_var->identity_no) && !empty($users_count_var->identity_no) ? $users_count_var->identity_no : '';
+                            $users_count_var->pro_credit = isset($users_count_var->pro_credit) && !empty($users_count_var->pro_credit) ? $users_count_var->pro_credit :0;
 
-                             $users_count_var->identity_no = isset($users_count_var->identity_no) && !empty($users_count_var->identity_no) ? $users_count_var->identity_no : '';
-                             $users_count_var->pro_credit = isset($users_count_var->pro_credit) && !empty($users_count_var->pro_credit) ? $users_count_var->pro_credit :0;
+                            if(!empty($users_count_var->username) && !empty($users_count_var->identity_no) && !empty($users_count_var->mobile_number))
+                            {
+                                $users_count_var->is_profile_complete = true;
+                            }else
+                            {
+                                $users_count_var->is_profile_complete = false;
+                            }
 
-                              if(!empty($users_count_var->username) && !empty($users_count_var->identity_no) && !empty($users_count_var->mobile_number))
-                                {
-                                    $users_count_var->is_profile_complete = true;
-                                }else
-                                {
-                                     $users_count_var->is_profile_complete = false;
+                            $getAllReview = DB::table('reviews')
+                            ->select(DB::raw('sum(rating) as total'),  DB::raw('COUNT(id) as total_rating_count'))
+                            ->groupBy('to_user_id')
+                            ->whereRaw("(reviews.to_user_id = '".$userid."' AND reviews.deleted_at IS null )")
+                            ->get()->toArray();
+
+
+                            if(!empty($getAllReview))
+                            {
+                                foreach ($getAllReview as $review) 
+                                {                                    
+                                    $total=!empty($review->total)?$review->total:0;
+                                    $total_rating_count=!empty($review->total_rating_count)?$review->total_rating_count:0;
                                 }
 
-                                 $getAllReview = DB::table('reviews')
-                                 ->select(DB::raw('sum(rating) as total'),  DB::raw('COUNT(id) as total_rating_count'))
-                                 ->groupBy('to_user_id')
-                                 ->whereRaw("(reviews.to_user_id = '".$userid."' AND reviews.deleted_at IS null )")
-                                ->get()->toArray();
-
-
-                                if(!empty($getAllReview))
-                                {
-                                    foreach ($getAllReview as $review) 
-                                    {
-                                       //$presentdata1['rating']= $review->rating;
-                                        
-                                         $total=!empty($review->total)?$review->total:0;
-                                         $total_rating_count=!empty($review->total_rating_count)?$review->total_rating_count:0;
-
-                                       //$alldata[]=$total;
-
-                                    }
-
-                                }
+                            }
 
                             if(!empty($total) && !empty($total_rating_count)){
 
@@ -6891,540 +6904,482 @@ class ApiController extends Controller
 
                             }
 
+                            $getAllReview1 = DB::table('users')
+                            ->leftjoin('reviews', 'users.id', '=', 'reviews.user_id')
+                            ->select('users.id','users.user_group_id','users.avatar_location','users.username', 'reviews.rating', 'reviews.review')
+                            ->whereRaw("(reviews.to_user_id = '".$userid."')")
+                            ->where('user_group_id', 2)
+                            ->limit(3)
+                            ->orderBy('reviews.id', 'desc')
+                            ->get()->toArray();
 
-                             $getAllReview1 = DB::table('users')
-                             ->leftjoin('reviews', 'users.id', '=', 'reviews.user_id')
-                             ->select('users.id','users.user_group_id','users.avatar_location','users.username', 'reviews.rating', 'reviews.review')
-                             ->whereRaw("(reviews.to_user_id = '".$userid."')")
-                             ->where('user_group_id', 2)
-                             ->limit(3)
-                             ->orderBy('reviews.id', 'desc')
-                             ->get()->toArray();
-
-                                // echo $getAllReview1->to_user_id; 
-                               $options=array();
-                               //echo "<pre>"; print_r($getAllReview1); die;
-                                $reviewData = array();
-                                $reviewData2 = array();
+                            $options=array();
+                            $reviewData = array();
+                            $reviewData2 = array();
                                
-                                    foreach ($getAllReview1 as $key => $qualification) 
-                                    {
-
-                                          
-                                        $user_id=$qualification->id;
-                                        $reviewData['user_id'] = $qualification->id;
-                                        $reviewData['user_group_id']=$qualification->user_group_id;
-                                        if(!empty( $qualification->username)){
-                                             $reviewData['username']=$qualification->username;
-                                        }
-                                       
-                                        
-                                        if($qualification->user_group_id==2)
-                                        {
-                                            $userprofilePath ='/img/user/profile/';
-                                           
-                                        }
-                                        if(!empty($profilePath.$qualification->avatar_location)) 
-                                        {
-                                            
-                                          $reviewData['profile']= isset($qualification->avatar_location) && !empty($qualification->avatar_location) ? url($userprofilePath.$qualification->avatar_location) : '';
-
-                                        } 
-                                        // else {
-                                        //    $reviewData['profile']= '';
-                                        // } 
-
-                                        if(!empty($qualification->review)){
-                                           $reviewData['review']=$qualification->review;  
-                                        }
-
-                                       if(!empty($qualification->rating)){
-                                         $reviewData['rating']=$qualification->rating;
-                                       }
-                                       
-                                        $reviewData2[] = $reviewData;
-                                    }
-                                   
-                               //print_r($reviewData2);die;
-
-                                if(!empty($reviewData2)){
-                                $data1['sub_services']=$options;
-                                    //array_push($allData, $reviewData2);
-                                $users_count_var->review_list = $reviewData2;
+                            foreach ($getAllReview1 as $key => $qualification) 
+                            {
+                                $user_id=$qualification->id;
+                                $reviewData['user_id'] = $qualification->id;
+                                $reviewData['user_group_id']=$qualification->user_group_id;
+                                if(!empty( $qualification->username)){
+                                    $reviewData['username']=$qualification->username;
                                 }
+                            
+                                if($qualification->user_group_id==2)
+                                {
+                                    $userprofilePath ='/img/user/profile/';
+                                }
+                                if(!empty($profilePath.$qualification->avatar_location)) 
+                                {
+                                    $reviewData['profile']= isset($qualification->avatar_location) && !empty($qualification->avatar_location) ? url($userprofilePath.$qualification->avatar_location) : '';
+                                }
+
+                                if(!empty($qualification->review)){
+                                    $reviewData['review']=$qualification->review;  
+                                }
+
+                                if(!empty($qualification->rating)){
+                                    $reviewData['rating']=$qualification->rating;
+                                }
+                                
+                                $reviewData2[] = $reviewData;
+                            }
+                                   
+                            if(!empty($reviewData2)){
+                                $data1['sub_services']=$options;
+                                $users_count_var->review_list = $reviewData2;
+                            }
+                        }
+                        $users_count_var->email = isset($users_count_var->email) && !empty($users_count_var->email) ? $users_count_var->email : '';
+                        $users_count_var->username = isset($users_count_var->username) && !empty($users_count_var->username) ? $users_count_var->username : '';
+                        $users_count_var->profile_title = isset($users_count_var->profile_title) && !empty($users_count_var->profile_title) ? $users_count_var->profile_title : '';
+                        $users_count_var->dob = isset($users_count_var->dob) && !empty($users_count_var->dob) ? $users_count_var->dob : '';
+                        $users_count_var->address = isset($users_count_var->address) && !empty($users_count_var->address) ? $users_count_var->address : '';
+                        $users_count_var->address_lat = isset($users_count_var->address_lat) && !empty($users_count_var->address_lat) ? $users_count_var->address_lat : '0';
+                        $users_count_var->address_long = isset($users_count_var->address_long) && !empty($users_count_var->address_long) ? $users_count_var->address_long : '0';
+                        $users_count_var->office_address = isset($users_count_var->office_address) && !empty($users_count_var->office_address) ? $users_count_var->office_address : '';
+                        $users_count_var->office_address_lat = isset($users_count_var->office_address_lat) && !empty($users_count_var->office_address_lat) ? $users_count_var->office_address_lat : '0';
+                        $users_count_var->office_address_long = isset($users_count_var->office_address_long) && !empty($users_count_var->office_address_long) ? $users_count_var->office_address_long : '0';
+                        $users_count_var->other_address = isset($users_count_var->other_address) && !empty($users_count_var->other_address) ? $users_count_var->other_address : '';
+                        $users_count_var->other_address_lat = isset($users_count_var->other_address_lat) && !empty($users_count_var->other_address_lat) ? $users_count_var->other_address_lat : '0';
+                        $users_count_var->other_address_long = isset($users_count_var->other_address_long) && !empty($users_count_var->other_address_long) ? $users_count_var->other_address_long : '0';
+                        $users_count_var->mobile_number = isset($users_count_var->mobile_number) && !empty($users_count_var->mobile_number) ? $users_count_var->mobile_number : '';
+                        $users_count_var->landline_number = isset($users_count_var->landline_number) && !empty($users_count_var->landline_number) ? $users_count_var->landline_number : '';
+                        $users_count_var->office_number = isset($users_count_var->office_number) && !empty($users_count_var->office_number) ? $users_count_var->office_number : '';                                    
+                        $users_count_var->profile_description = isset($users_count_var->profile_description) && !empty($users_count_var->profile_description) ? $users_count_var->profile_description : '';
+                        $users_count_var->total_employee = $users_count_var->total_employee;
+                        $settingEntity = DB::table('settings')->where('user_id',$userEntity->id)->first(); 
+
+                        if($settingEntity)
+                        {
+                            $users_count_var->lang =$settingEntity->app_language;
+                        }else
+                        {
+                            $users_count_var->lang =0;
+                        }
+                        if(!empty($users_count_var->avatar_location))
+                        {
+                            $path=$profilePath;
+                            $users_count_var->avatar_location = url($path.$users_count_var->avatar_location);
+                        }
+                        else
+                        {
+                            $users_count_var->avatar_location ="";
+                        }
+                        ///////////////////////Total Employees/////////////////
+                            //  $totalEmployee=DB::table('workers')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                            //  if(!empty($totalEmployee))
+                            // {
+                            //   $users_count_var->total_employee = count($totalEmployee);
+                            // }
+                            // else
+                            // {
+                            //    $users_count_var->total_employee="0";
+                            // }
+                        ///////////////////////Total Employees/////////////////
+
+                        ///////////////////////Total Balance/////////////////
+                        $totalAccountBalance=DB::table('bonus')->where('user_id',$userEntity->id)->where('expire_status','0')->whereRaw("(deleted_at IS null )")->first();
+                        if(!empty($totalAccountBalance))
+                        {
+                        $users_count_var->account_balance = $totalAccountBalance->current_balance;
+                        }
+                        else
+                        {
+                        $users_count_var->account_balance="0";
+                        }
+                                    
+                        ///////////////////////Total Balance/////////////////
+
+                        ///////////////////////Social Data/////////////////
+
+                        $datasocial=array();
+                        $socialData=DB::table('social_networks')->where('user_id',$userEntity->id)->whereRaw("(status = 1 AND deleted_at IS null )")->first(); 
+                        if(!empty($socialData))
+                        {
+                        
+                            $datasocial['facebook_url'] = isset($socialData->facebook_url) && !empty($socialData->facebook_url) ? $socialData->facebook_url : '';
+                            $datasocial['insta_url'] = isset($socialData->instagram_url) && !empty($socialData->instagram_url) ? $socialData->instagram_url : '';
+                            $datasocial['linkedin_url'] = isset($socialData->linkedin_url) && !empty($socialData->linkedin_url) ? $socialData->linkedin_url : '';
+                            $datasocial['twitter_url'] = isset($socialData->twitter_url) && !empty($socialData->twitter_url) ? $socialData->twitter_url : '';
+                            $datasocial['other_url'] = isset($socialData->other) && !empty($socialData->other) ? $socialData->other : '';
+                            $datasocial['created_at'] = isset($socialData->created_at) && !empty($socialData->created_at) ? $socialData->created_at : '';
+
                         }
 
-                            $users_count_var->email = isset($users_count_var->email) && !empty($users_count_var->email) ? $users_count_var->email : '';
+                        if(!empty($datasocial))
+                        {
+                            $users_count_var->social_url[] = $datasocial;
+                        }
+                        else
+                        {
+                            $users_count_var->social_url=[];
+                        }
 
-                            $users_count_var->username = isset($users_count_var->username) && !empty($users_count_var->username) ? $users_count_var->username : '';
-                            $users_count_var->profile_title = isset($users_count_var->profile_title) && !empty($users_count_var->profile_title) ? $users_count_var->profile_title : '';
+                        ///////////////////////Social Data/////////////////
 
-                            $users_count_var->dob = isset($users_count_var->dob) && !empty($users_count_var->dob) ? $users_count_var->dob : '';
+                        ///////////////////////services offered/////////////////
 
-                            $users_count_var->address = isset($users_count_var->address) && !empty($users_count_var->address) ? $users_count_var->address : '';
+                        $srname="";$ssubrname="";
+                        if($lang=='es')
+                        {
+                            $srname='services.es_name AS service_name';
+                            $ssubrname='sub_services.es_name AS sub_service_name';
+                        }
+                        else
+                        {
+                            $srname='services.en_name AS service_name';
+                            $ssubrname='sub_services.en_name AS sub_service_name';
+                        }
 
-                             $users_count_var->address_lat = isset($users_count_var->address_lat) && !empty($users_count_var->address_lat) ? $users_count_var->address_lat : '0';
 
-                             $users_count_var->address_long = isset($users_count_var->address_long) && !empty($users_count_var->address_long) ? $users_count_var->address_long : '0';
+                        $servicesOffered = DB::table('services_offered')
+                        ->leftjoin('services', 'services_offered.service_id', '=', 'services.id')
+                        ->leftjoin('sub_services', 'services_offered.sub_service_id', '=', 'sub_services.id')
+                        ->select('services_offered.id','services_offered.user_id','services_offered.service_id',$srname,'services_offered.sub_service_id',$ssubrname,'services_offered.created_at')
+                        ->where('services_offered.user_id',$userEntity->id)->whereRaw("(services_offered.deleted_at IS null )")->orderBy('created_at', 'ASC')->groupBy('services_offered.service_id')->get()->toArray();
 
-                             $users_count_var->office_address = isset($users_count_var->office_address) && !empty($users_count_var->office_address) ? $users_count_var->office_address : '';
-
-                             $users_count_var->office_address_lat = isset($users_count_var->office_address_lat) && !empty($users_count_var->office_address_lat) ? $users_count_var->office_address_lat : '0';
-
-                             $users_count_var->office_address_long = isset($users_count_var->office_address_long) && !empty($users_count_var->office_address_long) ? $users_count_var->office_address_long : '0';
-                             $users_count_var->other_address = isset($users_count_var->other_address) && !empty($users_count_var->other_address) ? $users_count_var->other_address : '';
-
-                             $users_count_var->other_address_lat = isset($users_count_var->other_address_lat) && !empty($users_count_var->other_address_lat) ? $users_count_var->other_address_lat : '0';
-
-                             $users_count_var->other_address_long = isset($users_count_var->other_address_long) && !empty($users_count_var->other_address_long) ? $users_count_var->other_address_long : '0';
-
-                            $users_count_var->mobile_number = isset($users_count_var->mobile_number) && !empty($users_count_var->mobile_number) ? $users_count_var->mobile_number : '';
-
-                            $users_count_var->landline_number = isset($users_count_var->landline_number) && !empty($users_count_var->landline_number) ? $users_count_var->landline_number : '';
-
-                            $users_count_var->office_number = isset($users_count_var->office_number) && !empty($users_count_var->office_number) ? $users_count_var->office_number : '';
-
-                                       
-                            $users_count_var->profile_description = isset($users_count_var->profile_description) && !empty($users_count_var->profile_description) ? $users_count_var->profile_description : '';
-
-                            $users_count_var->total_employee = $users_count_var->total_employee;
-
-                            $settingEntity = DB::table('settings')->where('user_id',$userEntity->id)->first(); 
-
-                            if($settingEntity)
+                        if(!empty($servicesOffered))
+                        {
+                            $data1=array();
+                            $allData=array();
+                            foreach ($servicesOffered as $key => $vall) 
                             {
-                                $users_count_var->lang =$settingEntity->app_language;
-                            }else
-                            {
-                                $users_count_var->lang =0;
+                                $data1['id'] = $vall->id;
+                                $data1['service_id'] = !empty($vall->service_id) ? $vall->service_id : '' ;
+                                $data1['service_name'] = !empty($vall->service_name) ? $vall->service_name : '' ;
+                                $data1['created_at'] =  $vall->created_at;
+                                
+                                $subServicesOffered = DB::table('services_offered')
+                                ->leftjoin('sub_services', 'services_offered.sub_service_id', '=', 'sub_services.id')
+                                ->select('services_offered.sub_service_id',$ssubrname)
+                                ->where('services_offered.user_id',$userEntity->id)
+                                ->where('services_offered.service_id',$vall->service_id)
+                                ->whereRaw("(services_offered.deleted_at IS null )")
+                                ->get()->toArray();
+
+                                $options=array();
+                                foreach ($subServicesOffered as $key => $vvalue) 
+                                {
+                                    if(!empty($vvalue->sub_service_id) && !empty($vvalue->sub_service_name))
+                                    {
+                                        $data2['sub_service_id'] =  !empty($vvalue->sub_service_id) ? $vvalue->sub_service_id : '' ;
+                                        $data2['sub_service_name'] =  !empty($vvalue->sub_service_name) ? $vvalue->sub_service_name : '' ;
+                                        array_push($options, $data2);
+                                    }
+                                }
+                                
+                                $data1['sub_services']=$options;
+                                array_push($allData, $data1);
                             }
-                            if(!empty($users_count_var->avatar_location))
+
+                            $users_count_var->services_offered = $allData;
+                        }
+                        else
+                        {
+                            $users_count_var->services_offered=[];
+                        }
+
+                        ///////////////////////services offered/////////////////
+
+                        ///////////////////////Payment Methods/////////////////
+
+                        $methodName="";
+                        if($lang=='es')
+                        {$methodName='payment_methods.name_es AS method_name';}
+                        else{$methodName='payment_methods.name_en AS method_name';}
+
+                        $usersPayMethod = DB::table('user_payment_methods')
+                        ->leftjoin('payment_methods', 'user_payment_methods.payment_method_id', '=', 'payment_methods.id')
+                        ->select('user_payment_methods.id','user_payment_methods.user_id','user_payment_methods.payment_method_id',$methodName,'user_payment_methods.status','user_payment_methods.created_at')
+                        ->where('user_payment_methods.user_id',$userEntity->id)->whereRaw("(user_payment_methods.deleted_at IS null )")
+                        ->get()->toArray();
+
+                        if(!empty($usersPayMethod))
+                        {
+                            $users_count_var->payment_methods = $usersPayMethod;
+                        }
+                        else
+                        {
+                            $users_count_var->payment_methods=[];
+                        }
+
+                        ///////////////////////Payment Methods/////////////////
+
+                        ///////////////////////Gallery/////////////////
+
+                        $allImages=DB::table('users_images_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                        $allImages2=array();
+                        $allVideo2=array();
+                        if(!empty($allImages))
+                        {
+                            $path=$galleryPath.$userEntity->id.'/';
+                            foreach ($allImages as $key => $value) 
                             {
-                                $path=$profilePath;
-                                $users_count_var->avatar_location = url($path.$users_count_var->avatar_location);
+                                $allImages1['id']=$value->id;
+                                $allImages1['user_id']=$value->user_id;
+                                $allImages1['file_name']=url($path.$value->file_name);
+                                $allImages1['file_type']=$value->file_type;
+                                $allImages1['status']=$value->status;
+                                $allImages1['created_at']=$value->created_at;
+                                array_push($allImages2, $allImages1);
+                            }
+                        
+                            $users_count_var->gallery['images'] = $allImages2;
+                        }
+                        else
+                        {
+                            $users_count_var->gallery['images']=[];
+                        }
+
+                        $allVideos=DB::table('users_videos_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
+
+                        if(!empty($allVideos))
+                        {
+                            $path=$videoPath.$userEntity->id.'/';
+                            foreach ($allVideos as $key => $value) 
+                            {
+                                $allVideo1['id']=$value->id;
+                                $allVideo1['user_id']=$value->user_id;
+                                $allVideo1['file_name']=url($path.$value->file_name);
+                                $allVideo1['file_type']=$value->file_type;
+                                $allVideo1['status']=$value->status;
+                                $allVideo1['created_at']=$value->created_at;
+                                array_push($allVideo2, $allVideo1);
+                            }
+                            $users_count_var->gallery['videos'] = $allVideo2;
+                        }
+                        else
+                        {
+                        $users_count_var->gallery['videos']=[];
+                        }
+                        ///////////////////////Gallery/////////////////
+
+                        ///////////////////////Users Documents/////////////////
+                        $certi2=array();$certi3=array();
+                        $policeR2=array(); $policeR3=array();
+
+                        $allCertificatesImages=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                    
+                        if(!empty($allCertificatesImages))
+                        {
+                            $path=$certifiePath.$userEntity->id.'/img/';
+                            foreach ($allCertificatesImages as $key => $value) 
+                            {
+                                $allImages1['id']=$value->id;
+                                $allImages1['user_id']=$value->user_id;
+                                $allImages1['file_name']=url($path.$value->file_name);
+                                $allImages1['file_extension']=!empty($value->file_extension)?$value->file_extension:'';
+                                $allImages1['status']=!empty($value->status)?$value->status:0;
+                                $allImages1['is_verified']=!empty($value->is_verified)?$value->is_verified:0;
+                                $allImages1['created_at']=$value->created_at;
+                                array_push($certi2, $allImages1);
+                            }
+                            $users_count_var->cetifications['images'] = $certi2;
+                        }
+                        else
+                        {
+                        $users_count_var->cetifications['images']=[];
+                        }
+
+                        $DocallCertificates=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
+                                    
+                        if(!empty($DocallCertificates))
+                        {
+                            $path=$certifiePath.$userEntity->id.'/doc/';
+                            foreach ($DocallCertificates as $key => $val22) 
+                            {
+                                $allDoc['id']=$val22->id;
+                                $allDoc['user_id']=$val22->user_id;
+                                $allDoc['file_name']=url($path.$val22->file_name);
+                                $allDoc['file_extension']=!empty($val22->file_extension)?$val22->file_extension:'';
+                                $allDoc['status']=!empty($val22->status)?$val22->status:'';
+                                $allDoc['created_at']=$val22->created_at;
+                                array_push($certi3, $allDoc);
+                            }
+                            $users_count_var->cetifications['documents'] = $certi3;
+                        }
+                        else
+                        {
+                        $users_count_var->cetifications['documents']=[];
+                        }
+                        ///////////////////////Users Documents/////////////////
+
+                        /////////////////////Police Record////////////////////////////
+
+                        if($userEntity->user_group_id==3)
+                        {
+                            $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
+
+                            if(!empty($allPoliceRecImage))
+                            {
+                                $path=$policePath.$userEntity->id.'/img/';
+                                foreach ($allPoliceRecImage as $key => $value) 
+                                {
+                                    $allVideo1['id']=$value->id;
+                                    $allVideo1['user_id']=$value->user_id;
+                                    $allVideo1['file_name']=url($path.$value->file_name);
+                                    $allVideo1['file_type']=$value->file_type;
+                                    $allVideo1['file_extension']=$value->file_extension;
+                                    $allVideo1['status']=$value->status;
+                                    $allVideo1['is_verified']=$value->is_verified;
+                                    $allVideo1['created_at']=$value->created_at;
+                                    array_push($policeR2, $allVideo1);
+                                }
+                                $users_count_var->police_records['images'] = $policeR2;
+                                $users_count_var->police_records_verified['verifiedI'] = $value->is_verified;
                             }
                             else
                             {
-                                $users_count_var->avatar_location ="";
+                                $users_count_var->police_records['images']=[];
+                                $users_count_var->police_records_verified['verifiedI'] = 2;
                             }
-                                  ///////////////////////Total Employees/////////////////
 
-                                     //  $totalEmployee=DB::table('workers')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
-                                     //  if(!empty($totalEmployee))
-                                     // {
-                                     //   $users_count_var->total_employee = count($totalEmployee);
-                                     // }
-                                     // else
-                                     // {
-                                     //    $users_count_var->total_employee="0";
-                                     // }
-                                 
-                                  ///////////////////////Total Employees/////////////////
+                            $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
 
-                                 ///////////////////////Total Balance/////////////////
-
-                                       
-
-                                          $totalAccountBalance=DB::table('bonus')->where('user_id',$userEntity->id)->where('expire_status','0')->whereRaw("(deleted_at IS null )")->first();
-                                          if(!empty($totalAccountBalance))
-                                         {
-                                           $users_count_var->account_balance = $totalAccountBalance->current_balance;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->account_balance="0";
-                                         }
-                                     
-                                      ///////////////////////Total Balance/////////////////
-     
-                                      ///////////////////////Social Data/////////////////
-
-                                    $datasocial=array();
-                                    $socialData=DB::table('social_networks')->where('user_id',$userEntity->id)->whereRaw("(status = 1 AND deleted_at IS null )")->first(); 
-                                        if(!empty($socialData))
-                                        {
-                                        
-                                            $datasocial['facebook_url'] = isset($socialData->facebook_url) && !empty($socialData->facebook_url) ? $socialData->facebook_url : '';
-
-                                            $datasocial['insta_url'] = isset($socialData->instagram_url) && !empty($socialData->instagram_url) ? $socialData->instagram_url : '';
-
-                                            $datasocial['linkedin_url'] = isset($socialData->linkedin_url) && !empty($socialData->linkedin_url) ? $socialData->linkedin_url : '';
-                                            $datasocial['twitter_url'] = isset($socialData->twitter_url) && !empty($socialData->twitter_url) ? $socialData->twitter_url : '';
-                                            $datasocial['other_url'] = isset($socialData->other) && !empty($socialData->other) ? $socialData->other : '';
-                                            $datasocial['created_at'] = isset($socialData->created_at) && !empty($socialData->created_at) ? $socialData->created_at : '';
-
-                                        }
-
-                                        if(!empty($datasocial))
-                                         {
-                                           $users_count_var->social_url[] = $datasocial;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->social_url=[];
-                                         }
-
-                                  ///////////////////////Social Data/////////////////
-
-
-                                  ///////////////////////services offered/////////////////
-
-                                      $srname="";$ssubrname="";
-                                    if($lang=='es')
-                                    {
-                                        $srname='services.es_name AS service_name';
-                                        $ssubrname='sub_services.es_name AS sub_service_name';
-                                    }
-                                    else
-                                    {
-                                        $srname='services.en_name AS service_name';
-                                        $ssubrname='sub_services.en_name AS sub_service_name';
-                                    }
-
-
-                                     $servicesOffered = DB::table('services_offered')
-                                    ->leftjoin('services', 'services_offered.service_id', '=', 'services.id')
-                                    ->leftjoin('sub_services', 'services_offered.sub_service_id', '=', 'sub_services.id')
-                                    ->select('services_offered.id','services_offered.user_id','services_offered.service_id',$srname,'services_offered.sub_service_id',$ssubrname,'services_offered.created_at')
-                                    ->where('services_offered.user_id',$userEntity->id)->whereRaw("(services_offered.deleted_at IS null )")->orderBy('created_at', 'ASC')->groupBy('services_offered.service_id')->get()->toArray();
-
-                                    if(!empty($servicesOffered))
-                                    {
-                                            $data1=array();
-                                            $allData=array();
-                                            foreach ($servicesOffered as $key => $vall) 
-                                            {
-
-                                                $data1['id'] = $vall->id;
-                                                $data1['service_id'] = !empty($vall->service_id) ? $vall->service_id : '' ;
-                                                $data1['service_name'] = !empty($vall->service_name) ? $vall->service_name : '' ;
-                                                $data1['created_at'] =  $vall->created_at;
-                                              
-                                                $subServicesOffered = DB::table('services_offered')
-                                                ->leftjoin('sub_services', 'services_offered.sub_service_id', '=', 'sub_services.id')
-                                                ->select('services_offered.sub_service_id',$ssubrname)
-                                                ->where('services_offered.user_id',$userEntity->id)
-                                                ->where('services_offered.service_id',$vall->service_id)
-                                                ->whereRaw("(services_offered.deleted_at IS null )")
-                                                ->get()->toArray();
-
-                                                $options=array();
-                                                foreach ($subServicesOffered as $key => $vvalue) 
-                                                {
-                                                    if(!empty($vvalue->sub_service_id) && !empty($vvalue->sub_service_name))
-                                                    {
-                                                        $data2['sub_service_id'] =  !empty($vvalue->sub_service_id) ? $vvalue->sub_service_id : '' ;
-                                                        $data2['sub_service_name'] =  !empty($vvalue->sub_service_name) ? $vvalue->sub_service_name : '' ;
-
-                                                        array_push($options, $data2);
-                                                    }
-                                                }
-                                               
-                                                $data1['sub_services']=$options;
-                                                array_push($allData, $data1);
-                                            }
-
-                                            $users_count_var->services_offered = $allData;
-                                    }
-                                     else
-                                     {
-                                        $users_count_var->services_offered=[];
-                                     }
-
-                                    ///////////////////////services offered/////////////////
-
-
-                                     ///////////////////////Payment Methods/////////////////
-
-                                     $methodName="";
-                                      if($lang=='es')
-                                        {$methodName='payment_methods.name_es AS method_name';}
-                                     else{$methodName='payment_methods.name_en AS method_name';}
-
-                                      $usersPayMethod = DB::table('user_payment_methods')
-                                    ->leftjoin('payment_methods', 'user_payment_methods.payment_method_id', '=', 'payment_methods.id')
-                                    ->select('user_payment_methods.id','user_payment_methods.user_id','user_payment_methods.payment_method_id',$methodName,'user_payment_methods.status','user_payment_methods.created_at')
-                                    ->where('user_payment_methods.user_id',$userEntity->id)->whereRaw("(user_payment_methods.deleted_at IS null )")->get()->toArray();
-
-                                         if(!empty($usersPayMethod))
-                                         {
-                                           $users_count_var->payment_methods = $usersPayMethod;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->payment_methods=[];
-                                         }
-
-                                         ///////////////////////Payment Methods/////////////////
-
-
-                                         ///////////////////////Gallery/////////////////
-
-                                          $allImages=DB::table('users_images_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
-                                          $allImages2=array();
-                                          $allVideo2=array();
-                                         if(!empty($allImages))
-                                         {
-                                            $path=$galleryPath.$userEntity->id.'/';
-                                            foreach ($allImages as $key => $value) 
-                                            {
-                                                $allImages1['id']=$value->id;
-                                                $allImages1['user_id']=$value->user_id;
-                                                $allImages1['file_name']=url($path.$value->file_name);
-                                                $allImages1['file_type']=$value->file_type;
-                                                $allImages1['status']=$value->status;
-                                                $allImages1['created_at']=$value->created_at;
-                                                array_push($allImages2, $allImages1);
-                                            }
-                                            
-                                            $users_count_var->gallery['images'] = $allImages2;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->gallery['images']=[];
-                                         }
-
-
-                                         $allVideos=DB::table('users_videos_gallery')->select('id','user_id','file_name','file_type','status','created_at')->where('user_id',$userEntity->id)->whereRaw("(deleted_at IS null )")->get()->toArray();
-
-                                         if(!empty($allVideos))
-                                         {
-                                           $path=$videoPath.$userEntity->id.'/';
-                                            foreach ($allVideos as $key => $value) 
-                                            {
-                                                $allVideo1['id']=$value->id;
-                                                $allVideo1['user_id']=$value->user_id;
-                                                $allVideo1['file_name']=url($path.$value->file_name);
-                                                $allVideo1['file_type']=$value->file_type;
-                                                $allVideo1['status']=$value->status;
-                                                $allVideo1['created_at']=$value->created_at;
-                                                array_push($allVideo2, $allVideo1);
-                                            }
-                                           $users_count_var->gallery['videos'] = $allVideo2;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->gallery['videos']=[];
-                                         }
-
-                                     ///////////////////////Gallery/////////////////
-
-
-                                    ///////////////////////users Documents/////////////////
-
-                                   
-                                           $certi2=array();$certi3=array();
-                                           $policeR2=array(); $policeR3=array();
-
-                                        $allCertificatesImages=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
-                                       
-                                         if(!empty($allCertificatesImages))
-                                         {
-                                            $path=$certifiePath.$userEntity->id.'/img/';
-                                            foreach ($allCertificatesImages as $key => $value) 
-                                            {
-                                                $allImages1['id']=$value->id;
-                                                $allImages1['user_id']=$value->user_id;
-                                                $allImages1['file_name']=url($path.$value->file_name);
-                                                $allImages1['file_extension']=!empty($value->file_extension)?$value->file_extension:'';
-                                                $allImages1['status']=!empty($value->status)?$value->status:0;
-                                                $allImages1['is_verified']=!empty($value->is_verified)?$value->is_verified:0;
-                                                $allImages1['created_at']=$value->created_at;
-                                                array_push($certi2, $allImages1);
-                                            }
-                                            $users_count_var->cetifications['images'] = $certi2;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->cetifications['images']=[];
-                                         }
-                                          //print_r($allCertificatesImages); die;
-
-
-                                          $DocallCertificates=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',0)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
-                                        
-                                         if(!empty($DocallCertificates))
-                                         {
-                                            $path=$certifiePath.$userEntity->id.'/doc/';
-                                            foreach ($DocallCertificates as $key => $val22) 
-                                            {
-                                                $allDoc['id']=$val22->id;
-                                                $allDoc['user_id']=$val22->user_id;
-                                                $allDoc['file_name']=url($path.$val22->file_name);
-                                                $allDoc['file_extension']=!empty($val22->file_extension)?$val22->file_extension:'';
-                                                $allDoc['status']=!empty($val22->status)?$val22->status:'';
-                                                $allDoc['created_at']=$val22->created_at;
-                                                array_push($certi3, $allDoc);
-                                            }
-                                            
-                                            $users_count_var->cetifications['documents'] = $certi3;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->cetifications['documents']=[];
-                                         }
-
-                                        /////////////////////Police Record////////////////////////////
-
-                                         if($userEntity->user_group_id==3)
-                                         {
-                                         $allPoliceRecImage=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',0)->whereRaw("(deleted_at IS null )")->get()->toArray();
-
-                                         if(!empty($allPoliceRecImage))
-                                         {
-                                           $path=$policePath.$userEntity->id.'/img/';
-                                            foreach ($allPoliceRecImage as $key => $value) 
-                                            {
-                                                $allVideo1['id']=$value->id;
-                                                $allVideo1['user_id']=$value->user_id;
-                                                $allVideo1['file_name']=url($path.$value->file_name);
-                                                $allVideo1['file_type']=$value->file_type;
-                                                $allVideo1['file_extension']=$value->file_extension;
-                                                $allVideo1['status']=$value->status;
-                                                $allVideo1['is_verified']=$value->is_verified;
-                                                $allVideo1['created_at']=$value->created_at;
-                                                array_push($policeR2, $allVideo1);
-                                            }
-                                           $users_count_var->police_records['images'] = $policeR2;
-                                           $users_count_var->police_records_verified['verifiedI'] = $value->is_verified;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->police_records['images']=[];
-                                            $users_count_var->police_records_verified['verifiedI'] = 2;
-                                         }
-
-                                         $allPoliceRecDoc=DB::table('user_certifications')->select('id','user_id','file_name','certification_type','file_type','file_extension','is_verified','status','created_at')->where('user_id',$userEntity->id)->where('certification_type',1)->where('file_type',1)->whereRaw("(deleted_at IS null )")->get()->toArray();
-
-                                         if(!empty($allPoliceRecDoc))
-                                         {
-                                           $path=$policePath.$userEntity->id.'/doc/';
-                                            foreach ($allPoliceRecDoc as $key => $valll) 
-                                            {
-                                                $all2['id']=$valll->id;
-                                                $all2['user_id']=$valll->user_id;
-                                                $all2['file_name']=url($path.$valll->file_name);
-                                                $all2['file_type']=$valll->file_type;
-                                                $all2['file_extension']=$valll->file_extension;
-                                                $all2['status']=$valll->status;
-                                                $all2['is_verified']=$valll->is_verified;
-                                                $all2['created_at']=$valll->created_at;
-                                                array_push($policeR3, $all2);
-                                            }
-                                           $users_count_var->police_records['documents'] = $policeR3;
-                                           $users_count_var->police_records_verified['verifiedD'] = $value->is_verified;
-                                         }
-                                         else
-                                         {
-                                            $users_count_var->police_records['documents']=[];
-                                            $users_count_var->police_records_verified['verifiedD'] = 2;
-                                         }
-                                     }
-
-                                    ///////////////////////Police Record/////////////////
-
-
-
-                                    ///////////////////////Services Area/////////////////
-
-                                 
-                                     $allarea = DB::table('users_services_area')
-                                    ->leftjoin('provinces', 'users_services_area.province_id', '=', 'provinces.id')
-                                    ->leftjoin('cities','users_services_area.city_id', '=', 'cities.id')
-                                    ->select('users_services_area.id','users_services_area.whole_country','users_services_area.province_id','users_services_area.city_id','users_services_area.status','users_services_area.created_at','provinces.name AS provinces_name','cities.name AS city_name')
-                                    ->where('users_services_area.user_id',$userEntity->id)->whereRaw("(users_services_area.deleted_at IS null )")->groupBy('users_services_area.province_id')->get()->toArray();
-
-
-                                    if(!empty($allarea))
-                                    {
-                                            $areaData=array();
-                                            $allAreaData=array();
-                                            foreach ($allarea as $key => $valuell) 
-                                            {
-
-                                                $areaData['id'] =  $valuell->id;
-                                                $areaData['whole_country'] =  !empty($valuell->whole_country) ? $valuell->whole_country : '' ;
-                                                $areaData['province_id'] =  !empty($valuell->province_id) ? $valuell->province_id : '' ;
-                                                $areaData['provinces_name'] =  !empty($valuell->provinces_name) ? $valuell->provinces_name : '' ;
-                                                $areaData['status'] =  $valuell->status;
-                                                $areaData['created_at'] =  $valuell->created_at;
-
-
-                                              
-                                             $allCities = DB::table('users_services_area')
-                                            ->leftjoin('cities','users_services_area.city_id', '=', 'cities.id')
-                                            ->select('users_services_area.city_id','cities.name AS city_name')
-                                             ->where('users_services_area.user_id',$userEntity->id)
-                                             ->where('users_services_area.province_id',$valuell->province_id)
-                                             ->whereRaw("(users_services_area.deleted_at IS null )")
-                                             ->get()->toArray();
-
-
-                                                $cityOption=array();
-                                                foreach ($allCities as $keyd => $svall) 
-                                                {
-                                                    if(!empty($svall->city_id) && !empty($svall->city_name))
-                                                    {
-                                                        $dtr['city_id'] =  !empty($svall->city_id) ? $svall->city_id : '' ;
-                                                        $dtr['city_name'] =  !empty($svall->city_name) ? $svall->city_name : '' ;
-
-                                                        array_push($cityOption, $dtr);
-                                                    }
-                                
-                                                 
-                                                }
-
-                                               
-                                               $areaData['cities']=$cityOption;
-                                                array_push($allAreaData, $areaData);
-                                            }
-
-                                            $users_count_var->service_areas = $allAreaData;
-                                    }
-                                     else
-                                     {
-                                       $users_count_var->service_areas=[];
-                                     }
-
-                                    ///////////////////////Services Area/////////////////
-                                     
-
-                                        $resultArray['status']='1'; 
-                                        // $resultArray['userData'] = $users_count_var;     
-                                         $resultdata=$this->intToString($users_count_var);
-                                        $resultArray['userData'] = $resultdata;        
-                                        $resultArray['message']=trans('apimessage.data_found_successfully');
-                                        $resultArray['session_key']='';//$session_key;
-                                        echo json_encode($resultArray); exit;
-
-                                    }
-                                    //End Contractor
-                                    else
-                                    {
-                                        $resultArray['status']='0';
-                                        $resultArray['message']=trans('apimessage.Invalid user.');
-                                        echo json_encode($resultArray); exit;  
-                                    }
-
-                                }
-                                else 
+                            if(!empty($allPoliceRecDoc))
+                            {
+                                $path=$policePath.$userEntity->id.'/doc/';
+                                foreach ($allPoliceRecDoc as $key => $valll) 
                                 {
-                                    $resultArray['status']='0';
-                                    $resultArray['message']=trans('apimessage.Invalid user.');
-                                    echo json_encode($resultArray); exit;
+                                    $all2['id']=$valll->id;
+                                    $all2['user_id']=$valll->user_id;
+                                    $all2['file_name']=url($path.$valll->file_name);
+                                    $all2['file_type']=$valll->file_type;
+                                    $all2['file_extension']=$valll->file_extension;
+                                    $all2['status']=$valll->status;
+                                    $all2['is_verified']=$valll->is_verified;
+                                    $all2['created_at']=$valll->created_at;
+                                    array_push($policeR3, $all2);
                                 }
+                                $users_count_var->police_records['documents'] = $policeR3;
+                                $users_count_var->police_records_verified['verifiedD'] = $value->is_verified;
+                            }
+                            else
+                            {
+                                $users_count_var->police_records['documents']=[];
+                                $users_count_var->police_records_verified['verifiedD'] = 2;
+                            }
+                        }
 
+                        ///////////////////////Police Record/////////////////
+
+
+
+                        ///////////////////////Services Area/////////////////
+
+                                
+                        $allarea = DB::table('users_services_area')
+                        ->leftjoin('provinces', 'users_services_area.province_id', '=', 'provinces.id')
+                        ->leftjoin('cities','users_services_area.city_id', '=', 'cities.id')
+                        ->select('users_services_area.id','users_services_area.whole_country','users_services_area.province_id','users_services_area.city_id','users_services_area.status','users_services_area.created_at','provinces.name AS provinces_name','cities.name AS city_name')
+                        ->where('users_services_area.user_id',$userEntity->id)->whereRaw("(users_services_area.deleted_at IS null )")->groupBy('users_services_area.province_id')->get()->toArray();
+
+
+                        if(!empty($allarea))
+                        {
+                            $areaData=array();
+                            $allAreaData=array();
+                            foreach ($allarea as $key => $valuell) 
+                            {
+
+                                $areaData['id'] =  $valuell->id;
+                                $areaData['whole_country'] =  !empty($valuell->whole_country) ? $valuell->whole_country : '' ;
+                                $areaData['province_id'] =  !empty($valuell->province_id) ? $valuell->province_id : '' ;
+                                $areaData['provinces_name'] =  !empty($valuell->provinces_name) ? $valuell->provinces_name : '' ;
+                                $areaData['status'] =  $valuell->status;
+                                $areaData['created_at'] =  $valuell->created_at;
+
+
+                                
+                                $allCities = DB::table('users_services_area')
+                                ->leftjoin('cities','users_services_area.city_id', '=', 'cities.id')
+                                ->select('users_services_area.city_id','cities.name AS city_name')
+                                ->where('users_services_area.user_id',$userEntity->id)
+                                ->where('users_services_area.province_id',$valuell->province_id)
+                                ->whereRaw("(users_services_area.deleted_at IS null )")
+                                ->get()->toArray();
+
+                                $cityOption=array();
+                                foreach ($allCities as $keyd => $svall) 
+                                {
+                                    if(!empty($svall->city_id) && !empty($svall->city_name))
+                                    {
+                                        $dtr['city_id'] =  !empty($svall->city_id) ? $svall->city_id : '' ;
+                                        $dtr['city_name'] =  !empty($svall->city_name) ? $svall->city_name : '' ;
+                                        array_push($cityOption, $dtr);
+                                    }
+                                    
+                                }
+                                $areaData['cities']=$cityOption;
+                                array_push($allAreaData, $areaData);
                             }
 
+                            $users_count_var->service_areas = $allAreaData;
                         }
-                        else 
+                        else
                         {
-                            $resultArray['status']='0';
-                            $resultArray['message']=trans('apimessage.Invalid parameter.');
-                            echo json_encode($resultArray); exit;
+                        $users_count_var->service_areas=[];
                         }
+
+                            ///////////////////////Services Area/////////////////
+                                     
+                        $resultArray['status']='1'; 
+                        $resultdata=$this->intToString($users_count_var);
+                        $resultArray['userData'] = $resultdata;        
+                        $resultArray['message']=trans('apimessage.data_found_successfully');
+                        $resultArray['session_key']='';//$session_key;
+                        echo json_encode($resultArray); exit;
+
+                    }
+                    //End Contractor
+                    else
+                    {
+                        $resultArray['status']='0';
+                        $resultArray['message']=trans('apimessage.Invalid user.');
+                        echo json_encode($resultArray); exit;  
+                    }
+
+                }
+                else 
+                {
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.Invalid user.');
+                    echo json_encode($resultArray); exit;
+                }
+
+            }
+
+        }
+        else 
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameter.');
+            echo json_encode($resultArray); exit;
+        }
                            
-             }
+    }
 
 
     /* ------------------------------------------------------------------------------------------------ */
@@ -7888,9 +7843,10 @@ class ApiController extends Controller
                                             //$title='Service buy';
                                             $title='¡Tenemos a un profesional dispuesto a ayudarte!';
                                             $message='Ingresa a la App y en la sección de PROYECTOS revisa su perfil completo y le puedes contactar directamente.';
-                                            $userid= 0;
-                                            $prouserId=0; 
-                                            $serviceId=$service_request;
+                                            $userid= $userid;
+                                            $prouserId=$userToken->id;
+                                            // $serviceId=$service_request;
+                                            $serviceId=$chkUserRecivedOpprtOrNot->service_request_id;
                                             $notify_type='service_buy';
                                             $senderId=0;
                                             $reciverId=0;
@@ -10886,9 +10842,9 @@ class ApiController extends Controller
         /* --------------------Delete All mEssage Api End-------------------- */
 
 
-        /*
-          * RATING REVIEWS TO CONTRACTOR BY USER API START HERE
-          */
+    /*
+     * RATING REVIEWS TO CONTRACTOR BY USER API START HERE
+    */
 
 
     public function ratingReviews(Request $request)
@@ -10915,7 +10871,6 @@ class ApiController extends Controller
             'to_user_id' => 'required',
             'rating' => 'required',
             'request_id' => 'required',
-            //'session_key' => 'required',
             ]);
 
             if($validator->fails())
@@ -11068,12 +11023,12 @@ class ApiController extends Controller
         }
     }         
 
-         /*
-          * RATING REVIEWS TO CONTRACTOR BY USER API END HERE
-          */
+    /*
+        * RATING REVIEWS TO CONTRACTOR BY USER API END HERE
+        */
 
 
-         /* ------------------------------------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------------------------------------ */
 
 
         //   public function searchingApi(Request $request)
@@ -12376,108 +12331,94 @@ class ApiController extends Controller
         $user_id = !empty($request->user_id) ? $request->user_id : '' ;
         $request_id = !empty($request->request_id) ? $request->request_id : '' ;
         $status_type = !empty($request->status_type) ? $request->status_type : '' ;
-        $session_key = !empty($request->session_key) ? $request->session_key : '' ;
         $lang = !empty($request->lang) ? $request->lang : 'en' ;
         App::setLocale($lang); 
-          $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'client_user_id' => 'required',
-            //'session_key' => 'required',
             'user_id' => 'required',
             'request_id' => 'required',
             'status_type' => 'required',
-            ]);
+        ]);
 
-            if($validator->fails())
-            {
-                $resultArray['status']='0';
-                $resultArray['message']=trans('apimessage.Invalid parameters.');
-                echo json_encode($resultArray); exit;      
-            }   
-                if(!empty($user_id) && !empty($client_user_id) && !empty($request_id)) 
+        if($validator->fails())
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameters.');
+            echo json_encode($resultArray); exit;      
+        }   
+        if(!empty($user_id) && !empty($client_user_id) && !empty($request_id)) 
+        {
+            
+            $userEntity = DB::table('users')
+            ->whereRaw("(active=1)")
+            ->whereRaw("(id = '".$client_user_id."' AND deleted_at IS null )")
+            ->first();
+            
+            if(!empty($userEntity))
+            {   
+                $assignuserlist = DB::table('assign_service_request')
+                ->where('assign_service_request.service_request_id', $request_id)
+                ->whereRaw("(user_id = '".$user_id."' AND deleted_at IS null )")
+                ->first();
+
+                if(!empty($assignuserlist))
                 {
-                    //$check_auth = $this->checkToken($access_token, $user_id, $session_key, $lang);
-
-                    if(1!=1)
+                    if($status_type==5)
                     {
-                    //echo json_encode($check_auth); exit;
-                    }
+                        $title='Servicio Terminado';
+                        $message='El profesional ha notificado que ha terminado su servicio, no olvides dejar tu calificación y comentario.';
+                            $msg=trans('apimessage.service_performed_successfully');
+                        $update_Arr['job_status']='5';
+                        $notify_type='service_performed';
 
-                    else
-                    {
-                         $userEntity = DB::table('users')
-                        ->whereRaw("(active=1)")
-                        ->whereRaw("(id = '".$client_user_id."' AND deleted_at IS null )")
-                        ->first();
+                        $userDevice=DB::table('user_devices')->where('user_id',$client_user_id)->first();
+                        $device_id=$userDevice->device_id;
+                        $device_type=$userDevice->device_type;
+                        $userId=$client_user_id;
+                        $prouserId=$user_id;
+                        $serviceId=$request_id;
+                        $senderid=0;
+                        $reciverid=0;
+                        $chattype=0;
                         
-                        if(!empty($userEntity))
-                        {   
-                            $assignuserlist = DB::table('assign_service_request')
-                                ->where('assign_service_request.service_request_id', $request_id)
-                                ->whereRaw("(user_id = '".$user_id."' AND deleted_at IS null )")
-                                ->first();
-                            if(!empty($assignuserlist))
-                            {
-                                if($status_type==5)
-                                {
-                                    $title='Servicio Terminado';
-                                    $message='El profesional ha notificado que ha terminado su servicio, no olvides dejar tu calificación y comentario.';
-                                     $msg=trans('apimessage.service_performed_successfully');
-                                    $update_Arr['job_status']='5';
-                                    $notify_type='service_performed';
-
-                                    $userDevice=DB::table('user_devices')->where('user_id',$client_user_id)->first();
-                                    $device_id=$userDevice->device_id;
-                                    $device_type=$userDevice->device_type;
-                                    $userId=$client_user_id;
-                                    $prouserId=$user_id;
-                                    $serviceId=$request_id;
-                                    $senderid=0;
-                                    $reciverid=0;
-                                    $chattype=0;
-                                  
-                                    $senderName=isset($userEntity->username)?$userEntity->username:'';
-                                    // if($userDevice->device_type=='android')
-                                    // {
-                                        $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
-                                    // }
-                                    // if($userDevice->device_type=='ios')
-                                    // {
-                                    //     $this->iospush($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
-                                    // }
-                                }
-                                if($status_type==3)
-                                {
-                                    $msg=trans('apimessage.service_request_successfully');
-                                    $update_Arr['job_status']='3';
-                                }
-                               
-                                $read_status =  DB::table('assign_service_request')->where('user_id', $user_id)->where('service_request_id',$request_id)->update($update_Arr);
-
-                                $resultArray['status']='1';
-                                $resultArray['message']=$msg;
-                                echo json_encode($resultArray); exit;
-                            }
-                            else
-                            {
-                                $resultArray['status']='0';
-                                $resultArray['message']=trans('apimessage.Invalid user.');
-                                echo json_encode($resultArray); exit; 
-
-                            }
-                        }
-                        else
-                        {
-                            $resultArray['status']='0';
-                            $resultArray['message']=trans('apimessage.Invalid user.');
-                            echo json_encode($resultArray); exit; 
-                        }
+                        $senderName=isset($userEntity->username)?$userEntity->username:'';
+                        
+                        $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
+                        
                     }
-                }else
-                {
-                    $resultArray['status']='0';
-                    $resultArray['message']=trans('apimessage.Invalid parameter.');
+                    if($status_type==3)
+                    {
+                        $msg=trans('apimessage.service_request_successfully');
+                        $update_Arr['job_status']='3';
+                    }
+                    
+                    $read_status =  DB::table('assign_service_request')->where('user_id', $user_id)->where('service_request_id',$request_id)->update($update_Arr);
+
+                    $resultArray['status']='1';
+                    $resultArray['message']=$msg;
                     echo json_encode($resultArray); exit;
                 }
+                else
+                {
+                    $resultArray['status']='0';
+                    $resultArray['message']=trans('apimessage.Invalid user.');
+                    echo json_encode($resultArray); exit; 
+
+                }
+            }
+            else
+            {
+                $resultArray['status']='0';
+                $resultArray['message']=trans('apimessage.Invalid user.');
+                echo json_encode($resultArray); exit; 
+            }
+            
+        }else
+        {
+            $resultArray['status']='0';
+            $resultArray['message']=trans('apimessage.Invalid parameter.');
+            echo json_encode($resultArray); exit;
+        }
     }
 
     function postpushnotification($device_id,$title,$message,$userId=null,$prouserId=null,$serviceId=null,$senderid=null,$reciverid=null,$chattype=null,$senderName=null,$notify_type=null,$urlToken=null)
@@ -12485,8 +12426,8 @@ class ApiController extends Controller
         if(!empty($device_id))
         {
           $fields = array(
-             'to' => $device_id,
-              'data' =>array('title' => $title, 'message' => $message,'urlToken' => $urlToken,'userId'=>$userId,'prouserId'=>$prouserId,'serviceId'=>$serviceId, 'senderId'=>$senderid,'reciverId'=>$reciverid,'chatType'=>$chattype,'sendername'=>$senderName,'notify_type'=>$notify_type,'sound'=>'default'),
+            'to' => $device_id,
+            'data' =>array('title' => $title, 'message' => $message,'urlToken' => $urlToken,'userId'=>$userId,'prouserId'=>$prouserId,'serviceId'=>$serviceId, 'senderId'=>$senderid,'reciverId'=>$reciverid,'chatType'=>$chattype,'sendername'=>$senderName,'notify_type'=>$notify_type,'sound'=>'default'),
             'notification'=>array('title'=>$title,'body'=>$message,'sound'=>'default')
             );
 
@@ -12511,9 +12452,9 @@ class ApiController extends Controller
           curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
           curl_setopt( $ch,CURLOPT_POST, true );
           curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+          curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true);
+          curl_setopt( $ch,CURLOPT_SSL_VERIFYHOST, 0);
+          curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false);
           curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
           // Execute post
           $result = curl_exec($ch);
@@ -12840,7 +12781,7 @@ class ApiController extends Controller
                             $device_type=$userToken->device_type;
                             $title='Reseña y calificación';
                             $message='Por favor déjanos tu comentario y calificación para que otros usuarios conozcan de tu experiencia con nosotros.';
-                            $userid= $client_user_id;
+                            $userId= $client_user_id;
                             $prouserId=$user_id; 
                             $serviceId= $request_id;
                             $senderid=0;
@@ -12850,7 +12791,7 @@ class ApiController extends Controller
                             $senderName=isset($userEntity->username)?$userEntity->username:'';
                             // if($userToken->device_type=='android')
                             // {
-                                $this->postpushnotification($device_id,$title,$message,$userid,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
+                                $this->postpushnotification($device_id,$title,$message,$userId,$prouserId,$serviceId,$senderid,$reciverid,$chattype,$senderName,$notify_type);
                             // }
                             // if($userToken->device_type=='ios')
                             // {

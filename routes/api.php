@@ -98,4 +98,4 @@ Route::post('requestProfileUpdate','Frontend\ApiController@requestProfileUpdate'
 
 Route::post('deleteAccount','Frontend\ApiController@deleteAccount');
 
-Route::get('notification/{id}', 'Frontend\ApiController@getNotificaton');
+Route::get('notification/{id}/{email}/{deviceId}/{device}', 'Frontend\ApiController@getNotificaton');
